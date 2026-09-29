@@ -123,6 +123,17 @@ def landing(request):
     return render(request, "index.html", {"doctores": doctors})
 
 
+def _login_account_for_email(email):
+    """Resuelve cuentas actuales aunque existan duplicados historicos."""
+    matches = User.objects.filter(email__iexact=email, is_active=True)
+    if matches.count() == 1:
+        return matches.first()
+    exact_username = matches.filter(username__iexact=email)
+    if exact_username.count() == 1:
+        return exact_username.first()
+    return None
+
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect(_dashboard_target(request.user))
@@ -142,10 +153,7 @@ def login_view(request):
             context["field_errors"]["password"] = "Ingresa tu contraseña."
         if context["field_errors"]:
             return render(request, "auth/login.html", context)
-        try:
-            account = User.objects.get(email__iexact=email)
-        except (User.DoesNotExist, User.MultipleObjectsReturned):
-            account = None
+        account = _login_account_for_email(email)
         user = authenticate(request, username=account.username, password=password) if account else None
         if user is None:
             context["login_error"] = "Correo o contraseña incorrectos."

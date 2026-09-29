@@ -2,7 +2,7 @@ import re
 import unicodedata
 
 from django import forms
-from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password, get_default_password_validators
 from django.core.exceptions import ValidationError
@@ -120,9 +120,29 @@ class PatientRegistrationForm(AccountRegistrationForm):
 class UnambiguousPasswordResetForm(PasswordResetForm):
     def get_users(self, email):
         email = email.strip()
-        if User.objects.filter(email__iexact=email).count() != 1:
-            return []
-        return super().get_users(email)
+        matches = User.objects.filter(email__iexact=email, is_active=True)
+        if matches.count() == 1:
+            return (user for user in matches if user.has_usable_password())
+
+        # Los datos antiguos pueden contener el mismo correo en varias cuentas.
+        # En ese caso se elige solo la cuenta cuyo nombre de usuario es el correo,
+        # que es el formato utilizado por los registros actuales de pacientes.
+        exact_account = matches.filter(username__iexact=email)
+        if exact_account.count() == 1:
+            return (user for user in exact_account if user.has_usable_password())
+        return []
+
+
+class SecureSetPasswordForm(SetPasswordForm):
+    """Aplica los validadores globales y evita reutilizar la clave vigente."""
+
+    def clean_new_password1(self):
+        password = self.cleaned_data.get("new_password1")
+        if password and self.user.has_usable_password() and self.user.check_password(password):
+            raise forms.ValidationError(
+                "La contraseña nueva debe ser diferente de la contraseña actual."
+            )
+        return password
 
 
 class DoctorCreateForm(AccountRegistrationForm):

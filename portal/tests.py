@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .models import Appointment, CallSignal, DoctorProfile, PatientProfile, VideoCall
+from .forms import SecureSetPasswordForm
 
 User = get_user_model()
 
@@ -145,10 +146,31 @@ class PasswordResetFlowTests(TestCase):
         from .models import PatientProfile
         PatientProfile.objects.get_or_create(user=self.user)
 
+    def test_reset_rejects_current_password(self):
+        form = SecureSetPasswordForm(self.user, data={
+            "new_password1": self.password,
+            "new_password2": self.password,
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn("new_password1", form.errors)
+
     def test_password_reset_page_loads(self):
         response = self.client.get(reverse("password_reset"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Recuperar contraseña")
+
+    def test_login_uses_email_username_when_legacy_email_is_duplicated(self):
+        User.objects.create_user(
+            username="legacy-admin", email=self.email, password="Different123!",
+            is_staff=True,
+        )
+        response = self.client.post(
+            reverse("login"), {"email": self.email, "password": self.password},
+        )
+        self.assertRedirects(
+            response, reverse("portal_dashboard"), fetch_redirect_response=False,
+        )
+        self.assertEqual(int(self.client.session["_auth_user_id"]), self.user.pk)
 
     @override_settings(
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",

@@ -15,10 +15,7 @@ class DevMobileCorsMiddleware:
         else:
             response = self.get_response(request)
         origin = request.headers.get("Origin", "")
-        allowed = settings.DEBUG and origin in {
-            "http://localhost:5173", "http://127.0.0.1:5173",
-            "capacitor://localhost", "http://localhost", "https://localhost",
-        }
+        allowed = origin in set(settings.MOBILE_ALLOWED_ORIGINS)
         if allowed:
             response["Access-Control-Allow-Origin"] = origin
             response["Vary"] = "Origin"

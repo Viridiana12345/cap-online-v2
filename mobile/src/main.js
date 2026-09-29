@@ -5,7 +5,11 @@ import './styles.css'
 
 const state={token:null,user:null,api:null,contacts:[]};
 const $=s=>document.querySelector(s);const content=$('#content');
-function defaultApi(){return Capacitor.isNativePlatform()?'http://10.0.2.2:8000/api/v1':'http://127.0.0.1:8000/api/v1'}
+function defaultApi(){
+  const productionApi=(import.meta.env.VITE_API_URL||'').replace(/\/$/,'');
+  if(productionApi)return productionApi;
+  return Capacitor.isNativePlatform()?'http://10.0.2.2:8000/api/v1':'http://127.0.0.1:8000/api/v1';
+}
 async function prefGet(key){return (await Preferences.get({key})).value}
 async function prefSet(key,value){await Preferences.set({key,value})}
 async function prefRemove(key){await Preferences.remove({key})}

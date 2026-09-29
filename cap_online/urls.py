@@ -21,6 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from portal import views as portal_views
+from portal.forms import SecureSetPasswordForm
 # from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -54,6 +55,7 @@ urlpatterns = [
         "reset/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(
             template_name="portal/auth/password_reset_confirm.html",
+            form_class=SecureSetPasswordForm,
             success_url=reverse_lazy("password_reset_complete"),
         ),
         name="password_reset_confirm"
