@@ -1,0 +1,1102 @@
+{% extends 'portal/base.html' %}
+
+{% block page_title %}
+Notificaciones
+{% endblock %}
+
+
+{% block extra_styles %}
+
+<style>
+
+    :root{
+
+        --noti-dark:#173D36;
+        --noti-primary:#4A9A87;
+        --noti-primary-2:#4A9A87;
+
+        --noti-green:#4A9A87;
+        --noti-green-dark:#2F6F62;
+
+        --noti-mint:#F4F8F6;
+        --noti-mint-2:#F4F8F6;
+
+        --noti-white:#ffffff;
+
+        --noti-text:#173D36;
+        --noti-muted:#5E756F;
+
+        --noti-border:#DDEBE6;
+
+        --noti-danger:#b93838;
+        --noti-warning:#4A9A87;
+
+        --noti-shadow:
+            0 10px 30px
+            rgba(74,154,135,.055);
+
+        --noti-shadow-hover:
+            0 16px 38px
+            rgba(74,154,135,.09);
+
+    }
+
+
+    /* =====================================================
+       PAGE
+    ===================================================== */
+
+    .notifications-page{
+        width:100%;
+    }
+
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+
+    .notifications-hero{
+
+        position:relative;
+
+        overflow:hidden;
+
+        margin-bottom:20px;
+
+        padding:24px 26px;
+
+        border:
+            1px solid var(--noti-border);
+
+        border-radius:22px;
+
+        background:
+
+            radial-gradient(
+                circle at 91% 10%,
+                rgba(74,154,135,.10),
+                transparent 28%
+            ),
+
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #F4F8F6
+            );
+
+        box-shadow:
+            var(--noti-shadow);
+
+    }
+
+
+    .notifications-hero::after{
+
+        content:"";
+
+        position:absolute;
+
+        width:170px;
+        height:170px;
+
+        right:-80px;
+        bottom:-90px;
+
+        border-radius:50%;
+
+        background:
+            rgba(74,154,135,.06);
+
+    }
+
+
+    .notifications-hero-content{
+
+        position:relative;
+
+        z-index:2;
+
+        max-width:680px;
+
+    }
+
+
+    .notifications-kicker{
+
+        display:inline-flex;
+
+        align-items:center;
+
+        gap:6px;
+
+        margin-bottom:8px;
+
+        padding:
+            6px 10px;
+
+        border-radius:999px;
+
+        background:
+            var(--noti-mint);
+
+        color:
+            var(--noti-green-dark);
+
+        font-size:8px;
+
+        font-weight:700;
+
+    }
+
+
+    .notifications-hero h2{
+
+        margin:0;
+
+        color:
+            var(--noti-dark);
+
+        font-size:
+            clamp(
+                23px,
+                3vw,
+                30px
+            );
+
+        line-height:1.08;
+
+        letter-spacing:-.5px;
+
+    }
+
+
+    .notifications-hero p{
+
+        margin-top:8px;
+
+        max-width:590px;
+
+        color:
+            var(--noti-muted);
+
+        font-size:10px;
+
+        line-height:1.6;
+
+    }
+
+
+    /* =====================================================
+       SECTION HEADER
+    ===================================================== */
+
+    .notification-section-head{
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:space-between;
+
+        gap:15px;
+
+        margin:
+            0 2px 12px;
+
+    }
+
+
+    .notification-section-head h2{
+
+        margin:0;
+
+        color:
+            var(--noti-dark);
+
+        font-size:18px;
+
+    }
+
+
+    .notification-section-head p{
+
+        margin-top:3px;
+
+        color:
+            var(--noti-muted);
+
+        font-size:9px;
+
+    }
+
+
+    /* =====================================================
+       READ BUTTON
+    ===================================================== */
+
+    .mark-read-btn{
+
+        min-height:38px;
+
+        padding:
+            0 13px;
+
+        border:
+            1px solid var(--noti-border);
+
+        border-radius:11px;
+
+        background:#ffffff;
+
+        color:
+            var(--noti-primary);
+
+        font-family:inherit;
+
+        font-size:8px;
+
+        font-weight:700;
+
+        cursor:pointer;
+
+        transition:.2s;
+
+    }
+
+
+    .mark-read-btn:hover{
+
+        transform:
+            translateY(-1px);
+
+        background:
+            var(--noti-mint);
+
+    }
+
+
+    /* =====================================================
+       LIST
+    ===================================================== */
+
+    .notification-list-new{
+
+        display:flex;
+
+        flex-direction:column;
+
+        gap:10px;
+
+    }
+
+
+    /* =====================================================
+       ITEM
+    ===================================================== */
+
+    .notification-item-new{
+
+        position:relative;
+
+        overflow:hidden;
+
+        display:grid;
+
+        grid-template-columns:
+            44px minmax(0,1fr);
+
+        gap:12px;
+
+        padding:15px;
+
+        border:
+            1px solid
+            var(--noti-border);
+
+        border-radius:17px;
+
+        background:#ffffff;
+
+        box-shadow:
+            0 5px 18px
+            rgba(74,154,135,.035);
+
+        transition:.2s;
+
+    }
+
+
+    .notification-item-new:hover{
+
+        transform:
+            translateY(-2px);
+
+        box-shadow:
+            var(--noti-shadow-hover);
+
+    }
+
+
+    .notification-item-new::after{
+
+        content:"";
+
+        position:absolute;
+
+        width:80px;
+        height:80px;
+
+        right:-42px;
+        bottom:-42px;
+
+        border-radius:50%;
+
+        background:
+            rgba(74,154,135,.045);
+
+    }
+
+
+    .notification-item-new.unread{
+
+        border-color:
+            #DDEBE6;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #F4F8F6
+            );
+
+    }
+
+
+    .notification-item-new.unread::before{
+
+        content:"";
+
+        position:absolute;
+
+        left:0;
+        top:12px;
+        bottom:12px;
+
+        width:3px;
+
+        border-radius:
+            0 3px 3px 0;
+
+        background:
+            var(--noti-green);
+
+    }
+
+
+    /* =====================================================
+       ICON
+    ===================================================== */
+
+    .notification-icon{
+
+        width:44px;
+        height:44px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        border-radius:14px;
+
+        background:
+            var(--noti-mint);
+
+        color:
+            var(--noti-primary);
+
+        font-size:18px;
+
+    }
+
+
+    .notification-item-new.unread
+    .notification-icon{
+
+        background:
+            #F4F8F6;
+
+        color:
+            var(--noti-green-dark);
+
+    }
+
+
+    /* =====================================================
+       CONTENT
+    ===================================================== */
+
+    .notification-content{
+
+        min-width:0;
+
+        position:relative;
+
+        z-index:2;
+
+    }
+
+
+    .notification-title-row{
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:space-between;
+
+        gap:10px;
+
+    }
+
+
+    .notification-title{
+
+        color:
+            var(--noti-dark);
+
+        font-size:10px;
+
+        font-weight:700;
+
+    }
+
+
+    .unread-dot{
+
+        width:7px;
+        height:7px;
+
+        flex:0 0 7px;
+
+        border-radius:50%;
+
+        background:
+            var(--noti-green);
+
+    }
+
+
+    .notification-message{
+
+        margin:
+            5px 0 0;
+
+        color:
+            var(--noti-muted);
+
+        font-size:9px;
+
+        line-height:1.55;
+
+    }
+
+
+    .notification-date{
+
+        display:block;
+
+        margin-top:8px;
+
+        color:
+            #5E756F;
+
+        font-size:7px;
+
+    }
+
+
+    /* =====================================================
+       MESSAGE ITEM
+    ===================================================== */
+
+    .message-notification{
+
+        border-color:
+            #DDEBE6;
+
+    }
+
+
+    .message-avatar{
+
+        width:44px;
+        height:44px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        border-radius:50%;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #4A9A87,
+                #68B39F
+            );
+
+        color:#173D36;
+
+        font-size:10px;
+
+        font-weight:700;
+
+    }
+
+
+    .message-preview{
+
+        margin-top:5px;
+
+        color:
+            var(--noti-muted);
+
+        font-size:9px;
+
+        line-height:1.55;
+
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+    ===================================================== */
+
+    .notification-empty{
+
+        display:flex;
+
+        align-items:center;
+
+        gap:14px;
+
+        padding:20px;
+
+        border:
+            1px solid
+            var(--noti-border);
+
+        border-radius:17px;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #F4F8F6
+            );
+
+        box-shadow:
+            var(--noti-shadow);
+
+    }
+
+
+    .notification-empty-icon{
+
+        width:50px;
+        height:50px;
+
+        flex:0 0 50px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        border-radius:15px;
+
+        background:
+            var(--noti-mint);
+
+        color:
+            var(--noti-primary);
+
+        font-size:20px;
+
+    }
+
+
+    .notification-empty h3{
+
+        margin:0 0 4px;
+
+        color:
+            var(--noti-dark);
+
+        font-size:11px;
+
+    }
+
+
+    .notification-empty p{
+
+        margin:0;
+
+        color:
+            var(--noti-muted);
+
+        font-size:8px;
+
+        line-height:1.5;
+
+    }
+
+
+    /* =====================================================
+       SECOND SECTION
+    ===================================================== */
+
+    .messages-section{
+
+        margin-top:26px;
+
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media(max-width:650px){
+
+        .notifications-hero{
+
+            padding:
+                20px 18px;
+
+            border-radius:19px;
+
+        }
+
+
+        .notification-section-head{
+
+            flex-direction:column;
+
+            align-items:flex-start;
+
+        }
+
+
+        .mark-read-btn{
+
+            width:100%;
+
+        }
+
+
+        .notification-item-new{
+
+            grid-template-columns:
+                40px minmax(0,1fr);
+
+            padding:13px;
+
+        }
+
+
+        .notification-icon,
+        .message-avatar{
+
+            width:40px;
+            height:40px;
+
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="notifications-page">
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="notifications-hero">
+
+
+        <div class="notifications-hero-content">
+
+
+            <span class="notifications-kicker">
+
+                ♡ Actividad CAP Online
+
+            </span>
+
+
+            <h2>
+
+                Mantente al día con tu espacio de atención
+
+            </h2>
+
+
+            <p>
+
+                Aquí puedes consultar avisos importantes,
+                cambios en tus citas y mensajes pendientes.
+
+            </p>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         ACTIVIDAD RECIENTE
+    ====================================================== -->
+
+    <section>
+
+
+        <div class="notification-section-head">
+
+
+            <div>
+
+
+                <h2>
+
+                    Actividad reciente
+
+                </h2>
+
+
+                <p>
+
+                    Avisos relacionados con tu cuenta y tus citas.
+
+                </p>
+
+
+            </div>
+
+
+
+            <form method="post">
+
+                {% csrf_token %}
+
+
+                <button
+                    class="mark-read-btn"
+                    type="submit"
+                >
+
+                    ✓ Marcar todas como leídas
+
+                </button>
+
+
+            </form>
+
+
+        </div>
+
+
+
+        <div class="notification-list-new">
+
+
+            {% for n in notifications %}
+
+
+            <article
+                class="
+                    notification-item-new
+                    {% if not n.is_read %}
+                        unread
+                    {% endif %}
+                "
+            >
+
+
+                <!-- ICON -->
+
+                <div class="notification-icon">
+
+                    {% if not n.is_read %}
+                        ♢
+                    {% else %}
+                        ✓
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- CONTENT -->
+
+                <div class="notification-content">
+
+
+                    <div class="notification-title-row">
+
+
+                        <div class="notification-title">
+
+                            {{ n.title }}
+
+                        </div>
+
+
+                        {% if not n.is_read %}
+
+                            <span class="unread-dot"></span>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+
+                    <p class="notification-message">
+
+                        {{ n.message }}
+
+                    </p>
+
+
+
+                    <small class="notification-date">
+
+                        {{ n.created_at|date:'d M Y · H:i' }}
+
+                    </small>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            {% empty %}
+
+
+            <div class="notification-empty">
+
+
+                <div class="notification-empty-icon">
+
+                    ♡
+
+                </div>
+
+
+                <div>
+
+
+                    <h3>
+
+                        Todo está al día
+
+                    </h3>
+
+
+                    <p>
+
+                        No tienes notificaciones persistentes por el momento.
+
+                    </p>
+
+
+                </div>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         MENSAJES SIN LEER
+    ====================================================== -->
+
+    <section class="messages-section">
+
+
+        <div class="notification-section-head">
+
+
+            <div>
+
+
+                <h2>
+
+                    Mensajes sin leer
+
+                </h2>
+
+
+                <p>
+
+                    Conversaciones que todavía requieren tu atención.
+
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="notification-list-new">
+
+
+            {% for m in unread_messages %}
+
+
+            <article
+                class="
+                    notification-item-new
+                    message-notification
+                    unread
+                "
+            >
+
+
+                <!-- AVATAR -->
+
+                <div class="message-avatar">
+
+                    {{ m.sender.first_name|default:m.sender.username|slice:':1'|upper }}
+
+                    {{ m.sender.last_name|slice:':1'|upper }}
+
+                </div>
+
+
+
+                <!-- CONTENT -->
+
+                <div class="notification-content">
+
+
+                    <div class="notification-title-row">
+
+
+                        <div class="notification-title">
+
+                            {{ m.sender.get_full_name|default:m.sender.username }}
+
+                        </div>
+
+
+                        <span class="unread-dot"></span>
+
+
+                    </div>
+
+
+
+                    <p class="message-preview">
+
+                        {{ m.text }}
+
+                    </p>
+
+
+
+                    <small class="notification-date">
+
+                        {{ m.created_at|date:'d M · H:i' }}
+
+                    </small>
+
+
+                </div>
+
+
+            </article>
+
+
+
+            {% empty %}
+
+
+            <div class="notification-empty">
+
+
+                <div class="notification-empty-icon">
+
+                    ◌
+
+                </div>
+
+
+                <div>
+
+
+                    <h3>
+
+                        No hay mensajes pendientes
+
+                    </h3>
+
+
+                    <p>
+
+                        Ya revisaste todas tus conversaciones recientes.
+
+                    </p>
+
+
+                </div>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+{% endblock %}

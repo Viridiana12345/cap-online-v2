@@ -1,0 +1,7 @@
+{
+  "appId": "com.caponline.mobile",
+  "appName": "CAP Online",
+  "webDir": "dist",
+  "server": {"cleartext": true},
+  "android": {"allowMixedContent": true}
+}

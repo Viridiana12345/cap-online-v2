@@ -1,0 +1,4876 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        CAP Online | Bienestar emocional
+    </title>
+
+    <meta
+        name="description"
+        content="CAP Online es una plataforma de atención psicológica que conecta pacientes con profesionales de manera accesible, privada y organizada."
+    >
+
+
+    <!-- =====================================================
+         FUENTES
+    ====================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <style>
+
+        :root{
+
+            /* =================================================
+               CAP ONLINE - PALETA VERDE DEL LOGO
+            ================================================= */
+
+            --dark:#173D36;
+            --dark-2:#4A9A87;
+
+            --primary:#4A9A87;
+            --primary-2:#8AC8B6;
+
+            --green:#4A9A87;
+            --green-dark:#2F6F62;
+
+            --mint:#F6F8F5;
+            --mint-2:#E8F3EE;
+            --mint-3:#D8E8E2;
+
+            --white:#ffffff;
+
+            --background:#F6F8F5;
+
+            --text:#173D36;
+            --muted:#59736B;
+
+            --border:#D8E8E2;
+
+            --success:#4A9A87;
+
+            --serif:"Fraunces",Georgia,serif;
+
+            --sans:
+                "DM Sans",
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            --shadow:
+                0 20px 55px
+                rgba(74,154,135,.09);
+
+            --shadow-small:
+                0 10px 30px
+                rgba(74,154,135,.06);
+
+        }
+
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+
+        body{
+
+            font-family:var(--sans);
+
+            color:var(--text);
+
+            background:var(--background);
+
+            overflow-x:hidden;
+
+            line-height:1.5;
+
+        }
+
+
+        a{
+            color:inherit;
+        }
+
+
+        img{
+            max-width:100%;
+            display:block;
+        }
+
+
+        button,
+        input{
+            font-family:inherit;
+        }
+
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .header{
+
+            position:fixed;
+
+            top:0;
+            left:0;
+            right:0;
+
+            z-index:1000;
+
+            padding:
+                15px 28px;
+
+            transition:
+                background .3s ease,
+                box-shadow .3s ease,
+                padding .3s ease;
+
+        }
+
+
+        .header.scrolled{
+
+            padding-top:10px;
+            padding-bottom:10px;
+
+            border-bottom:
+                1px solid
+                rgba(74,154,135,.06);
+
+            background:
+                rgba(255,255,255,.94);
+
+            backdrop-filter:
+                blur(18px);
+
+            box-shadow:
+                0 6px 25px
+                rgba(74,154,135,.06);
+
+        }
+
+
+        .nav{
+
+            width:100%;
+
+            max-width:1240px;
+
+            margin:auto;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:space-between;
+
+            gap:25px;
+
+        }
+
+
+
+        /* =====================================================
+           LOGO
+        ===================================================== */
+
+        .brand{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:11px;
+
+            text-decoration:none;
+
+        }
+
+
+        .brand-logo{
+
+            width:49px;
+            height:49px;
+
+            flex:0 0 49px;
+
+            display:flex;
+
+            align-items:center;
+            justify-content:center;
+
+            padding:4px;
+
+            border:
+                1px solid
+                rgba(74,154,135,.07);
+
+            border-radius:15px;
+
+            background:#ffffff;
+
+            box-shadow:
+                0 7px 20px
+                rgba(74,154,135,.08);
+
+        }
+
+
+        .logo-img{
+
+            width:100%;
+            height:100%;
+
+            object-fit:contain;
+
+        }
+
+
+        .brand-copy strong{
+
+            display:block;
+
+            color:var(--dark);
+
+            font-family:var(--serif);
+
+            font-size:19px;
+
+            font-weight:700;
+
+            line-height:1;
+
+        }
+
+
+        .brand-copy span{
+
+            display:block;
+
+            margin-top:5px;
+
+            color:var(--muted);
+
+            font-size:9px;
+
+        }
+
+
+
+        /* =====================================================
+           NAV LINKS
+        ===================================================== */
+
+        .nav-links{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:27px;
+
+        }
+
+
+        .nav-links a{
+
+            position:relative;
+
+            color:#59736B;
+
+            font-size:12px;
+
+            font-weight:600;
+
+            text-decoration:none;
+
+            transition:.2s;
+
+        }
+
+
+        .nav-links a::after{
+
+            content:"";
+
+            position:absolute;
+
+            left:0;
+            bottom:-7px;
+
+            width:0;
+            height:2px;
+
+            border-radius:999px;
+
+            background:var(--primary);
+
+            transition:.2s;
+
+        }
+
+
+        .nav-links a:hover{
+
+            color:var(--dark);
+
+        }
+
+
+        .nav-links a:hover::after{
+
+            width:100%;
+
+        }
+
+
+
+        /* =====================================================
+           HEADER ACTIONS
+        ===================================================== */
+
+        .nav-actions{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:8px;
+
+        }
+
+
+        .login-btn{
+
+            display:inline-flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            min-height:43px;
+
+            padding:
+                0 15px;
+
+            border-radius:12px;
+
+            color:var(--dark);
+
+            font-size:11px;
+
+            font-weight:700;
+
+            text-decoration:none;
+
+            transition:.2s;
+
+        }
+
+
+        .login-btn:hover{
+
+            background:var(--mint);
+
+        }
+
+
+        .signup-btn{
+
+            display:inline-flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            min-height:43px;
+
+            padding:
+                0 17px;
+
+            border-radius:12px;
+
+            color:#173D36;
+
+            font-size:11px;
+
+            font-weight:700;
+
+            text-decoration:none;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #4A9A87,
+                    #68B39F
+                );
+
+            box-shadow:
+                0 8px 18px
+                rgba(74,154,135,.12);
+
+            transition:.2s;
+
+        }
+
+
+        .signup-btn:hover{
+
+            transform:
+                translateY(-1px);
+
+            box-shadow:
+                0 12px 24px
+                rgba(74,154,135,.16);
+
+        }
+
+
+
+        /* =====================================================
+           MOBILE MENU BUTTON
+        ===================================================== */
+
+        .menu-button{
+
+            display:none;
+
+            width:43px;
+            height:43px;
+
+            align-items:center;
+            justify-content:center;
+
+            flex-direction:column;
+
+            gap:4px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:12px;
+
+            background:#ffffff;
+
+            cursor:pointer;
+
+        }
+
+
+        .menu-button span{
+
+            display:block;
+
+            width:19px;
+            height:2px;
+
+            border-radius:10px;
+
+            background:var(--dark);
+
+            transition:.25s;
+
+        }
+
+
+        .menu-button.open span:nth-child(1){
+
+            transform:
+                translateY(6px)
+                rotate(45deg);
+
+        }
+
+
+        .menu-button.open span:nth-child(2){
+
+            opacity:0;
+
+        }
+
+
+        .menu-button.open span:nth-child(3){
+
+            transform:
+                translateY(-6px)
+                rotate(-45deg);
+
+        }
+
+
+
+        /* =====================================================
+           MOBILE PANEL
+        ===================================================== */
+
+        .mobile-panel{
+
+            position:fixed;
+
+            top:0;
+            right:0;
+            bottom:0;
+
+            z-index:1200;
+
+            width:
+                min(
+                    320px,
+                    82vw
+                );
+
+            padding:
+                90px 25px 25px;
+
+            background:#ffffff;
+
+            box-shadow:
+                -20px 0 55px
+                rgba(74,154,135,.16);
+
+            transform:
+                translateX(105%);
+
+            transition:
+                transform .3s ease;
+
+        }
+
+
+        .mobile-panel.open{
+
+            transform:
+                translateX(0);
+
+        }
+
+
+        .mobile-panel a{
+
+            display:block;
+
+            padding:
+                14px 4px;
+
+            border-bottom:
+                1px solid
+                var(--border);
+
+            color:var(--dark);
+
+            font-size:13px;
+
+            font-weight:600;
+
+            text-decoration:none;
+
+        }
+
+
+        .mobile-panel
+        .signup-mobile{
+
+            margin-top:18px;
+
+            border:0;
+
+            border-radius:13px;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #4A9A87,
+                     #68B39F
+                );
+
+            color:#173D36;
+
+            text-align:center;
+
+        }
+
+
+        .mobile-overlay{
+
+            display:none;
+
+            position:fixed;
+
+            inset:0;
+
+            z-index:1100;
+
+            background:
+                rgba(74,154,135,.38);
+
+            backdrop-filter:
+                blur(3px);
+
+        }
+
+
+        .mobile-overlay.open{
+
+            display:block;
+
+        }
+
+
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .hero{
+
+            position:relative;
+
+            min-height:100vh;
+
+            display:flex;
+
+            align-items:center;
+
+            overflow:hidden;
+
+            padding:
+                130px 30px 85px;
+
+            background:
+
+                radial-gradient(
+                    circle at 13% 18%,
+                    rgba(74,154,135,.15),
+                    transparent 27%
+                ),
+
+                radial-gradient(
+                    circle at 86% 80%,
+                    rgba(74,154,135,.11),
+                    transparent 27%
+                ),
+
+                linear-gradient(
+                    180deg,
+                    #ffffff 0%,
+                    #F6F8F5 100%
+                );
+
+        }
+
+
+        .hero-container{
+
+            position:relative;
+
+            z-index:3;
+
+            width:100%;
+
+            max-width:1240px;
+
+            margin:auto;
+
+            display:grid;
+
+            grid-template-columns:
+                1.05fr .95fr;
+
+            align-items:center;
+
+            gap:65px;
+
+        }
+
+
+        .hero-badge{
+
+            display:inline-flex;
+
+            align-items:center;
+
+            gap:8px;
+
+            margin-bottom:20px;
+
+            padding:
+                8px 13px;
+
+            border:
+                1px solid
+                rgba(74,154,135,.17);
+
+            border-radius:999px;
+
+            background:
+                rgba(255,255,255,.76);
+
+            color:
+                var(--green-dark);
+
+            font-size:10px;
+
+            font-weight:700;
+
+            box-shadow:
+                0 6px 18px
+                rgba(74,154,135,.04);
+
+        }
+
+
+        .hero-badge-dot{
+
+            width:7px;
+            height:7px;
+
+            border-radius:50%;
+
+            background:
+                var(--green);
+
+            box-shadow:
+                0 0 0 5px
+                rgba(74,154,135,.12);
+
+        }
+
+
+        .hero h1{
+
+            max-width:660px;
+
+            color:var(--dark);
+
+            font-family:var(--serif);
+
+            font-size:
+                clamp(
+                    44px,
+                    5.2vw,
+                    70px
+                );
+
+            font-weight:700;
+
+            line-height:1.03;
+
+            letter-spacing:-1.5px;
+
+        }
+
+
+        .hero h1 span{
+
+            display:block;
+
+            margin-top:8px;
+
+            color:var(--primary);
+
+        }
+
+
+        .hero-description{
+
+            max-width:570px;
+
+            margin-top:22px;
+
+            color:
+                var(--muted);
+
+            font-size:14px;
+
+            line-height:1.8;
+
+        }
+
+
+
+        /* HERO ACTIONS */
+
+        .hero-actions{
+
+            display:flex;
+
+            align-items:center;
+
+            flex-wrap:wrap;
+
+            gap:11px;
+
+            margin-top:29px;
+
+        }
+
+
+        .primary-action{
+
+            min-height:50px;
+
+            display:inline-flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            padding:
+                0 21px;
+
+            border-radius:14px;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #4A9A87,
+                    #68B39F
+                );
+
+            color:#173D36;
+
+            font-size:12px;
+
+            font-weight:700;
+
+            text-decoration:none;
+
+            box-shadow:
+                0 11px 23px
+                rgba(74,154,135,.14);
+
+            transition:.25s;
+
+        }
+
+
+        .primary-action:hover{
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 15px 28px
+                rgba(74,154,135,.18);
+
+        }
+
+
+        .secondary-action{
+
+            min-height:50px;
+
+            display:inline-flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            padding:
+                0 20px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:14px;
+
+            background:
+                rgba(255,255,255,.82);
+
+            color:var(--dark);
+
+            font-size:12px;
+
+            font-weight:700;
+
+            text-decoration:none;
+
+            transition:.2s;
+
+        }
+
+
+        .secondary-action:hover{
+
+            background:#ffffff;
+
+            border-color:
+                rgba(74,154,135,.33);
+
+            color:
+                var(--primary);
+
+        }
+
+
+
+        /* TRUST */
+
+        .trust-row{
+
+            display:flex;
+
+            flex-wrap:wrap;
+
+            gap:18px;
+
+            margin-top:25px;
+
+        }
+
+
+        .trust-item{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:7px;
+
+            color:#59736B;
+
+            font-size:10px;
+
+            font-weight:500;
+
+        }
+
+
+        .trust-icon{
+
+            width:23px;
+            height:23px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            border-radius:50%;
+
+            background:
+                #F6F8F5;
+
+            color:
+                var(--green-dark);
+
+            font-size:9px;
+
+            font-weight:800;
+
+        }
+
+
+
+        /* =====================================================
+           HERO VISUAL
+        ===================================================== */
+
+        .hero-visual{
+
+            position:relative;
+
+            min-height:540px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+        }
+
+
+        .big-circle{
+
+            position:absolute;
+
+            width:455px;
+            height:455px;
+
+            border-radius:
+                46% 54% 55% 45% /
+                52% 46% 54% 48%;
+
+            background:
+
+                linear-gradient(
+                    145deg,
+                    rgba(74,154,135,.17),
+                    rgba(255,255,255,.82)
+                );
+
+            animation:
+                morph 12s ease-in-out infinite,
+                floatMain 7s ease-in-out infinite;
+
+        }
+
+
+        @keyframes morph{
+
+            0%,
+            100%{
+
+                border-radius:
+                    46% 54% 55% 45% /
+                    52% 46% 54% 48%;
+
+            }
+
+            50%{
+
+                border-radius:
+                    55% 45% 43% 57% /
+                    45% 55% 47% 53%;
+
+            }
+
+        }
+
+
+        @keyframes floatMain{
+
+            0%,
+            100%{
+
+                transform:
+                    translateY(0);
+
+            }
+
+            50%{
+
+                transform:
+                    translateY(-12px);
+
+            }
+
+        }
+
+
+        .heart-card{
+
+            position:relative;
+
+            z-index:5;
+
+            width:320px;
+            height:380px;
+
+            display:flex;
+
+            flex-direction:column;
+
+            align-items:center;
+
+            justify-content:center;
+
+            border:
+                1px solid
+                rgba(255,255,255,.72);
+
+            border-radius:42px;
+
+            background:
+                rgba(255,255,255,.74);
+
+            backdrop-filter:
+                blur(17px);
+
+            box-shadow:
+                0 27px 65px
+                rgba(74,154,135,.12);
+
+            animation:
+                cardFloat 6s
+                ease-in-out
+                infinite;
+
+        }
+
+
+        @keyframes cardFloat{
+
+            0%,
+            100%{
+
+                transform:
+                    translateY(0)
+                    rotate(-1deg);
+
+            }
+
+            50%{
+
+                transform:
+                    translateY(-11px)
+                    rotate(1deg);
+
+            }
+
+        }
+
+
+        .heart-logo-large{
+
+            width:155px;
+            height:155px;
+
+            object-fit:contain;
+
+            animation:
+                breathe 4s
+                ease-in-out
+                infinite;
+
+        }
+
+
+        @keyframes breathe{
+
+            0%,
+            100%{
+
+                transform:
+                    scale(1);
+
+            }
+
+            50%{
+
+                transform:
+                    scale(1.04);
+
+            }
+
+        }
+
+
+        .heart-card h3{
+
+            margin-top:15px;
+
+            color:var(--dark);
+
+            font-family:var(--serif);
+
+            font-size:21px;
+
+        }
+
+
+        .heart-card p{
+
+            margin-top:6px;
+
+            color:
+                var(--muted);
+
+            font-size:10px;
+
+        }
+
+
+        .floating-card{
+
+            position:absolute;
+
+            z-index:7;
+
+            padding:
+                12px 15px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.82);
+
+            border-radius:15px;
+
+            background:
+                rgba(255,255,255,.90);
+
+            backdrop-filter:
+                blur(12px);
+
+            box-shadow:
+                0 11px 27px
+                rgba(74,154,135,.08);
+
+            color:
+                var(--dark);
+
+            font-size:9px;
+
+            animation:
+                littleFloat 5s
+                ease-in-out
+                infinite;
+
+        }
+
+
+        .floating-card strong{
+
+            display:block;
+
+            margin-bottom:3px;
+
+            color:
+                var(--green-dark);
+
+            font-size:10px;
+
+        }
+
+
+        .float-one{
+
+            top:90px;
+            left:0;
+
+        }
+
+
+        .float-two{
+
+            right:0;
+            bottom:110px;
+
+            animation-duration:5.7s;
+
+        }
+
+
+        .float-three{
+
+            left:25px;
+            bottom:55px;
+
+            animation-duration:6.2s;
+
+        }
+
+
+        @keyframes littleFloat{
+
+            0%,
+            100%{
+
+                transform:
+                    translateY(0);
+
+            }
+
+            50%{
+
+                transform:
+                    translateY(-9px);
+
+            }
+
+        }
+
+
+
+        /* =====================================================
+           GENERAL SECTIONS
+        ===================================================== */
+
+        .section{
+
+            padding:
+                95px 30px;
+
+        }
+
+
+        .container{
+
+            width:100%;
+
+            max-width:1180px;
+
+            margin:auto;
+
+        }
+
+
+        .section-label{
+
+            display:block;
+
+            margin-bottom:11px;
+
+            color:
+                var(--green-dark);
+
+            font-size:9px;
+
+            font-weight:800;
+
+            letter-spacing:1.5px;
+
+            text-transform:uppercase;
+
+        }
+
+
+        .section-title{
+
+            color:
+                var(--dark);
+
+            font-family:
+                var(--serif);
+
+            font-size:
+                clamp(
+                    31px,
+                    4vw,
+                    45px
+                );
+
+            line-height:1.1;
+
+            letter-spacing:-.8px;
+
+        }
+
+
+        .section-description{
+
+            max-width:620px;
+
+            margin-top:15px;
+
+            color:
+                var(--muted);
+
+            font-size:12px;
+
+            line-height:1.8;
+
+        }
+
+
+
+        /* =====================================================
+           ABOUT
+        ===================================================== */
+
+        .about{
+
+            background:#ffffff;
+
+        }
+
+
+        .about-grid{
+
+            display:grid;
+
+            grid-template-columns:
+                .9fr 1.1fr;
+
+            align-items:center;
+
+            gap:75px;
+
+        }
+
+
+        .about-visual{
+
+            position:relative;
+
+            min-height:430px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+        }
+
+
+        .about-shape{
+
+            position:absolute;
+
+            width:350px;
+            height:350px;
+
+            border-radius:
+                60% 40% 48% 52% /
+                43% 55% 45% 57%;
+
+            background:
+
+                linear-gradient(
+                    145deg,
+                    #D8E8E2,
+                    #F6F8F5
+                );
+
+            animation:
+                morph 10s
+                ease-in-out
+                infinite;
+
+        }
+
+
+        .about-card{
+
+            position:relative;
+
+            z-index:3;
+
+            width:285px;
+
+            padding:
+                34px 27px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:25px;
+
+            background:#ffffff;
+
+            text-align:center;
+
+            box-shadow:
+                var(--shadow);
+
+        }
+
+
+        .about-logo{
+
+            width:75px;
+            height:75px;
+
+            margin:
+                0 auto 17px;
+
+            object-fit:contain;
+
+        }
+
+
+        .about-card h3{
+
+            color:
+                var(--dark);
+
+            font-family:
+                var(--serif);
+
+            font-size:19px;
+
+        }
+
+
+        .about-card p{
+
+            margin-top:8px;
+
+            color:
+                var(--muted);
+
+            font-size:10px;
+
+            line-height:1.65;
+
+        }
+
+
+        .about-points{
+
+            display:grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap:14px;
+
+            margin-top:27px;
+
+        }
+
+
+        .about-point{
+
+            display:flex;
+
+            align-items:flex-start;
+
+            gap:11px;
+
+            padding:
+                12px 0;
+
+        }
+
+
+        .about-point-icon{
+
+            width:32px;
+            height:32px;
+
+            flex:0 0 32px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            border-radius:10px;
+
+            background:
+                var(--mint);
+
+            color:
+                var(--green-dark);
+
+            font-size:12px;
+
+            font-weight:700;
+
+        }
+
+
+        .about-point strong{
+
+            display:block;
+
+            color:
+                var(--dark);
+
+            font-size:11px;
+
+        }
+
+
+        .about-point p{
+
+            margin-top:3px;
+
+            color:
+                var(--muted);
+
+            font-size:9px;
+
+            line-height:1.55;
+
+        }
+
+
+
+        /* =====================================================
+           SERVICES
+        ===================================================== */
+
+        .services{
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    #F6F8F5,
+                    #F6F8F5
+                );
+
+        }
+
+
+        .center-heading{
+
+            max-width:700px;
+
+            margin:
+                0 auto 50px;
+
+            text-align:center;
+
+        }
+
+
+        .center-heading
+        .section-description{
+
+            margin:
+                14px auto 0;
+
+        }
+
+
+        .services-grid{
+
+            display:grid;
+
+            grid-template-columns:
+                repeat(4,1fr);
+
+            gap:17px;
+
+        }
+
+
+        .service-card{
+
+            position:relative;
+
+            overflow:hidden;
+
+            padding:
+                27px 22px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:21px;
+
+            background:#ffffff;
+
+            box-shadow:
+                0 8px 25px
+                rgba(74,154,135,.045);
+
+            transition:
+                .28s ease;
+
+        }
+
+
+        .service-card:hover{
+
+            transform:
+                translateY(-7px);
+
+            box-shadow:
+                0 18px 40px
+                rgba(74,154,135,.085);
+
+        }
+
+
+        .service-card::after{
+
+            content:"";
+
+            position:absolute;
+
+            width:85px;
+            height:85px;
+
+            right:-35px;
+            top:-35px;
+
+            border-radius:50%;
+
+            background:
+                rgba(74,154,135,.07);
+
+        }
+
+
+        .service-icon{
+
+            width:50px;
+            height:50px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            margin-bottom:18px;
+
+            border-radius:15px;
+
+            background:
+                var(--mint);
+
+            color:
+                var(--green-dark);
+
+        }
+
+
+        .service-icon svg{
+
+            width:23px;
+            height:23px;
+
+            fill:none;
+
+            stroke:currentColor;
+
+            stroke-width:1.8;
+
+            stroke-linecap:round;
+
+            stroke-linejoin:round;
+
+        }
+
+
+        .service-card h3{
+
+            margin-bottom:8px;
+
+            color:
+                var(--dark);
+
+            font-family:
+                var(--serif);
+
+            font-size:15px;
+
+        }
+
+
+        .service-card p{
+
+            color:
+                var(--muted);
+
+            font-size:9.5px;
+
+            line-height:1.7;
+
+        }
+
+
+
+        /* =====================================================
+           HOW IT WORKS
+        ===================================================== */
+
+        .how{
+
+            background:#ffffff;
+
+        }
+
+
+        .steps{
+
+            position:relative;
+
+            display:grid;
+
+            grid-template-columns:
+                repeat(3,1fr);
+
+            gap:34px;
+
+            margin-top:55px;
+
+        }
+
+
+        .steps::before{
+
+            content:"";
+
+            position:absolute;
+
+            top:31px;
+
+            left:16%;
+            right:16%;
+
+            height:1px;
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    #D8E8E2,
+                    #D8E8E2,
+                    transparent
+                );
+
+        }
+
+
+        .step{
+
+            position:relative;
+
+            z-index:2;
+
+            text-align:center;
+
+        }
+
+
+        .step-number{
+
+            width:62px;
+            height:62px;
+
+            margin:
+                0 auto 18px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            border:
+                7px solid
+                #ffffff;
+
+            border-radius:50%;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #4A9A87,
+                    #68B39F
+                );
+
+            color:#173D36;
+
+            font-size:12px;
+
+            font-weight:800;
+
+            box-shadow:
+                0 8px 21px
+                rgba(74,154,135,.13);
+
+        }
+
+
+        .step h3{
+
+            margin-bottom:7px;
+
+            color:
+                var(--dark);
+
+            font-family:
+                var(--serif);
+
+            font-size:15px;
+
+        }
+
+
+        .step p{
+
+            max-width:260px;
+
+            margin:auto;
+
+            color:
+                var(--muted);
+
+            font-size:9.5px;
+
+            line-height:1.7;
+
+        }
+
+
+
+        /* =====================================================
+           SPECIALISTS
+        ===================================================== */
+
+        .specialists{
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    #F6F8F5,
+                    #F6F8F5
+                );
+
+        }
+
+
+        .specialist-banner{
+
+            display:grid;
+
+            grid-template-columns:
+                minmax(0,1fr)
+                330px;
+
+            align-items:center;
+
+            gap:55px;
+
+            padding:
+                50px 55px;
+
+            border:
+                1px solid
+                rgba(74,154,135,.13);
+
+            border-radius:30px;
+
+            background:
+
+                linear-gradient(
+                    145deg,
+                    #ffffff,
+                    #F6F8F5
+                );
+
+            box-shadow:
+                var(--shadow);
+
+        }
+
+
+        .specialist-banner h2{
+
+            margin-top:5px;
+
+            color:
+                var(--dark);
+
+            font-family:
+                var(--serif);
+
+            font-size:
+                clamp(
+                    29px,
+                    4vw,
+                    41px
+                );
+
+            line-height:1.1;
+
+        }
+
+
+        .specialist-banner p{
+
+            max-width:590px;
+
+            margin-top:14px;
+
+            color:
+                var(--muted);
+
+            font-size:11px;
+
+            line-height:1.8;
+
+        }
+
+
+        .specialist-action{
+
+            min-height:48px;
+
+            display:inline-flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            margin-top:23px;
+
+            padding:
+                0 18px;
+
+            border-radius:13px;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #4A9A87,
+                   #68B39F
+                );
+
+            color:#173D36;
+
+            font-size:11px;
+
+            font-weight:700;
+
+            text-decoration:none;
+
+            transition:.2s;
+
+        }
+
+
+        .specialist-action:hover{
+
+            transform:
+                translateY(-2px);
+
+        }
+
+
+        .people-visual{
+
+            position:relative;
+
+            height:245px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+        }
+
+
+        .people-circle{
+
+            position:absolute;
+
+            width:225px;
+            height:225px;
+
+            border-radius:50%;
+
+            background:
+
+                linear-gradient(
+                    145deg,
+                    #D8E8E2,
+                    #F6F8F5
+                );
+
+            animation:
+                floatMain 7s
+                ease-in-out
+                infinite;
+
+        }
+
+
+        .people-logo{
+
+            position:relative;
+
+            z-index:2;
+
+            width:145px;
+            height:145px;
+
+            object-fit:contain;
+
+        }
+
+
+
+        /* =====================================================
+           SUPPORT / PHRASES
+        ===================================================== */
+
+        .support-section{
+
+            background:#ffffff;
+
+        }
+
+
+        .support-box{
+
+            display:grid;
+
+            grid-template-columns:
+                .8fr 1.2fr;
+
+            gap:60px;
+
+            align-items:center;
+
+        }
+
+
+        .support-visual{
+
+            position:relative;
+
+            min-height:330px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            overflow:hidden;
+
+            border-radius:28px;
+
+            background:
+
+                linear-gradient(
+                    145deg,
+                    #4A9A87,
+                    #68B39F
+                );
+
+            box-shadow:
+                0 20px 45px
+                rgba(74,154,135,.13);
+
+        }
+
+
+        .support-visual::before{
+
+            content:"";
+
+            position:absolute;
+
+            width:210px;
+            height:210px;
+
+            top:-100px;
+            right:-80px;
+
+            border-radius:50%;
+
+            background:
+                rgba(255,255,255,.08);
+
+        }
+
+
+        .support-quote{
+
+            position:relative;
+
+            z-index:2;
+
+            max-width:260px;
+
+            padding:
+                25px;
+
+            color:#ffffff;
+
+            text-align:center;
+
+        }
+
+
+        .support-heart{
+
+            width:60px;
+            height:60px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            margin:
+                0 auto 17px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.17);
+
+            border-radius:18px;
+
+            background:
+                rgba(255,255,255,.10);
+
+            font-size:23px;
+
+        }
+
+
+        .support-quote strong{
+
+            display:block;
+
+            font-family:
+                var(--serif);
+
+            font-size:21px;
+
+            line-height:1.3;
+
+        }
+
+
+        .support-quote p{
+
+            margin-top:9px;
+
+            color:
+                rgba(255,255,255,.77);
+
+            font-size:9px;
+
+            line-height:1.65;
+
+        }
+
+
+        .support-list{
+
+            display:flex;
+
+            flex-direction:column;
+
+            gap:14px;
+
+            margin-top:24px;
+
+        }
+
+
+        .support-item{
+
+            display:flex;
+
+            align-items:flex-start;
+
+            gap:12px;
+
+        }
+
+
+        .support-check{
+
+            width:29px;
+            height:29px;
+
+            flex:0 0 29px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            border-radius:50%;
+
+            background:
+                var(--mint);
+
+            color:
+                var(--green-dark);
+
+            font-size:11px;
+
+        }
+
+
+        .support-item strong{
+
+            display:block;
+
+            color:
+                var(--dark);
+
+            font-size:11px;
+
+        }
+
+
+        .support-item p{
+
+            margin-top:3px;
+
+            color:
+                var(--muted);
+
+            font-size:9px;
+
+            line-height:1.55;
+
+        }
+
+
+
+        /* =====================================================
+           SECURITY
+        ===================================================== */
+
+        .security-section{
+
+            background:
+                #F6F8F5;
+
+        }
+
+
+        .security-box{
+
+            display:grid;
+
+            grid-template-columns:
+                330px 1fr;
+
+            gap:65px;
+
+            align-items:center;
+
+        }
+
+
+        .security-visual{
+
+            min-height:320px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            border-radius:28px;
+
+            background:
+
+                linear-gradient(
+                    145deg,
+                    #4A9A87,
+                    #68B39F
+                );
+
+            box-shadow:
+                0 20px 45px
+                rgba(74,154,135,.14);
+
+        }
+
+
+        .lock{
+
+            width:120px;
+            height:120px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            border:
+                1px solid
+                rgba(255,255,255,.20);
+
+            border-radius:33px;
+
+            background:
+                rgba(255,255,255,.11);
+
+            animation:
+                cardFloat 6s
+                ease-in-out
+                infinite;
+
+        }
+
+
+        .lock svg{
+
+            width:53px;
+            height:53px;
+
+            fill:none;
+
+            stroke:#ffffff;
+
+            stroke-width:1.6;
+
+        }
+
+
+        .security-list{
+
+            margin-top:26px;
+
+            display:flex;
+
+            flex-direction:column;
+
+            gap:14px;
+
+        }
+
+
+        .security-item{
+
+            display:flex;
+
+            align-items:flex-start;
+
+            gap:12px;
+
+        }
+
+
+        .security-check{
+
+            width:28px;
+            height:28px;
+
+            flex:0 0 28px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            border-radius:50%;
+
+            background:
+                var(--mint);
+
+            color:
+                var(--green-dark);
+
+            font-size:10px;
+
+            font-weight:700;
+
+        }
+
+
+        .security-item strong{
+
+            display:block;
+
+            color:
+                var(--dark);
+
+            font-size:11px;
+
+        }
+
+
+        .security-item p{
+
+            margin-top:3px;
+
+            color:
+                var(--muted);
+
+            font-size:9px;
+
+            line-height:1.55;
+
+        }
+
+
+
+        /* =====================================================
+           CTA
+        ===================================================== */
+
+        .cta-section{
+
+            padding:
+                75px 30px;
+
+            background:#ffffff;
+
+        }
+
+
+        .cta{
+
+            position:relative;
+
+            max-width:1180px;
+
+            margin:auto;
+
+            overflow:hidden;
+
+            padding:
+                65px 30px;
+
+            border-radius:32px;
+
+            text-align:center;
+
+            color:#173D36;
+
+            background:
+
+                radial-gradient(
+                    circle at 15% 20%,
+                    rgba(255,255,255,.13),
+                    transparent 26%
+                ),
+
+                linear-gradient(
+                    145deg,
+                    #4A9A87,
+                    #68B39F
+                );
+
+        }
+
+
+        .cta::before{
+
+            content:"";
+
+            position:absolute;
+
+            width:280px;
+            height:280px;
+
+            top:-150px;
+            right:-100px;
+
+            border-radius:50%;
+
+            background:
+                rgba(255,255,255,.06);
+
+        }
+
+
+        .cta h2{
+
+            position:relative;
+
+            z-index:2;
+
+            font-family:
+                var(--serif);
+
+            font-size:
+                clamp(
+                    29px,
+                    4vw,
+                    42px
+                );
+
+            line-height:1.1;
+
+        }
+
+
+        .cta p{
+
+            position:relative;
+
+            z-index:2;
+
+            max-width:550px;
+
+            margin:
+                14px auto 0;
+
+            color:
+                rgba(255,255,255,.82);
+
+            font-size:11px;
+
+            line-height:1.7;
+
+        }
+
+
+        .cta-actions{
+
+            position:relative;
+
+            z-index:2;
+
+            display:flex;
+
+            justify-content:center;
+
+            flex-wrap:wrap;
+
+            gap:10px;
+
+            margin-top:26px;
+
+        }
+
+
+        .cta-white{
+
+            min-height:48px;
+
+            display:inline-flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            padding:
+                0 20px;
+
+            border-radius:13px;
+
+            background:#ffffff;
+
+            color:var(--dark);
+
+            font-size:11px;
+
+            font-weight:700;
+
+            text-decoration:none;
+
+        }
+
+
+        .cta-outline{
+
+            min-height:48px;
+
+            display:inline-flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            padding:
+                0 20px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.27);
+
+            border-radius:13px;
+
+            background:
+                rgba(255,255,255,.07);
+
+            color:#ffffff;
+
+            font-size:11px;
+
+            font-weight:700;
+
+            text-decoration:none;
+
+        }
+
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .footer{
+
+            padding:
+                55px 30px 27px;
+
+            background:#173D36;
+
+            color:#ffffff;
+
+        }
+
+
+        .footer-grid{
+
+            width:100%;
+
+            max-width:1180px;
+
+            margin:auto;
+
+            display:grid;
+
+            grid-template-columns:
+                1.5fr 1fr 1fr;
+
+            gap:45px;
+
+        }
+
+
+        .footer-brand{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:10px;
+
+        }
+
+
+        .footer-brand
+        .brand-logo{
+
+            width:45px;
+            height:45px;
+
+        }
+
+
+        .footer-brand strong{
+
+            font-family:
+                var(--serif);
+
+            font-size:16px;
+
+        }
+
+
+        .footer-description{
+
+            max-width:350px;
+
+            margin-top:14px;
+
+            color:
+                rgba(255,255,255,.64);
+
+            font-size:9px;
+
+            line-height:1.7;
+
+        }
+
+
+        .footer h4{
+
+            margin-bottom:13px;
+
+            font-size:11px;
+
+        }
+
+
+        .footer-links{
+
+            display:flex;
+
+            flex-direction:column;
+
+            gap:9px;
+
+        }
+
+
+        .footer-links a{
+
+            color:
+                rgba(255,255,255,.64);
+
+            font-size:9px;
+
+            text-decoration:none;
+
+            transition:.2s;
+
+        }
+
+
+        .footer-links a:hover{
+
+            color:#ffffff;
+
+        }
+
+
+        .copyright{
+
+            max-width:1180px;
+
+            margin:
+                37px auto 0;
+
+            padding-top:19px;
+
+            border-top:
+                1px solid
+                rgba(255,255,255,.11);
+
+            color:
+                rgba(255,255,255,.45);
+
+            text-align:center;
+
+            font-size:8px;
+
+        }
+
+
+
+        /* =====================================================
+           ANIMATIONS
+        ===================================================== */
+
+        .reveal{
+
+            opacity:0;
+
+            transform:
+                translateY(25px);
+
+            transition:
+                opacity .75s ease,
+                transform .75s ease;
+
+        }
+
+
+        .reveal.visible{
+
+            opacity:1;
+
+            transform:
+                translateY(0);
+
+        }
+
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media(max-width:1000px){
+
+            .nav-links{
+                display:none;
+            }
+
+
+            .nav-actions
+            .login-btn{
+                display:none;
+            }
+
+
+            .menu-button{
+                display:flex;
+            }
+
+
+            .hero-container{
+
+                grid-template-columns:1fr;
+
+                text-align:center;
+
+            }
+
+
+            .hero-description{
+
+                margin-left:auto;
+                margin-right:auto;
+
+            }
+
+
+            .hero-actions,
+            .trust-row{
+
+                justify-content:center;
+
+            }
+
+
+            .hero-visual{
+
+                min-height:470px;
+
+            }
+
+
+            .about-grid{
+
+                grid-template-columns:1fr;
+
+                gap:30px;
+
+            }
+
+
+            .services-grid{
+
+                grid-template-columns:
+                    repeat(2,1fr);
+
+            }
+
+
+            .specialist-banner{
+
+                grid-template-columns:1fr;
+
+                text-align:center;
+
+            }
+
+
+            .specialist-banner p{
+
+                margin-left:auto;
+                margin-right:auto;
+
+            }
+
+
+            .support-box{
+
+                grid-template-columns:1fr;
+
+            }
+
+
+            .security-box{
+
+                grid-template-columns:1fr;
+
+            }
+
+
+            .security-visual,
+            .support-visual{
+
+                max-width:480px;
+
+                width:100%;
+
+                margin:auto;
+
+            }
+
+        }
+
+
+
+        @media(max-width:700px){
+
+            .header{
+
+                padding:
+                    11px 15px;
+
+            }
+
+
+            .brand-copy span{
+
+                display:none;
+
+            }
+
+
+            .signup-btn{
+
+                min-height:40px;
+
+                padding:
+                    0 12px;
+
+            }
+
+
+            .hero{
+
+                padding:
+                    110px 17px 55px;
+
+            }
+
+
+            .hero h1{
+
+                font-size:
+                    clamp(
+                        39px,
+                        12vw,
+                        55px
+                    );
+
+            }
+
+
+            .hero-description{
+
+                font-size:12px;
+
+            }
+
+
+            .hero-visual{
+
+                min-height:400px;
+
+            }
+
+
+            .big-circle{
+
+                width:330px;
+                height:330px;
+
+            }
+
+
+            .heart-card{
+
+                width:255px;
+                height:310px;
+
+                border-radius:34px;
+
+            }
+
+
+            .heart-logo-large{
+
+                width:125px;
+                height:125px;
+
+            }
+
+
+            .float-one{
+
+                top:45px;
+
+            }
+
+
+            .float-two{
+
+                bottom:40px;
+
+            }
+
+
+            .float-three{
+
+                display:none;
+
+            }
+
+
+            .section{
+
+                padding:
+                    70px 18px;
+
+            }
+
+
+            .services-grid{
+
+                grid-template-columns:1fr;
+
+            }
+
+
+            .steps{
+
+                grid-template-columns:1fr;
+
+                gap:35px;
+
+            }
+
+
+            .steps::before{
+
+                display:none;
+
+            }
+
+
+            .about-points{
+
+                grid-template-columns:1fr;
+
+            }
+
+
+            .specialist-banner{
+
+                padding:
+                    36px 19px;
+
+                border-radius:24px;
+
+            }
+
+
+            .footer-grid{
+
+                grid-template-columns:1fr;
+
+                gap:30px;
+
+            }
+
+
+            .cta-section{
+
+                padding:
+                    55px 15px;
+
+            }
+
+
+            .cta{
+
+                padding:
+                    50px 19px;
+
+                border-radius:25px;
+
+            }
+
+        }
+
+
+
+        @media(prefers-reduced-motion:reduce){
+
+            *{
+
+                animation-duration:
+                    .01ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    .01ms !important;
+
+                scroll-behavior:
+                    auto !important;
+
+            }
+
+        }
+
+    </style>
+
+{% include "includes/responsive_styles.html" %}
+</head>
+
+
+<body class="landing-page">
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header
+    class="header"
+    id="header"
+>
+
+    <nav class="nav">
+
+
+        <!-- LOGO -->
+
+        <a
+            href="#inicio"
+            class="brand"
+        >
+
+            <div class="brand-logo">
+
+                <img
+                    class="logo-img"
+                    src="{% static 'portal/img/cap-online-logo.png' %}"
+                    alt="CAP Online"
+                >
+
+            </div>
+
+
+            <div class="brand-copy">
+
+                <strong>
+                    CAP Online
+                </strong>
+
+                <span>
+                    Centro de Atención Psicológica Online
+                </span>
+
+            </div>
+
+        </a>
+
+
+
+        <!-- MENU -->
+
+        <div class="nav-links">
+
+            <a href="#inicio">
+                Inicio
+            </a>
+
+            <a href="#nosotros">
+                Nosotros
+            </a>
+
+            <a href="#servicios">
+                Servicios
+            </a>
+
+            <a href="#como-funciona">
+                ¿Cómo funciona?
+            </a>
+
+            <a href="#especialistas">
+                Especialistas
+            </a>
+
+        </div>
+
+
+
+        <!-- ACTIONS -->
+
+        <div class="nav-actions">
+
+
+            <a
+                href="{% url 'login' %}"
+                class="login-btn"
+            >
+                Iniciar sesión
+            </a>
+
+
+            <a
+                href="{% url 'signup' %}"
+                class="signup-btn"
+            >
+                Crear cuenta
+            </a>
+
+
+            <button
+                class="menu-button"
+                id="menuButton"
+                type="button"
+                aria-label="Abrir menú"
+                aria-expanded="false"
+            >
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </button>
+
+
+        </div>
+
+    </nav>
+
+</header>
+
+
+
+<!-- =========================================================
+     MOBILE MENU
+========================================================= -->
+
+<div
+    class="mobile-overlay"
+    id="mobileOverlay"
+></div>
+
+
+<aside
+    class="mobile-panel"
+    id="mobilePanel"
+>
+
+    <a href="#inicio">
+        Inicio
+    </a>
+
+    <a href="#nosotros">
+        Nosotros
+    </a>
+
+    <a href="#servicios">
+        Servicios
+    </a>
+
+    <a href="#como-funciona">
+        ¿Cómo funciona?
+    </a>
+
+    <a href="#especialistas">
+        Especialistas
+    </a>
+
+    <a href="{% url 'login' %}">
+        Iniciar sesión
+    </a>
+
+    <a
+        href="{% url 'signup' %}"
+        class="signup-mobile"
+    >
+        Crear cuenta
+    </a>
+
+</aside>
+
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<section
+    class="hero"
+    id="inicio"
+>
+
+
+    <div class="hero-container">
+
+
+        <!-- COPY -->
+
+        <div>
+
+
+            <div class="hero-badge">
+
+                <span class="hero-badge-dot"></span>
+
+                Un espacio pensado para tu bienestar
+
+            </div>
+
+
+            <h1>
+
+                Tu bienestar emocional,
+
+                <span>
+                    más cerca de ti.
+                </span>
+
+            </h1>
+
+
+            <p class="hero-description">
+
+                Conecta con profesionales de la psicología,
+                administra tus citas y encuentra un espacio
+                de acompañamiento pensado para ayudarte a
+                cuidar de ti, a tu propio ritmo.
+
+            </p>
+
+
+
+            <div class="hero-actions">
+
+
+                <!-- ✅ RUTA CORRECTA -->
+
+                <a
+                    href="{% url 'portal_specialists' %}"
+                    class="primary-action"
+                >
+
+                    Encontrar especialista →
+
+                </a>
+
+
+                <a
+                    href="{% url 'signup' %}"
+                    class="secondary-action"
+                >
+
+                    Crear mi cuenta
+
+                </a>
+
+
+            </div>
+
+
+
+            <div class="trust-row">
+
+
+                <div class="trust-item">
+
+                    <span class="trust-icon">
+                        ✓
+                    </span>
+
+                    Acceso protegido
+
+                </div>
+
+
+                <div class="trust-item">
+
+                    <span class="trust-icon">
+                        ✓
+                    </span>
+
+                    Atención en línea
+
+                </div>
+
+
+                <div class="trust-item">
+
+                    <span class="trust-icon">
+                        ✓
+                    </span>
+
+                    Profesionales disponibles
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- VISUAL -->
+
+        <div class="hero-visual">
+
+
+            <div class="big-circle"></div>
+
+
+            <div class="floating-card float-one">
+
+                <strong>
+                    Respira
+                </strong>
+
+                Un momento para ti.
+
+            </div>
+
+
+            <div class="floating-card float-two">
+
+                <strong>
+                    Tu bienestar
+                </strong>
+
+                También merece atención.
+
+            </div>
+
+
+            <div class="floating-card float-three">
+
+                <strong>
+                    A tu ritmo
+                </strong>
+
+                Un pequeño paso también cuenta.
+
+            </div>
+
+
+
+            <div class="heart-card">
+
+
+                <img
+                    class="heart-logo-large"
+                    src="{% static 'portal/img/cap-online-logo.png' %}"
+                    alt="CAP Online"
+                >
+
+
+                <h3>
+                    CAP Online
+                </h3>
+
+
+                <p>
+                    Un espacio para sentirte acompañado
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     NOSOTROS
+========================================================= -->
+
+<section
+    class="section about"
+    id="nosotros"
+>
+
+    <div class="container about-grid">
+
+
+        <div class="about-visual reveal">
+
+
+            <div class="about-shape"></div>
+
+
+            <div class="about-card">
+
+
+                <img
+                    class="about-logo"
+                    src="{% static 'portal/img/cap-online-logo.png' %}"
+                    alt="CAP Online"
+                >
+
+
+                <h3>
+                    Bienestar accesible
+                </h3>
+
+
+                <p>
+
+                    Tecnología y atención profesional reunidas
+                    en un mismo espacio.
+
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="reveal">
+
+
+            <span class="section-label">
+                Sobre CAP Online
+            </span>
+
+
+            <h2 class="section-title">
+
+                Un espacio digital creado para acompañarte.
+
+            </h2>
+
+
+            <p class="section-description">
+
+                CAP Online facilita la conexión entre pacientes
+                y profesionales de la psicología mediante una
+                experiencia clara, cercana y organizada.
+
+            </p>
+
+
+
+            <div class="about-points">
+
+
+                <div class="about-point">
+
+                    <span class="about-point-icon">
+                        ✓
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Fácil de utilizar
+                        </strong>
+
+                        <p>
+                            Encuentra rápidamente las funciones que necesitas.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="about-point">
+
+                    <span class="about-point-icon">
+                        ♡
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Pensado para ti
+                        </strong>
+
+                        <p>
+                            Una experiencia enfocada en tranquilidad y bienestar.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="about-point">
+
+                    <span class="about-point-icon">
+                        ◉
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Web y móvil
+                        </strong>
+
+                        <p>
+                            Accede a tu cuenta desde diferentes dispositivos.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="about-point">
+
+                    <span class="about-point-icon">
+                        ◌
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Todo en un lugar
+                        </strong>
+
+                        <p>
+                            Especialistas, citas, chat y notificaciones.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     SERVICIOS
+========================================================= -->
+
+<section
+    class="section services"
+    id="servicios"
+>
+
+    <div class="container">
+
+
+        <div class="center-heading reveal">
+
+
+            <span class="section-label">
+                Servicios
+            </span>
+
+
+            <h2 class="section-title">
+
+                Herramientas para acompañar tu proceso.
+
+            </h2>
+
+
+            <p class="section-description">
+
+                CAP Online reúne las principales funciones
+                para ayudarte a mantener organizada tu atención.
+
+            </p>
+
+
+        </div>
+
+
+
+        <div class="services-grid">
+
+
+            <!-- CITA -->
+
+            <article class="service-card reveal">
+
+
+                <div class="service-icon">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <rect
+                            x="4"
+                            y="5"
+                            width="16"
+                            height="15"
+                            rx="2"
+                        />
+
+                        <path d="M8 3v4M16 3v4M4 10h16"/>
+
+                    </svg>
+
+                </div>
+
+
+                <h3>
+                    Agenda tus citas
+                </h3>
+
+
+                <p>
+
+                    Selecciona fechas, consulta tus sesiones
+                    y mantén organizada tu agenda.
+
+                </p>
+
+
+            </article>
+
+
+
+            <!-- ESPECIALISTAS -->
+
+            <article class="service-card reveal">
+
+
+                <div class="service-icon">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path
+                            d="M20.8 8.6c0-3-2.3-5.3-5.2-5.3-1.5 0-2.8.6-3.6 1.6-.8-1-2.1-1.6-3.6-1.6-2.9 0-5.2 2.3-5.2 5.3 0 5.4 8.8 10.7 8.8 10.7s8.8-5.3 8.8-10.7Z"
+                        />
+
+                    </svg>
+
+                </div>
+
+
+                <h3>
+                    Encuentra especialistas
+                </h3>
+
+
+                <p>
+
+                    Explora perfiles profesionales, experiencia,
+                    modalidad y áreas de atención.
+
+                </p>
+
+
+            </article>
+
+
+
+            <!-- CHAT -->
+
+            <article class="service-card reveal">
+
+
+                <div class="service-icon">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path
+                            d="M21 11.5a8.5 8.5 0 1 1-3.8-7.1L21 3l-1.2 4.3a8.4 8.4 0 0 1 1.2 4.2Z"
+                        />
+
+                    </svg>
+
+                </div>
+
+
+                <h3>
+                    Mensajería
+                </h3>
+
+
+                <p>
+
+                    Mantén tus conversaciones organizadas
+                    dentro de tu espacio de atención.
+
+                </p>
+
+
+            </article>
+
+
+
+            <!-- NOTIFICACIONES -->
+
+            <article class="service-card reveal">
+
+
+                <div class="service-icon">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path
+                            d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"
+                        />
+
+                        <path
+                            d="M13.7 21a2 2 0 0 1-3.4 0"
+                        />
+
+                    </svg>
+
+                </div>
+
+
+                <h3>
+                    Notificaciones
+                </h3>
+
+
+                <p>
+
+                    Consulta avisos relacionados con tus citas,
+                    mensajes y actividad reciente.
+
+                </p>
+
+
+            </article>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     CÓMO FUNCIONA
+========================================================= -->
+
+<section
+    class="section how"
+    id="como-funciona"
+>
+
+    <div class="container">
+
+
+        <div class="center-heading reveal">
+
+
+            <span class="section-label">
+                ¿Cómo funciona?
+            </span>
+
+
+            <h2 class="section-title">
+                Comenzar es sencillo.
+            </h2>
+
+
+            <p class="section-description">
+
+                En pocos pasos puedes crear tu perfil
+                y comenzar a utilizar CAP Online.
+
+            </p>
+
+
+        </div>
+
+
+
+        <div class="steps">
+
+
+            <article class="step reveal">
+
+
+                <div class="step-number">
+                    01
+                </div>
+
+
+                <h3>
+                    Crea tu cuenta
+                </h3>
+
+
+                <p>
+
+                    Registra tus datos y crea tu espacio personal.
+
+                </p>
+
+
+            </article>
+
+
+
+            <article class="step reveal">
+
+
+                <div class="step-number">
+                    02
+                </div>
+
+
+                <h3>
+                    Encuentra un especialista
+                </h3>
+
+
+                <p>
+
+                    Consulta los perfiles y encuentra una opción
+                    que se adapte a tus necesidades.
+
+                </p>
+
+
+            </article>
+
+
+
+            <article class="step reveal">
+
+
+                <div class="step-number">
+                    03
+                </div>
+
+
+                <h3>
+                    Agenda tu cita
+                </h3>
+
+
+                <p>
+
+                    Selecciona fecha y horario y mantén el seguimiento
+                    desde tu cuenta.
+
+                </p>
+
+
+            </article>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     ESPECIALISTAS
+========================================================= -->
+
+<section
+    class="section specialists"
+    id="especialistas"
+>
+
+    <div class="container">
+
+
+        <div class="specialist-banner reveal">
+
+
+            <div>
+
+
+                <span class="section-label">
+                    Profesionales
+                </span>
+
+
+                <h2>
+
+                    Encuentra el acompañamiento adecuado para ti.
+
+                </h2>
+
+
+                <p>
+
+                    Consulta perfiles de especialistas,
+                    conoce su experiencia, modalidad de atención
+                    y disponibilidad antes de elegir.
+
+                </p>
+
+
+                <!-- ✅ AQUÍ ESTABA EL ERROR -->
+
+                <a
+                    href="{% url 'portal_specialists' %}"
+                    class="specialist-action"
+                >
+
+                    Ver especialistas →
+
+                </a>
+
+
+            </div>
+
+
+
+            <div class="people-visual">
+
+
+                <div class="people-circle"></div>
+
+
+                <img
+                    class="people-logo"
+                    src="{% static 'portal/img/cap-online-logo.png' %}"
+                    alt="CAP Online"
+                >
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     FRASES DE APOYO
+========================================================= -->
+
+<section class="section support-section">
+
+    <div class="container support-box">
+
+
+        <div class="support-visual reveal">
+
+
+            <div class="support-quote">
+
+
+                <div class="support-heart">
+                    ♡
+                </div>
+
+
+                <strong>
+
+                    “Puedes ir a tu propio ritmo.”
+
+                </strong>
+
+
+                <p>
+
+                    Cuidarte también puede comenzar
+                    con un pequeño momento para ti.
+
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="reveal">
+
+
+            <span class="section-label">
+                Tu espacio
+            </span>
+
+
+            <h2 class="section-title">
+
+                Tu proceso también merece calma.
+
+            </h2>
+
+
+            <p class="section-description">
+
+                CAP Online busca que la experiencia digital
+                también transmita cercanía, orden y tranquilidad.
+
+            </p>
+
+
+
+            <div class="support-list">
+
+
+                <div class="support-item">
+
+                    <span class="support-check">
+                        ♡
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Avanza a tu ritmo
+                        </strong>
+
+                        <p>
+                            No necesitas resolver todo en un solo día.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="support-item">
+
+                    <span class="support-check">
+                        ♡
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Un pequeño paso también cuenta
+                        </strong>
+
+                        <p>
+                            Darte un espacio para ti ya es una forma de comenzar.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="support-item">
+
+                    <span class="support-check">
+                        ♡
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Encuentra acompañamiento
+                        </strong>
+
+                        <p>
+                            Explora profesionales y elige con calma.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     SEGURIDAD
+========================================================= -->
+
+<section class="section security-section">
+
+    <div class="container security-box">
+
+
+        <div class="security-visual reveal">
+
+
+            <div class="lock">
+
+                <svg viewBox="0 0 24 24">
+
+                    <rect
+                        x="5"
+                        y="11"
+                        width="14"
+                        height="9"
+                        rx="2"
+                    />
+
+                    <path
+                        d="M8 11V7a4 4 0 0 1 8 0v4"
+                    />
+
+                </svg>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="reveal">
+
+
+            <span class="section-label">
+                Privacidad y seguridad
+            </span>
+
+
+            <h2 class="section-title">
+
+                Tu información merece ser cuidada.
+
+            </h2>
+
+
+            <p class="section-description">
+
+                CAP Online incorpora autenticación,
+                cuentas individuales y controles de acceso
+                para organizar el uso de la plataforma.
+
+            </p>
+
+
+
+            <div class="security-list">
+
+
+                <div class="security-item">
+
+                    <span class="security-check">
+                        ✓
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Cuenta personal
+                        </strong>
+
+                        <p>
+                            Cada usuario utiliza sus propias credenciales.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="security-item">
+
+                    <span class="security-check">
+                        ✓
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Recuperación de contraseña
+                        </strong>
+
+                        <p>
+                            Puedes recuperar el acceso mediante tu correo registrado.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="security-item">
+
+                    <span class="security-check">
+                        ✓
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Roles diferenciados
+                        </strong>
+
+                        <p>
+                            Pacientes y profesionales cuentan con funciones específicas.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     CTA
+========================================================= -->
+
+<section class="cta-section">
+
+
+    <div class="cta reveal">
+
+
+        <h2>
+
+            Tu bienestar puede comenzar con un pequeño paso.
+
+        </h2>
+
+
+        <p>
+
+            Crea tu cuenta y comienza a explorar
+            CAP Online a tu propio ritmo.
+
+        </p>
+
+
+
+        <div class="cta-actions">
+
+
+            <a
+                href="{% url 'signup' %}"
+                class="cta-white"
+            >
+
+                Crear mi cuenta
+
+            </a>
+
+
+            <a
+                href="{% url 'login' %}"
+                class="cta-outline"
+            >
+
+                Ya tengo una cuenta
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="footer">
+
+
+    <div class="footer-grid">
+
+
+        <div>
+
+
+            <div class="footer-brand">
+
+
+                <div class="brand-logo">
+
+                    <img
+                        class="logo-img"
+                        src="{% static 'portal/img/cap-online-logo.png' %}"
+                        alt="CAP Online"
+                    >
+
+                </div>
+
+
+                <strong>
+                    CAP Online
+                </strong>
+
+
+            </div>
+
+
+
+            <p class="footer-description">
+
+                Plataforma digital orientada a facilitar
+                el acceso y la administración de servicios
+                de atención psicológica.
+
+            </p>
+
+
+        </div>
+
+
+
+        <div>
+
+
+            <h4>
+                Plataforma
+            </h4>
+
+
+            <div class="footer-links">
+
+
+                <a href="#inicio">
+                    Inicio
+                </a>
+
+
+                <a href="#nosotros">
+                    Nosotros
+                </a>
+
+
+                <a href="#servicios">
+                    Servicios
+                </a>
+
+
+                <!-- ✅ CORREGIDO -->
+
+                <a href="{% url 'portal_specialists' %}">
+                    Especialistas
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <div>
+
+
+            <h4>
+                Cuenta
+            </h4>
+
+
+            <div class="footer-links">
+
+
+                <a href="{% url 'login' %}">
+                    Iniciar sesión
+                </a>
+
+
+                <a href="{% url 'signup' %}">
+                    Crear cuenta
+                </a>
+
+
+                <a href="{% url 'politica_privacidad' %}">
+                    Política de privacidad
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="copyright">
+
+        © 2026 CAP Online · Centro de Atención Psicológica Online
+
+    </div>
+
+
+</footer>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+    /* HEADER */
+
+    const header =
+        document.getElementById(
+            "header"
+        );
+
+
+    function updateHeader(){
+
+        header.classList.toggle(
+            "scrolled",
+            window.scrollY > 25
+        );
+
+    }
+
+
+    window.addEventListener(
+        "scroll",
+        updateHeader
+    );
+
+
+    updateHeader();
+
+
+
+    /* =====================================================
+       MOBILE MENU
+    ====================================================== */
+
+    const menuButton =
+        document.getElementById(
+            "menuButton"
+        );
+
+
+    const mobilePanel =
+        document.getElementById(
+            "mobilePanel"
+        );
+
+
+    const mobileOverlay =
+        document.getElementById(
+            "mobileOverlay"
+        );
+
+
+    function closeMenu(){
+
+        mobilePanel.inert = true;
+        document.body.style.overflow = "";
+
+        menuButton.classList.remove(
+            "open"
+        );
+
+        mobilePanel.classList.remove(
+            "open"
+        );
+
+        mobileOverlay.classList.remove(
+            "open"
+        );
+
+        menuButton.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+    }
+
+
+    function toggleMenu(){
+
+        const isOpen =
+            mobilePanel.classList.toggle(
+                "open"
+            );
+
+        mobilePanel.inert = !isOpen;
+        document.body.style.overflow = isOpen ? "hidden" : "";
+
+
+        menuButton.classList.toggle(
+            "open",
+            isOpen
+        );
+
+
+        mobileOverlay.classList.toggle(
+            "open",
+            isOpen
+        );
+
+
+        menuButton.setAttribute(
+            "aria-expanded",
+            isOpen
+            ?
+            "true"
+            :
+            "false"
+        );
+
+    }
+
+
+    mobilePanel.inert = true;
+    menuButton.setAttribute("aria-controls", "mobilePanel");
+    window.addEventListener("resize", function(){
+        if(window.innerWidth > 1000) closeMenu();
+    });
+
+    menuButton.addEventListener(
+        "click",
+        toggleMenu
+    );
+
+
+    mobileOverlay.addEventListener(
+        "click",
+        closeMenu
+    );
+
+
+    mobilePanel
+    .querySelectorAll(
+        "a"
+    )
+    .forEach(
+        function(link){
+
+            link.addEventListener(
+                "click",
+                closeMenu
+            );
+
+        }
+    );
+
+
+    document.addEventListener(
+        "keydown",
+        function(event){
+
+            if(
+                event.key ===
+                "Escape"
+            ){
+
+                closeMenu();
+
+            }
+
+        }
+    );
+
+
+
+    /* =====================================================
+       SCROLL REVEAL
+    ====================================================== */
+
+    const revealElements =
+        document.querySelectorAll(
+            ".reveal"
+        );
+
+
+    const observer =
+        new IntersectionObserver(
+
+            function(entries){
+
+                entries.forEach(
+                    function(entry){
+
+                        if(
+                            entry.isIntersecting
+                        ){
+
+                            entry.target.classList.add(
+                                "visible"
+                            );
+
+
+                            observer.unobserve(
+                                entry.target
+                            );
+
+                        }
+
+                    }
+                );
+
+            },
+
+            {
+                threshold:.12
+            }
+
+        );
+
+
+    revealElements.forEach(
+        function(element){
+
+            observer.observe(
+                element
+            );
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>
+

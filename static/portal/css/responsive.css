@@ -1,0 +1,230 @@
+/* Shared sizing for public pages, authentication and the portal. */
+*, *::before, *::after { box-sizing: border-box; }
+/* Hide scrollbar chrome while preserving native scrolling. */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 90px; }
+body { overflow-wrap: anywhere; }
+img, video, canvas { max-width: 100%; }
+input, select, textarea, button { max-width: 100%; }
+input, select, textarea { min-width: 0; }
+textarea { resize: vertical; }
+fieldset { min-width: 0; }
+.btn { white-space: normal; text-align: center; }
+:where(.hero-container, .about-grid, .services-grid, .steps, .specialist-banner,
+    .support-box, .security-box, .footer-grid, .register-shell, .grid,
+    .dashboard-grid, .cap-dashboard, .dashboard-side, .quick-grid-new,
+    .stat-grid-new, .citas-wrap, .doctor-grid, .doctor-card, .profile-content,
+    .specialist-hero, .chat-layout, .video-grid, .appointment-card) > * { min-width: 0; }
+.field, .field-group, .form-wrapper, .content-card,
+.portal-content, .portal-content-inner { min-width: 0; max-width: 100%; }
+.section-title, .appointment-actions, .video-controls { gap: 12px; flex-wrap: wrap; }
+.bubble, .notification-message, .hist-notes, .doctor-bio { overflow-wrap: anywhere; }
+.table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.table-scroll:focus-visible { outline: 2px solid #4A9A87; outline-offset: 3px; }
+.table-scroll .admin-table { min-width: 600px; }
+
+/* The portal has its own navigation; reset legacy shell spacing. */
+body.portal-body .main { padding: 0; min-width: 0; }
+body.portal-body .sidebar { height: 100vh; height: 100dvh; border-radius: 0; }
+body.portal-body .sidebar .nav { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+body.portal-body .sidebar .nav a { flex-shrink: 0; }
+body.portal-body .sidebar-footer { flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+body.portal-body .page-heading { min-width: 0; }
+body.portal-body .page-title { overflow-wrap: anywhere; }
+body.portal-body .hamburger { flex: 0 0 44px; width: 44px; height: 44px; }
+body.portal-body .top-actions { flex-shrink: 0; }
+body.portal-body .chat-contacts { min-width: 0; }
+body.portal-body .contacts-list { max-width: 100%; }
+body.portal-body .chat-head > *, body.portal-body .chat-user { min-width: 0; }
+body.portal-body .chat-user-avatar, body.portal-body .chat-head-btn { flex-shrink: 0; }
+body.portal-body .video-grid video { height: auto; aspect-ratio: 4 / 3; }
+body.portal-body .cal-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+body.portal-body .calls-form-row { flex-wrap: wrap; }
+body.portal-body .calls-form-row > *, body.portal-body .calls-item-left { min-width: 0; }
+
+/* Tipografía cómoda y legible en todo el portal. */
+body.portal-body { font-size: 16px; }
+body.portal-body .page-subtitle { font-size: 12px; }
+body.portal-body .page-title { font-size: clamp(24px, 2.2vw, 32px); }
+body.portal-body .nav-label { font-size: 11px; line-height: 1.25; }
+body.portal-body .profile-link { font-size: 11px; }
+body.portal-body :is(.doctor-bio, .specialist-page p, .profile-card p,
+    .notification-message, .hist-notes) { font-size: 14px; }
+body.portal-body :is(.profile-pill, .availability-chip, .empty-availability,
+    .info-item strong, .appointment-card a) { font-size: 13px; }
+body.portal-body .info-item p { font-size: 13px; }
+body.portal-body .card-heading p { font-size: 12px; }
+
+/* Evita la cuadrícula heredada que comprimía la invitación a agendar. */
+body.portal-body .specialist-page .appointment-card {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+}
+body.portal-body .specialist-page .appointment-card h3 { font-size: 18px; }
+body.portal-body .specialist-page .appointment-card p {
+    margin-top: 8px;
+    font-size: 14px;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+/* El chat ocupa la pantalla y conserva el compositor siempre accesible. */
+body.portal-body .chat-page { display: flex; flex-direction: column; min-height: 0; }
+body.portal-body .chat-layout {
+    height: clamp(520px, calc(100dvh - 270px), 720px);
+    min-height: 520px;
+}
+body.portal-body .chat-window { min-height: 0; overflow: hidden; }
+body.portal-body .messages {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+}
+body.portal-body .chat-compose { flex: 0 0 auto; }
+body.portal-body .chat-hero p { font-size: 14px; }
+body.portal-body .chat-kicker { font-size: 11px; }
+body.portal-body .contacts-head h3 { font-size: 17px; }
+body.portal-body .contacts-head span { font-size: 12px; }
+body.portal-body .contact-info strong { font-size: 14px; }
+body.portal-body .contact-info span { font-size: 12px; }
+body.portal-body .chat-user-info strong { font-size: 14px; }
+body.portal-body .chat-user-status { font-size: 12px; }
+body.portal-body .bubble { font-size: 14px; }
+body.portal-body .message-time { font-size: 11px; }
+body.portal-body .chat-compose input { font-size: 15px; }
+body.portal-body .chat-empty-thread p,
+body.portal-body .select-chat-box p { font-size: 14px; }
+
+body.landing-page .mobile-panel { overflow-y: auto; overscroll-behavior: contain; }
+body.landing-page .hero-container { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); }
+body.landing-page .brand, body.landing-page .nav-actions { min-width: 0; }
+body.landing-page .menu-button { flex-shrink: 0; }
+body.registration-page .modal-card { max-height: calc(100dvh - 32px); }
+body.registration-page .modal-header, body.registration-page .modal-footer { flex-shrink: 0; }
+body.registration-page .modal-content { min-height: 0; overscroll-behavior: contain; }
+
+/* Chat compacto para laptop: evita paneles demasiado altos o extendidos. */
+@media (min-width: 851px) {
+    body.portal-body .chat-page {
+        width: min(100%, 1120px);
+        margin-inline: auto;
+    }
+    body.portal-body .chat-hero {
+        margin-bottom: 10px;
+        padding: 14px 18px;
+    }
+    body.portal-body .chat-hero h2 { font-size: 25px; }
+    body.portal-body .chat-hero p { margin-top: 4px; }
+    body.portal-body .chat-layout {
+        grid-template-columns: 240px minmax(0, 1fr);
+        height: clamp(440px, calc(100dvh - 320px), 590px);
+        min-height: 440px;
+        border-radius: 19px;
+    }
+    body.portal-body .chat-contacts { padding: 11px; }
+    body.portal-body .contact { padding: 8px; }
+    body.portal-body .contact-avatar {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+    }
+    body.portal-body .chat-head {
+        min-height: 58px;
+        padding: 9px 13px;
+    }
+    body.portal-body .messages { padding: 14px 15px; gap: 7px; }
+    body.portal-body .bubble { max-width: 68%; padding: 8px 11px; }
+    body.portal-body .chat-compose { padding: 9px 10px; }
+    body.portal-body .chat-compose input { min-height: 44px; }
+    body.portal-body .chat-send { width: 44px; height: 44px; }
+}
+
+@media (max-width: 1100px) {
+    body.portal-body .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+    body.portal-body .appointment-card { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 1000px) {
+    body.landing-page .hero-container { grid-template-columns: minmax(0, 1fr); }
+    body.landing-page .hero h1 { margin-inline: auto; }
+}
+
+@media (max-width: 850px) {
+    /* Switch the chat before the contacts column crowds the conversation. */
+    body.portal-body .chat-layout { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 0; }
+    body.portal-body .chat-contacts { border-right: 0; border-bottom: 1px solid var(--border); max-height: 170px; }
+    body.portal-body .contacts-list { flex-direction: row; overflow-x: auto; }
+    body.portal-body .contact { flex: 0 0 190px; }
+    body.portal-body .chat-window { min-height: 0; }
+    body.portal-body .messages { min-height: 260px; height: 42vh; height: 42dvh; max-height: 460px; }
+}
+
+@media (max-width: 768px) {
+    body.portal-body .topbar { gap: 10px; }
+    body.portal-body .sidebar { visibility: hidden; }
+    body.portal-body .sidebar.open { visibility: visible; }
+    body.portal-body .sidebar-logo { margin-bottom: 16px; }
+    body.portal-body .portal-content { padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px)); }
+    body.portal-body .chat-head { flex-wrap: wrap; }
+    body.portal-body .nav-label, body.portal-body .profile-link { font-size: 14px; }
+    body.portal-body .bubble { max-width: 90%; font-size: 15px; }
+    body.portal-body .calls-form-row { flex-direction: column; align-items: stretch; }
+    body.portal-body .calls-form-row > * { width: 100%; }
+    body.portal-body .cal-nav-btn { width: 44px; height: 44px; }
+    body.portal-body .cal-day { min-height: 32px; font-size: 13px; }
+    body.portal-body .cal-dow { font-size: 10px; }
+    body.portal-body .hist-action, body.portal-body .doctor-action,
+    body.portal-body .mark-read-btn, .btn, .video-controls button { min-height: 44px; }
+    /* Readable fields also avoid automatic zoom when the mobile keyboard opens. */
+    body input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+    body select, body textarea,
+    body.portal-body select, body.portal-body textarea,
+    body.registration-page select, body.registration-page textarea,
+    body.auth-page select, body.auth-page textarea { font-size: 16px; }
+    body.portal-body .citas-hero p, body.portal-body .chat-hero p,
+    body.portal-body .specialists-hero p, body.portal-body .notifications-hero p,
+    body.portal-body .notification-message, body.portal-body .message-preview,
+    body.portal-body .doctor-bio, body.portal-body .hist-notes { font-size: 15px; }
+    body.portal-body .field-label, body.portal-body .slot-sub,
+    body.portal-body .hist-doctor, body.portal-body .pending-badge { font-size: 12px; }
+    body.portal-body .slot-time, body.portal-body .hist-action,
+    body.portal-body .doctor-action, body.portal-body .btn-submit { font-size: 13px; }
+    .public-nav { height: auto; min-height: 76px; gap: 12px; flex-wrap: wrap; padding: 12px 16px; }
+    .auth-page { padding: 20px 12px; min-height: 100dvh; }
+    .phone-auth { min-width: 0; }
+    .auth-title { font-size: clamp(26px, 7vw, 34px); }
+    .auth-links { flex-wrap: wrap; gap: 12px; }
+}
+
+@media (max-width: 480px) {
+    body.landing-page .header, body.landing-page .header.scrolled { padding: 10px; }
+    body.landing-page .brand { gap: 7px; }
+    body.landing-page .brand-logo { width: 38px; height: 38px; flex-basis: 38px; }
+    body.landing-page .brand-copy strong { font-size: 16px; }
+    body.landing-page .nav-actions { gap: 6px; }
+    body.landing-page .signup-btn { padding-inline: 9px; font-size: 10px; }
+    body.landing-page .menu-button { width: 40px; height: 44px; }
+    body.landing-page .big-circle, body.landing-page .about-shape { width: 100%; max-width: 330px; height: auto; aspect-ratio: 1; }
+    body.landing-page .heart-card, body.landing-page .about-card { max-width: 100%; }
+    body.landing-page .hero-actions > a, body.landing-page .cta-actions > a { width: 100%; min-height: 48px; }
+    body.landing-page .mobile-panel { padding: 75px 20px 25px; }
+    body.portal-body .topbar { padding-inline: 10px; }
+    body.portal-body .page-title { font-size: 19px; }
+    body.portal-body .content-card { padding: 16px; }
+    body.portal-body .section-title { align-items: stretch; flex-direction: column; }
+    body.portal-body .calendar-box { padding: 10px; }
+    body.portal-body .cal-grid { gap: 2px; }
+    body.portal-body .reschedule-details { width: 100%; }
+    body.portal-body .reschedule-form input { min-width: 0; }
+    body.portal-body .video-shell { padding: 10px; }
+    body.portal-body .video-controls { gap: 8px; }
+    body.registration-page .rules { grid-template-columns: minmax(0, 1fr); }
+    body.registration-page .section-heading, body.registration-page .password-top { flex-wrap: wrap; }
+    body.registration-page .modal { padding: 12px; }
+    body.registration-page .modal-header { padding: 18px 16px; }
+    body.registration-page .modal-footer { padding: 12px 16px; flex-wrap: wrap; }
+    body.registration-page .modal-footer button { flex: 1 1 100%; }
+}

@@ -1,0 +1,53 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Iniciar sesión · CAP Online</title>
+  <link rel="stylesheet" href="{% static 'portal/css/app.css' %}">
+  {% include "includes/responsive_styles.html" %}
+  <link rel="stylesheet" href="{% static 'portal/css/login.css' %}">
+  <script src="{% static 'portal/js/login.js' %}" defer></script>
+</head>
+<body class="auth-page">
+<div class="phone-auth">
+  <div class="auth-brand">
+    <img src="{% static 'portal/img/cap-online-logo.png' %}" alt="Logo de CAP Online">
+    <h1>CAP Online</h1><div class="muted">Atención psicológica en línea</div>
+  </div>
+  <h2 class="auth-title">Iniciar sesión</h2>
+  <p class="auth-sub">Bienvenido. Ingresa para continuar.</p>
+  {% for message in messages %}<div class="message {{ message.tags }}" role="status">{{ message }}</div>{% endfor %}
+  {% if login_error %}
+    <div class="message error" id="login-error" role="alert" tabindex="-1">
+      {{ login_error }}
+      <a href="{% url 'password_reset' %}">Recuperar contraseña</a>
+    </div>
+  {% endif %}
+  <form method="post" id="login-form">
+    {% csrf_token %}
+    <div class="field">
+      <label for="login-email">Correo electrónico</label>
+      <input id="login-email" type="email" name="email" value="{{ email }}" placeholder="correo@ejemplo.com" required autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="email-error" aria-invalid="{% if field_errors.email %}true{% else %}false{% endif %}">
+      <p class="login-field-error" id="email-error" aria-live="polite">{{ field_errors.email }}</p>
+    </div>
+    <div class="field">
+      <label for="login-password">Contraseña</label>
+      <div class="login-password-wrap">
+        <input id="login-password" type="password" name="password" required autocomplete="current-password" aria-describedby="password-error caps-warning" aria-invalid="{% if field_errors.password %}true{% else %}false{% endif %}">
+        <button type="button" id="toggle-password" class="login-password-toggle" aria-controls="login-password" aria-pressed="false" hidden>Mostrar</button>
+      </div>
+      <p class="login-field-error" id="password-error" aria-live="polite">{{ field_errors.password }}</p>
+      <p id="caps-warning" class="login-hint" role="status" hidden>Bloq Mayús está activado.</p>
+    </div>
+    <div class="auth-links"><a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a></div>
+    <button class="btn btn-primary login-submit" id="login-submit" type="submit">Iniciar sesión</button>
+    <p id="login-status" class="login-hint" role="status" aria-live="polite"></p>
+  </form>
+  <button class="btn biometric-demo login-submit" type="button" onclick="alert('El acceso biométrico se activa desde la aplicación móvil instalada. Usa Face ID en iPhone o el método biométrico disponible en tu dispositivo Android.')">Ingresar con biometría</button>
+  <div class="auth-foot">¿No tienes cuenta? <a href="{% url 'signup' %}">Crear cuenta</a></div>
+  <div class="auth-foot"><a href="{% url 'landing' %}">← Volver al sitio</a></div>
+</div>
+</body>
+</html>

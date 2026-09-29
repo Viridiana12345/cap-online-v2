@@ -1,0 +1,3551 @@
+{% extends 'portal/base.html' %}
+
+
+{% block page_title %}
+
+    {% if is_doctor %}
+        Hola, Dr(a). {{ user.first_name|default:user.username }}
+    {% else %}
+        ¡Hola, {{ user.first_name|default:user.username }}!
+    {% endif %}
+
+{% endblock %}
+
+
+
+{% block extra_styles %}
+
+<style>
+
+    :root{
+
+        /* ===============================
+           COLORES CAP ONLINE MÁS SUAVES
+        =============================== */
+
+        --dash-dark:#173D36;
+
+        --dash-primary:#173D36;
+
+        --dash-primary-light:#173D36;
+
+        --dash-green:#173D36;
+
+        --dash-green-dark:#4A9A87;
+
+        --dash-mint:#F4F8F6;
+
+        --dash-mint-2:#F4F8F6;
+
+        --dash-mint-3:#DDEBE6;
+
+        --dash-white:#ffffff;
+
+        --dash-bg:#F4F8F6;
+
+        --dash-text:#173D36;
+
+        --dash-muted:#173D36;
+
+        --dash-border:#DDEBE6;
+
+        --dash-success:#173D36;
+
+        --dash-warning:#4A9A87;
+
+        --dash-shadow:
+            0 12px 35px
+            rgba(74,154,135,.065);
+
+        --dash-shadow-hover:
+            0 18px 42px
+            rgba(74,154,135,.10);
+
+    }
+
+
+
+    /* =====================================================
+       BIENVENIDA
+    ===================================================== */
+
+    .welcome-card{
+
+        position:relative;
+
+        overflow:hidden;
+
+        margin-bottom:24px;
+
+        padding:31px 32px;
+
+        border:
+
+            1px solid
+            rgba(74,154,135,.12);
+
+        border-radius:27px;
+
+        color:#173D36;
+
+        background:
+
+            radial-gradient(
+                circle at 90% 10%,
+                rgba(255,255,255,.18),
+                transparent 28%
+            ),
+
+            radial-gradient(
+                circle at 75% 120%,
+                rgba(255,255,255,.10),
+                transparent 36%
+            ),
+
+            linear-gradient(
+                135deg,
+                #4A9A87,
+                #68B39F
+            );
+
+        box-shadow:
+
+            0 17px 42px
+            rgba(74,154,135,.13);
+
+    }
+
+
+
+    .welcome-card::before{
+
+        content:"";
+
+        position:absolute;
+
+        width:170px;
+
+        height:170px;
+
+        border-radius:50%;
+
+        top:-90px;
+
+        right:120px;
+
+        background:
+
+            rgba(255,255,255,.055);
+
+    }
+
+
+
+    .welcome-card::after{
+
+        content:"";
+
+        position:absolute;
+
+        width:240px;
+
+        height:240px;
+
+        right:-105px;
+
+        bottom:-130px;
+
+        border-radius:50%;
+
+        background:
+
+            rgba(255,255,255,.065);
+
+    }
+
+
+
+    .welcome-content{
+
+        position:relative;
+
+        z-index:2;
+
+        max-width:760px;
+
+    }
+
+
+
+    .welcome-date{
+
+        display:flex;
+
+        align-items:center;
+
+        gap:7px;
+
+        margin-bottom:13px;
+
+        color:
+
+            rgba(255,255,255,.79);
+
+        font-size:10px;
+
+        font-weight:600;
+
+        text-transform:capitalize;
+
+    }
+
+
+
+    .welcome-date-dot{
+
+        width:7px;
+
+        height:7px;
+
+        border-radius:50%;
+
+        background:#DDEBE6;
+
+        box-shadow:
+
+            0 0 0 4px
+            rgba(255,255,255,.09);
+
+    }
+
+
+
+    .welcome-pill{
+
+        display:inline-flex;
+
+        align-items:center;
+
+        gap:7px;
+
+        min-height:30px;
+
+        padding:
+
+            0 12px;
+
+        margin-bottom:14px;
+
+        border-radius:999px;
+
+        border:
+
+            1px solid
+            rgba(255,255,255,.18);
+
+        background:
+
+            rgba(255,255,255,.11);
+
+        color:
+
+            rgba(255,255,255,.94);
+
+        font-size:10px;
+
+        font-weight:700;
+
+    }
+
+
+
+    .welcome-card h2{
+
+        margin:0;
+
+        max-width:700px;
+
+        font-size:
+
+            clamp(
+                27px,
+                4vw,
+                38px
+            );
+
+        line-height:1.09;
+
+        letter-spacing:-.8px;
+
+    }
+
+
+
+    .welcome-card p{
+
+        max-width:660px;
+
+        margin-top:13px;
+
+        color:
+
+            rgba(255,255,255,.83);
+
+        font-size:13px;
+
+        line-height:1.75;
+
+    }
+
+
+
+    .support-message{
+
+        display:inline-flex;
+
+        align-items:center;
+
+        gap:8px;
+
+        margin-top:19px;
+
+        padding:
+
+            9px 13px;
+
+        border-radius:13px;
+
+        background:
+
+            rgba(255,255,255,.11);
+
+        color:
+
+            rgba(255,255,255,.94);
+
+        font-size:11px;
+
+        font-weight:600;
+
+    }
+
+
+
+    /* =====================================================
+       DASHBOARD
+    ===================================================== */
+
+    .cap-dashboard{
+
+        width:100%;
+
+        display:grid;
+
+        grid-template-columns:
+
+            minmax(0,1.45fr)
+
+            minmax(300px,.75fr);
+
+        gap:24px;
+
+        align-items:start;
+
+    }
+
+
+
+    .dashboard-main,
+    .dashboard-side{
+
+        min-width:0;
+
+    }
+
+
+
+    /* =====================================================
+       ENCABEZADOS
+    ===================================================== */
+
+    .dashboard-heading{
+
+        display:flex;
+
+        justify-content:space-between;
+
+        align-items:center;
+
+        gap:15px;
+
+        margin:
+
+            28px 2px 13px;
+
+    }
+
+
+
+    .dashboard-heading h2{
+
+        margin:0;
+
+        color:var(--dash-dark);
+
+        font-size:20px;
+
+        letter-spacing:-.3px;
+
+    }
+
+
+
+    .dashboard-heading p{
+
+        margin-top:4px;
+
+        color:var(--dash-muted);
+
+        font-size:10px;
+
+    }
+
+
+
+    .section-link{
+
+        color:
+
+            var(--dash-primary) !important;
+
+        font-size:11px;
+
+        font-weight:700;
+
+        text-decoration:none;
+
+    }
+
+
+
+    /* =====================================================
+       ESTADO DE ÁNIMO
+    ===================================================== */
+
+    .mood-card-new{
+
+        position:relative;
+
+        overflow:hidden;
+
+        padding:26px;
+
+        border:
+
+            1px solid
+            rgba(74,154,135,.13);
+
+        border-radius:24px;
+
+        background:
+
+            radial-gradient(
+                circle at 93% 8%,
+                rgba(74,154,135,.09),
+                transparent 29%
+            ),
+
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #F4F8F6
+            );
+
+        box-shadow:
+
+            var(--dash-shadow);
+
+    }
+
+
+
+    .mood-top{
+
+        display:flex;
+
+        justify-content:space-between;
+
+        align-items:flex-start;
+
+        gap:20px;
+
+    }
+
+
+
+    .mood-top h2{
+
+        margin:0;
+
+        color:var(--dash-dark);
+
+        font-size:21px;
+
+    }
+
+
+
+    .mood-top p{
+
+        margin-top:5px;
+
+        max-width:550px;
+
+        color:var(--dash-muted);
+
+        font-size:11px;
+
+        line-height:1.6;
+
+    }
+
+
+
+    .mood-symbol{
+
+        width:44px;
+
+        height:44px;
+
+        flex:0 0 44px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:14px;
+
+        background:var(--dash-mint);
+
+        color:var(--dash-primary);
+
+        font-size:20px;
+
+    }
+
+
+
+    .moods-new{
+
+        display:grid;
+
+        grid-template-columns:
+
+            repeat(5,1fr);
+
+        gap:10px;
+
+        margin-top:22px;
+
+    }
+
+
+
+    .mood-option{
+
+        min-height:78px;
+
+        display:flex;
+
+        flex-direction:column;
+
+        align-items:center;
+
+        justify-content:center;
+
+        gap:6px;
+
+        border:
+
+            1px solid
+            var(--dash-border);
+
+        border-radius:17px;
+
+        background:
+
+            rgba(255,255,255,.93);
+
+        cursor:pointer;
+
+        transition:.2s ease;
+
+    }
+
+
+
+    .mood-option:hover{
+
+        transform:
+
+            translateY(-3px);
+
+        border-color:
+
+            rgba(74,154,135,.34);
+
+        box-shadow:
+
+            0 9px 20px
+            rgba(74,154,135,.06);
+
+    }
+
+
+
+    .mood-option.active{
+
+        border-color:
+
+            var(--dash-primary-light);
+
+        background:
+
+            var(--dash-mint);
+
+        box-shadow:
+
+            0 7px 17px
+            rgba(74,154,135,.08);
+
+    }
+
+
+
+    .mood-emoji{
+
+        font-size:25px;
+
+    }
+
+
+
+    .mood-label{
+
+        color:#4A9A87;
+
+        font-size:9px;
+
+        font-weight:600;
+
+    }
+
+
+
+    /* =====================================================
+       PRÓXIMA CITA
+    ===================================================== */
+
+    .next-appointment-card{
+
+        display:flex;
+
+        align-items:center;
+
+        gap:15px;
+
+        padding:20px;
+
+        border:
+
+            1px solid
+            var(--dash-border);
+
+        border-radius:22px;
+
+        background:white;
+
+        box-shadow:
+
+            var(--dash-shadow);
+
+    }
+
+
+
+    .appointment-icon{
+
+        width:56px;
+
+        height:56px;
+
+        flex:0 0 56px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:18px;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #F4F8F6,
+                #DDEBE6
+            );
+
+        color:
+
+            var(--dash-primary);
+
+        font-size:23px;
+
+    }
+
+
+
+    .appointment-info{
+
+        flex:1;
+
+        min-width:0;
+
+    }
+
+
+
+    .appointment-info strong{
+
+        display:block;
+
+        margin-bottom:5px;
+
+        color:var(--dash-dark);
+
+        font-size:13px;
+
+    }
+
+
+
+    .appointment-info span{
+
+        display:block;
+
+        color:var(--dash-muted);
+
+        font-size:10px;
+
+        line-height:1.5;
+
+    }
+
+
+
+    .status-pill{
+
+        display:inline-flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        min-height:28px;
+
+        padding:
+
+            0 10px;
+
+        border-radius:999px;
+
+        font-size:9px;
+
+        font-weight:700;
+
+        white-space:nowrap;
+
+    }
+
+
+
+    .status-pill.ok{
+
+        background:
+
+            #F4F8F6;
+
+        color:
+
+            #2F6F62;
+
+    }
+
+
+
+    .status-pill.warn{
+
+        background:
+
+            #F4F8F6;
+
+        color:
+
+            #4A9A87;
+
+    }
+
+
+
+    /* =====================================================
+       SIN CITA
+    ===================================================== */
+
+    .empty-card{
+
+        display:flex;
+
+        align-items:center;
+
+        gap:15px;
+
+        padding:21px;
+
+        border:
+
+            1px solid
+            var(--dash-border);
+
+        border-radius:22px;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #F4F8F6
+            );
+
+        box-shadow:
+
+            var(--dash-shadow);
+
+    }
+
+
+
+    .empty-icon{
+
+        width:55px;
+
+        height:55px;
+
+        flex:0 0 55px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:17px;
+
+        background:
+
+            var(--dash-mint);
+
+        color:
+
+            var(--dash-primary);
+
+        font-size:22px;
+
+    }
+
+
+
+    .empty-card h3{
+
+        margin:
+
+            0 0 5px;
+
+        color:var(--dash-dark);
+
+        font-size:13px;
+
+    }
+
+
+
+    .empty-card p{
+
+        margin:0;
+
+        color:var(--dash-muted);
+
+        font-size:10px;
+
+        line-height:1.55;
+
+    }
+
+
+
+    .empty-card a{
+
+        display:inline-block;
+
+        margin-top:7px;
+
+        color:
+
+            var(--dash-primary) !important;
+
+        font-size:10px;
+
+        font-weight:700;
+
+    }
+
+
+
+    /* =====================================================
+       ACCESOS RÁPIDOS
+    ===================================================== */
+
+    .quick-grid-new{
+
+        display:grid;
+
+        grid-template-columns:
+
+            repeat(4,1fr);
+
+        gap:12px;
+
+    }
+
+
+
+    .quick-card-new{
+
+        position:relative;
+
+        overflow:hidden;
+
+        min-height:125px;
+
+        display:flex;
+
+        flex-direction:column;
+
+        justify-content:space-between;
+
+        padding:17px;
+
+        border:
+
+            1px solid
+            var(--dash-border);
+
+        border-radius:19px;
+
+        background:#ffffff;
+
+        color:
+
+            var(--dash-text) !important;
+
+        box-shadow:
+
+            0 7px 20px
+            rgba(74,154,135,.04);
+
+        transition:.22s;
+
+    }
+
+
+
+    .quick-card-new:hover{
+
+        transform:
+
+            translateY(-4px);
+
+        border-color:
+
+            rgba(74,154,135,.28);
+
+        box-shadow:
+
+            var(--dash-shadow-hover);
+
+    }
+
+
+
+    .quick-card-new::after{
+
+        content:"";
+
+        position:absolute;
+
+        width:85px;
+
+        height:85px;
+
+        right:-42px;
+
+        bottom:-42px;
+
+        border-radius:50%;
+
+        background:
+
+            rgba(74,154,135,.055);
+
+    }
+
+
+
+    .quick-icon{
+
+        width:40px;
+
+        height:40px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:13px;
+
+        background:
+
+            var(--dash-mint);
+
+        color:
+
+            var(--dash-primary);
+
+        font-size:18px;
+
+    }
+
+
+
+    .quick-card-new strong{
+
+        display:block;
+
+        color:
+
+            var(--dash-dark);
+
+        font-size:11px;
+
+    }
+
+
+
+    .quick-card-new small{
+
+        display:block;
+
+        margin-top:3px;
+
+        color:
+
+            var(--dash-muted);
+
+        font-size:8px;
+
+    }
+
+
+
+    /* =====================================================
+       FRASE DEL DÍA
+    ===================================================== */
+
+    .daily-support{
+
+        position:relative;
+
+        overflow:hidden;
+
+        margin-top:24px;
+
+        padding:22px;
+
+        border:
+
+            1px solid
+            #DDEBE6;
+
+        border-radius:21px;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #F4F8F6,
+                #F4F8F6
+            );
+
+        box-shadow:
+
+            0 7px 22px
+            rgba(74,154,135,.04);
+
+    }
+
+
+
+    .daily-support::after{
+
+        content:"";
+
+        position:absolute;
+
+        width:110px;
+
+        height:110px;
+
+        right:-55px;
+
+        bottom:-60px;
+
+        border-radius:50%;
+
+        background:
+
+            rgba(74,154,135,.08);
+
+    }
+
+
+
+    .daily-support-top{
+
+        position:relative;
+
+        z-index:2;
+
+        display:flex;
+
+        align-items:center;
+
+        gap:11px;
+
+    }
+
+
+
+    .daily-support-icon{
+
+        width:40px;
+
+        height:40px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:13px;
+
+        background:white;
+
+        color:
+
+            var(--dash-green-dark);
+
+        box-shadow:
+
+            0 5px 15px
+            rgba(74,154,135,.05);
+
+    }
+
+
+
+    .daily-support-label{
+
+        display:block;
+
+        margin-bottom:2px;
+
+        color:
+
+            var(--dash-muted);
+
+        font-size:8px;
+
+        font-weight:700;
+
+        text-transform:uppercase;
+
+        letter-spacing:.7px;
+
+    }
+
+
+
+    .daily-support h3{
+
+        margin:0;
+
+        color:
+
+            var(--dash-dark);
+
+        font-size:13px;
+
+    }
+
+
+
+    .daily-support p{
+
+        position:relative;
+
+        z-index:2;
+
+        margin:
+
+            13px 0 0;
+
+        max-width:650px;
+
+        color:#4A9A87;
+
+        font-size:11px;
+
+        line-height:1.7;
+
+    }
+
+
+
+    /* =====================================================
+       RESPIRACIÓN
+    ===================================================== */
+
+    .breathing-card{
+
+        position:relative;
+
+        overflow:hidden;
+
+        padding:26px;
+
+        border-radius:24px;
+
+        color:#173D36;
+
+        background:
+
+            radial-gradient(
+                circle at 86% 14%,
+                rgba(255,255,255,.16),
+                transparent 25%
+            ),
+
+            linear-gradient(
+                145deg,
+                #4A9A87,
+                #68B39F
+            );
+
+        box-shadow:
+
+            0 17px 40px
+            rgba(74,154,135,.13);
+
+    }
+
+
+
+    .breathing-circle{
+
+        position:absolute;
+
+        width:140px;
+
+        height:140px;
+
+        right:-50px;
+
+        bottom:-50px;
+
+        border-radius:50%;
+
+        background:
+
+            rgba(255,255,255,.075);
+
+        animation:
+
+            breatheCircle
+            5s ease-in-out infinite;
+
+    }
+
+
+
+    @keyframes breatheCircle{
+
+        0%,
+        100%{
+
+            transform:scale(1);
+
+        }
+
+        50%{
+
+            transform:scale(1.18);
+
+        }
+
+    }
+
+
+
+    .time-pill{
+
+        display:inline-flex;
+
+        align-items:center;
+
+        min-height:27px;
+
+        padding:
+
+            0 10px;
+
+        border:
+
+            1px solid
+            rgba(255,255,255,.18);
+
+        border-radius:999px;
+
+        background:
+
+            rgba(255,255,255,.10);
+
+        color:
+
+            rgba(255,255,255,.90);
+
+        font-size:9px;
+
+        font-weight:700;
+
+    }
+
+
+
+    .breathing-card h3{
+
+        position:relative;
+
+        z-index:2;
+
+        margin:
+
+            18px 0 8px;
+
+        font-size:19px;
+
+    }
+
+
+
+    .breathing-card p{
+
+        position:relative;
+
+        z-index:2;
+
+        margin:0;
+
+        color:
+
+            rgba(255,255,255,.81);
+
+        font-size:11px;
+
+        line-height:1.7;
+
+    }
+
+
+
+    .breathing-steps{
+
+        position:relative;
+
+        z-index:2;
+
+        display:flex;
+
+        gap:7px;
+
+        margin-top:18px;
+
+    }
+
+
+
+    .breathing-step{
+
+        flex:1;
+
+        padding:
+
+            10px 5px;
+
+        border:
+
+            1px solid
+            rgba(255,255,255,.15);
+
+        border-radius:12px;
+
+        background:
+
+            rgba(255,255,255,.085);
+
+        text-align:center;
+
+    }
+
+
+
+    .breathing-step strong{
+
+        display:block;
+
+        font-size:12px;
+
+    }
+
+
+
+    .breathing-step span{
+
+        display:block;
+
+        margin-top:2px;
+
+        color:
+
+            rgba(255,255,255,.68);
+
+        font-size:8px;
+
+    }
+
+
+
+    /* =====================================================
+       PSICÓLOGOS DESTACADOS
+    ===================================================== */
+
+    .featured-list{
+
+        display:flex;
+
+        flex-direction:column;
+
+        gap:10px;
+
+    }
+
+
+
+    .featured-doctor{
+
+        display:flex;
+
+        align-items:center;
+
+        gap:12px;
+
+        padding:13px;
+
+        border:
+
+            1px solid
+            var(--dash-border);
+
+        border-radius:17px;
+
+        background:white;
+
+        color:
+
+            var(--dash-text) !important;
+
+        box-shadow:
+
+            0 5px 17px
+            rgba(74,154,135,.035);
+
+        transition:.2s;
+
+    }
+
+
+
+    .featured-doctor:hover{
+
+        transform:
+
+            translateX(3px);
+
+        border-color:
+
+            rgba(74,154,135,.28);
+
+        box-shadow:
+
+            0 8px 23px
+            rgba(74,154,135,.065);
+
+    }
+
+
+
+    .featured-photo{
+
+        width:53px;
+
+        height:53px;
+
+        flex:0 0 53px;
+
+        object-fit:cover;
+
+        border-radius:15px;
+
+    }
+
+
+
+    .featured-fallback{
+
+        width:53px;
+
+        height:53px;
+
+        flex:0 0 53px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:15px;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #F4F8F6,
+                #DDEBE6
+            );
+
+        color:
+
+            var(--dash-primary);
+
+        font-size:22px;
+
+    }
+
+
+
+    .featured-info{
+
+        flex:1;
+
+        min-width:0;
+
+    }
+
+
+
+    .featured-info strong{
+
+        display:block;
+
+        overflow:hidden;
+
+        white-space:nowrap;
+
+        text-overflow:ellipsis;
+
+        color:
+
+            var(--dash-dark);
+
+        font-size:11px;
+
+    }
+
+
+
+    .featured-info span{
+
+        display:block;
+
+        margin-top:4px;
+
+        overflow:hidden;
+
+        white-space:nowrap;
+
+        text-overflow:ellipsis;
+
+        color:
+
+            var(--dash-muted);
+
+        font-size:9px;
+
+    }
+
+
+
+    .featured-arrow{
+
+        color:
+
+            var(--dash-primary);
+
+        font-size:18px;
+
+    }
+
+
+
+    /* =====================================================
+       DOCTOR
+    ===================================================== */
+
+    .doctor-dashboard{
+
+        display:flex;
+
+        flex-direction:column;
+
+        gap:24px;
+
+    }
+
+
+
+    .doctor-welcome{
+
+        position:relative;
+
+        overflow:hidden;
+
+        padding:29px;
+
+        border-radius:25px;
+
+        color:#173D36;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #4A9A87,
+                #68B39F
+            );
+
+        box-shadow:
+
+            0 17px 40px
+            rgba(74,154,135,.13);
+
+    }
+
+
+
+    .doctor-welcome-date{
+
+        margin-bottom:11px;
+
+        color:
+
+            rgba(255,255,255,.75);
+
+        font-size:10px;
+
+        text-transform:capitalize;
+
+    }
+
+
+
+    .doctor-welcome h2{
+
+        margin:0;
+
+        font-size:28px;
+
+    }
+
+
+
+    .doctor-welcome p{
+
+        max-width:660px;
+
+        margin-top:10px;
+
+        color:
+
+            rgba(255,255,255,.82);
+
+        font-size:12px;
+
+        line-height:1.7;
+
+    }
+
+
+
+    .doctor-support{
+
+        display:inline-flex;
+
+        margin-top:16px;
+
+        padding:
+
+            8px 11px;
+
+        border-radius:12px;
+
+        background:
+
+            rgba(255,255,255,.10);
+
+        color:white;
+
+        font-size:10px;
+
+        font-weight:600;
+
+    }
+
+
+
+    .stat-grid-new{
+
+        display:grid;
+
+        grid-template-columns:
+
+            repeat(3,1fr);
+
+        gap:15px;
+
+    }
+
+
+
+    .stat-card-new{
+
+        min-height:135px;
+
+        padding:20px;
+
+        border:
+
+            1px solid
+            var(--dash-border);
+
+        border-radius:21px;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #F4F8F6
+            );
+
+        box-shadow:
+
+            var(--dash-shadow);
+
+    }
+
+
+
+    .stat-icon{
+
+        width:38px;
+
+        height:38px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:12px;
+
+        background:
+
+            var(--dash-mint);
+
+        color:
+
+            var(--dash-primary);
+
+    }
+
+
+
+    .stat-card-new span{
+
+        display:block;
+
+        margin-top:17px;
+
+        color:
+
+            var(--dash-muted);
+
+        font-size:10px;
+
+    }
+
+
+
+    .stat-card-new strong{
+
+        display:block;
+
+        margin-top:5px;
+
+        color:
+
+            var(--dash-dark);
+
+        font-size:27px;
+
+    }
+
+
+
+    .doctor-appointments{
+
+        display:flex;
+
+        flex-direction:column;
+
+        gap:10px;
+
+    }
+
+
+
+    .doctor-appointment{
+
+        display:flex;
+
+        justify-content:space-between;
+
+        align-items:center;
+
+        gap:15px;
+
+        padding:
+
+            17px 19px;
+
+        border:
+
+            1px solid
+            var(--dash-border);
+
+        border-radius:17px;
+
+        background:white;
+
+    }
+
+
+
+    .doctor-appointment h3{
+
+        margin:
+
+            0 0 4px;
+
+        color:
+
+            var(--dash-dark);
+
+        font-size:12px;
+
+    }
+
+
+
+    .doctor-appointment p{
+
+        margin:0;
+
+        color:
+
+            var(--dash-muted);
+
+        font-size:10px;
+
+    }
+
+
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media(max-width:1100px){
+
+        .cap-dashboard{
+
+            grid-template-columns:1fr;
+
+        }
+
+
+        .dashboard-side{
+
+            display:grid;
+
+            grid-template-columns:
+
+                1fr 1fr;
+
+            gap:20px;
+
+        }
+
+
+        .dashboard-side
+        .dashboard-heading{
+
+            grid-column:
+
+                1 / -1;
+
+        }
+
+    }
+
+
+
+    @media(max-width:800px){
+
+        .dashboard-side{
+
+            grid-template-columns:1fr;
+
+        }
+
+
+        .quick-grid-new{
+
+            grid-template-columns:
+
+                repeat(2,1fr);
+
+        }
+
+
+        .stat-grid-new{
+
+            grid-template-columns:1fr;
+
+        }
+
+    }
+
+
+
+    @media(max-width:560px){
+
+        .welcome-card{
+
+            padding:
+
+                24px 19px;
+
+            border-radius:22px;
+
+        }
+
+
+        .welcome-card h2{
+
+            font-size:26px;
+
+        }
+
+
+        .mood-card-new{
+
+            padding:
+
+                21px 16px;
+
+        }
+
+
+        .moods-new{
+
+            gap:6px;
+
+        }
+
+
+        .mood-option{
+
+            min-height:65px;
+
+        }
+
+
+        .mood-emoji{
+
+            font-size:21px;
+
+        }
+
+
+        .mood-label{
+
+            display:none;
+
+        }
+
+
+        .quick-card-new{
+
+            min-height:108px;
+
+            padding:14px;
+
+        }
+
+
+        .next-appointment-card,
+        .empty-card{
+
+            padding:16px;
+
+        }
+
+
+        .status-pill{
+
+            display:none;
+
+        }
+
+
+        .breathing-card{
+
+            padding:22px;
+
+        }
+
+
+        .doctor-appointment{
+
+            flex-direction:column;
+
+            align-items:flex-start;
+
+        }
+
+    }
+
+
+
+    @media(prefers-reduced-motion:reduce){
+
+        .breathing-circle{
+
+            animation:none;
+
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+{% if not is_doctor %}
+
+
+<!-- =====================================================
+     BIENVENIDA DEL PACIENTE
+===================================================== -->
+
+<section class="welcome-card">
+
+
+    <div class="welcome-content">
+
+
+        <!-- FECHA -->
+
+        <div class="welcome-date">
+
+            <span class="welcome-date-dot"></span>
+
+            <span id="currentDate">
+                Hoy
+            </span>
+
+        </div>
+
+
+
+        <span class="welcome-pill">
+
+            ♡ Bienvenida a tu espacio
+
+        </span>
+
+
+
+        <h2>
+
+            Qué gusto tenerte aquí,
+            {{ user.first_name|default:user.username }}.
+
+        </h2>
+
+
+
+        <p>
+
+            Este es un espacio pensado para acompañarte
+            y cuidar de tu bienestar.
+
+            Puedes avanzar a tu propio ritmo, revisar tus citas,
+            conversar con tu especialista o simplemente
+            regalarte unos minutos para ti.
+
+        </p>
+
+
+
+        <div
+            class="support-message"
+            id="supportMessage"
+        >
+
+            ♡ Un pequeño paso también cuenta.
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<div class="cap-dashboard">
+
+
+    <!-- =====================================================
+         COLUMNA IZQUIERDA
+    ====================================================== -->
+
+    <section class="dashboard-main">
+
+
+
+        <!-- =================================================
+             ESTADO DE ÁNIMO
+        ================================================== -->
+
+        <div class="mood-card-new">
+
+
+            <div class="mood-top">
+
+
+                <div>
+
+                    <h2>
+                        ¿Cómo te sientes hoy?
+                    </h2>
+
+
+                    <p>
+
+                        No existe una respuesta correcta.
+
+                        Solo tómate un momento para reconocer
+                        cómo te sientes.
+
+                    </p>
+
+                </div>
+
+
+
+                <div class="mood-symbol">
+
+                    ♡
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="moods-new">
+
+
+                <button
+                    class="mood-option"
+                    type="button"
+                >
+
+                    <span class="mood-emoji">
+
+                        😊
+
+                    </span>
+
+                    <span class="mood-label">
+
+                        Muy bien
+
+                    </span>
+
+                </button>
+
+
+
+                <button
+                    class="mood-option"
+                    type="button"
+                >
+
+                    <span class="mood-emoji">
+
+                        😌
+
+                    </span>
+
+                    <span class="mood-label">
+
+                        Tranquilo
+
+                    </span>
+
+                </button>
+
+
+
+                <button
+                    class="mood-option"
+                    type="button"
+                >
+
+                    <span class="mood-emoji">
+
+                        😐
+
+                    </span>
+
+                    <span class="mood-label">
+
+                        Normal
+
+                    </span>
+
+                </button>
+
+
+
+                <button
+                    class="mood-option"
+                    type="button"
+                >
+
+                    <span class="mood-emoji">
+
+                        😔
+
+                    </span>
+
+                    <span class="mood-label">
+
+                        Triste
+
+                    </span>
+
+                </button>
+
+
+
+                <button
+                    class="mood-option"
+                    type="button"
+                >
+
+                    <span class="mood-emoji">
+
+                        😣
+
+                    </span>
+
+                    <span class="mood-label">
+
+                        Difícil
+
+                    </span>
+
+                </button>
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             PRÓXIMA CITA
+        ================================================== -->
+
+        <div class="dashboard-heading">
+
+
+            <div>
+
+                <h2>
+                    Próxima cita
+                </h2>
+
+                <p>
+                    Tu siguiente espacio de acompañamiento.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'portal_calendar_patient' %}"
+                class="section-link"
+            >
+
+                Ver mis citas →
+
+            </a>
+
+
+        </div>
+
+
+
+        {% if next_appointment %}
+
+
+        <div class="next-appointment-card">
+
+
+            <div class="appointment-icon">
+
+                ♡
+
+            </div>
+
+
+
+            <div class="appointment-info">
+
+
+                <strong>
+
+                    {{ next_appointment.doctor.get_full_name|default:next_appointment.doctor.username }}
+
+                </strong>
+
+
+                <span>
+
+                    {{ next_appointment.start_at|date:'d M Y · H:i' }}
+
+                    ·
+
+                    {{ next_appointment.get_modalidad_display }}
+
+                </span>
+
+
+            </div>
+
+
+
+            <span
+                class="
+                    status-pill
+
+                    {% if next_appointment.status == 'approved' %}
+                        ok
+                    {% else %}
+                        warn
+                    {% endif %}
+                "
+            >
+
+                {{ next_appointment.get_status_display }}
+
+            </span>
+
+
+        </div>
+
+
+        {% else %}
+
+
+        <div class="empty-card">
+
+
+            <div class="empty-icon">
+
+                ◷
+
+            </div>
+
+
+
+            <div>
+
+
+                <h3>
+
+                    Aún no tienes una cita próxima
+
+                </h3>
+
+
+                <p>
+
+                    Cuando te sientas listo puedes conocer
+                    a nuestros especialistas y elegir
+                    una opción para ti.
+
+                </p>
+
+
+                <a
+                    href="{% url 'portal_specialists' %}"
+                >
+
+                    Buscar especialista →
+
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             ACCESOS RÁPIDOS
+        ================================================== -->
+
+        <div class="dashboard-heading">
+
+
+            <div>
+
+                <h2>
+                    Accesos rápidos
+                </h2>
+
+
+                <p>
+
+                    Encuentra rápidamente lo que necesitas.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="quick-grid-new">
+
+
+
+            <!-- PSICOLOGOS -->
+
+            <a
+                class="quick-card-new"
+                href="{% url 'portal_specialists' %}"
+            >
+
+
+                <div class="quick-icon">
+
+                    ♡
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+
+                        Psicólogos
+
+                    </strong>
+
+
+                    <small>
+
+                        Encuentra acompañamiento
+
+                    </small>
+
+                </div>
+
+
+            </a>
+
+
+
+            <!-- CITAS -->
+
+            <a
+                class="quick-card-new"
+                href="{% url 'portal_calendar_patient' %}"
+            >
+
+
+                <div class="quick-icon">
+
+                    ◷
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+
+                        Mis citas
+
+                    </strong>
+
+
+                    <small>
+
+                        Consulta tu agenda
+
+                    </small>
+
+                </div>
+
+
+            </a>
+
+
+
+            <!-- CHAT -->
+
+            <a
+                class="quick-card-new"
+                href="{% url 'portal_chat' %}"
+            >
+
+
+                <div class="quick-icon">
+
+                    ◌
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+
+                        Mensajes
+
+                    </strong>
+
+
+                    <small>
+
+                        Tus conversaciones
+
+                    </small>
+
+                </div>
+
+
+            </a>
+
+
+
+            <!-- PERFIL -->
+
+            <a
+                class="quick-card-new"
+                href="{% url 'portal_settings' %}"
+            >
+
+
+                <div class="quick-icon">
+
+                    ♙
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+
+                        Mi perfil
+
+                    </strong>
+
+
+                    <small>
+
+                        Administra tu cuenta
+
+                    </small>
+
+                </div>
+
+
+            </a>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             FRASE DEL DÍA
+        ================================================== -->
+
+        <section class="daily-support">
+
+
+            <div class="daily-support-top">
+
+
+                <div class="daily-support-icon">
+
+                    ♡
+
+                </div>
+
+
+                <div>
+
+
+                    <span class="daily-support-label">
+
+                        Para recordar hoy
+
+                    </span>
+
+
+                    <h3>
+
+                        Una frase para ti
+
+                    </h3>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <p id="dailyPhrase">
+
+                Está bien avanzar despacio.
+                Lo importante es seguir cuidando de ti.
+
+            </p>
+
+
+        </section>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         COLUMNA DERECHA
+    ====================================================== -->
+
+    <aside class="dashboard-side">
+
+
+
+        <!-- =================================================
+             RESPIRACIÓN
+        ================================================== -->
+
+        <div class="breathing-card">
+
+
+            <div class="breathing-circle"></div>
+
+
+
+            <span class="time-pill">
+
+                5 minutos
+
+            </span>
+
+
+
+            <h3>
+
+                Regálate un momento
+
+            </h3>
+
+
+
+            <p>
+
+                No necesitas resolver todo ahora.
+
+                Haz una pausa, relaja tus hombros
+                y acompaña tu respiración
+                durante unos minutos.
+
+            </p>
+
+
+
+            <div class="breathing-steps">
+
+
+                <div class="breathing-step">
+
+                    <strong>
+                        4s
+                    </strong>
+
+                    <span>
+                        Inhala
+                    </span>
+
+                </div>
+
+
+
+                <div class="breathing-step">
+
+                    <strong>
+                        4s
+                    </strong>
+
+                    <span>
+                        Mantén
+                    </span>
+
+                </div>
+
+
+
+                <div class="breathing-step">
+
+                    <strong>
+                        6s
+                    </strong>
+
+                    <span>
+                        Exhala
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             PSICÓLOGOS
+        ================================================== -->
+
+        <div class="dashboard-heading">
+
+
+            <div>
+
+                <h2>
+
+                    Psicólogos destacados
+
+                </h2>
+
+
+                <p>
+
+                    Conoce profesionales disponibles.
+
+                </p>
+
+            </div>
+
+
+
+            <a
+                href="{% url 'portal_specialists' %}"
+                class="section-link"
+            >
+
+                Ver todos →
+
+            </a>
+
+
+        </div>
+
+
+
+        <div class="featured-list">
+
+
+            {% for d in featured_doctors %}
+
+
+            <a
+                class="featured-doctor"
+                href="{% url 'portal_profile' d.id %}"
+            >
+
+
+                {% if d.foto %}
+
+
+                    <img
+                        class="featured-photo"
+                        src="{{ d.foto.url }}"
+                        alt="{{ d.user.get_full_name|default:d.user.username }}"
+                    >
+
+
+                {% else %}
+
+
+                    <div class="featured-fallback">
+
+                        ♡
+
+                    </div>
+
+
+                {% endif %}
+
+
+
+                <div class="featured-info">
+
+
+                    <strong>
+
+                        {{ d.user.get_full_name|default:d.user.username }}
+
+                    </strong>
+
+
+                    <span>
+
+                        {{ d.especialidad|default:'Psicología' }}
+
+                    </span>
+
+
+                </div>
+
+
+
+                <div class="featured-arrow">
+
+                    ›
+
+                </div>
+
+
+            </a>
+
+
+            {% empty %}
+
+
+            <div class="empty-card">
+
+
+                <div class="empty-icon">
+
+                    ♡
+
+                </div>
+
+
+                <div>
+
+
+                    <h3>
+
+                        Próximamente
+
+                    </h3>
+
+
+                    <p>
+
+                        Aún no hay especialistas destacados disponibles.
+
+                    </p>
+
+
+                </div>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </aside>
+
+
+</div>
+
+
+
+{% else %}
+
+
+<!-- =========================================================
+     DASHBOARD DOCTOR
+========================================================= -->
+
+<div class="doctor-dashboard">
+
+
+
+    <!-- WELCOME -->
+
+    <section class="doctor-welcome">
+
+
+        <div
+            class="doctor-welcome-date"
+            id="doctorCurrentDate"
+        >
+
+            Hoy
+
+        </div>
+
+
+
+        <h2>
+
+            Bienvenido,
+            Dr(a). {{ user.first_name|default:user.username }}.
+
+        </h2>
+
+
+
+        <p>
+
+            Gracias por formar parte de CAP Online.
+
+            Desde aquí puedes revisar tus pacientes,
+            consultar mensajes y mantener organizada
+            tu agenda de atención.
+
+        </p>
+
+
+
+        <div
+            class="doctor-support"
+            id="doctorSupport"
+        >
+
+            ♡ Tu acompañamiento puede hacer una diferencia.
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         ESTADÍSTICAS
+    ====================================================== -->
+
+    <div class="stat-grid-new">
+
+
+        <div class="stat-card-new">
+
+
+            <div class="stat-icon">
+
+                ♙
+
+            </div>
+
+
+            <span>
+
+                Pacientes relacionados
+
+            </span>
+
+
+            <strong>
+
+                {{ patient_count }}
+
+            </strong>
+
+
+        </div>
+
+
+
+        <div class="stat-card-new">
+
+
+            <div class="stat-icon">
+
+                ◌
+
+            </div>
+
+
+            <span>
+
+                Mensajes sin leer
+
+            </span>
+
+
+            <strong>
+
+                {{ unread_messages_count }}
+
+            </strong>
+
+
+        </div>
+
+
+
+        <div class="stat-card-new">
+
+
+            <div class="stat-icon">
+
+                ◷
+
+            </div>
+
+
+            <span>
+
+                Próxima cita
+
+            </span>
+
+
+            <strong>
+
+
+                {% if next_appointment %}
+
+                    {{ next_appointment.start_at|date:'d M' }}
+
+                {% else %}
+
+                    —
+
+                {% endif %}
+
+
+            </strong>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         AGENDA
+    ====================================================== -->
+
+    <section>
+
+
+        <div class="dashboard-heading">
+
+
+            <div>
+
+
+                <h2>
+
+                    Agenda reciente
+
+                </h2>
+
+
+                <p>
+
+                    Consulta tus próximas sesiones.
+
+                </p>
+
+
+            </div>
+
+
+
+            <a
+                href="{% url 'portal_calendar_doctor' %}"
+                class="section-link"
+            >
+
+                Abrir agenda →
+
+            </a>
+
+
+        </div>
+
+
+
+        <div class="doctor-appointments">
+
+
+            {% for a in recent_appointments %}
+
+
+            <div class="doctor-appointment">
+
+
+                <div>
+
+
+                    <h3>
+
+                        {{ a.patient.get_full_name|default:a.patient.username }}
+
+                    </h3>
+
+
+                    <p>
+
+                        {{ a.start_at|date:'d M Y · H:i' }}
+
+                        ·
+
+                        {{ a.get_modalidad_display }}
+
+                    </p>
+
+
+                </div>
+
+
+
+                <span class="status-pill ok">
+
+                    {{ a.get_status_display }}
+
+                </span>
+
+
+            </div>
+
+
+            {% empty %}
+
+
+            <div class="empty-card">
+
+
+                <div class="empty-icon">
+
+                    ◷
+
+                </div>
+
+
+                <div>
+
+
+                    <h3>
+
+                        No hay citas registradas
+
+                    </h3>
+
+
+                    <p>
+
+                        Tus próximas citas aparecerán aquí.
+
+                    </p>
+
+
+                </div>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+{% endif %}
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+<script>
+
+
+    /* =====================================================
+       FECHA ACTUAL
+    ====================================================== */
+
+    const today =
+        new Date();
+
+
+    const dateFormatter =
+        new Intl.DateTimeFormat(
+            "es-MX",
+            {
+                weekday:"long",
+                day:"numeric",
+                month:"long",
+                year:"numeric"
+            }
+        );
+
+
+    let formattedDate =
+        dateFormatter.format(
+            today
+        );
+
+
+    formattedDate =
+        formattedDate.charAt(0)
+        .toUpperCase()
+        +
+        formattedDate.slice(1);
+
+
+
+    const currentDate =
+        document.getElementById(
+            "currentDate"
+        );
+
+
+    const doctorCurrentDate =
+        document.getElementById(
+            "doctorCurrentDate"
+        );
+
+
+    if(currentDate){
+
+        currentDate.textContent =
+            formattedDate;
+
+    }
+
+
+    if(doctorCurrentDate){
+
+        doctorCurrentDate.textContent =
+            formattedDate;
+
+    }
+
+
+
+    /* =====================================================
+       MOOD
+    ====================================================== */
+
+    document
+    .querySelectorAll(
+        ".mood-option"
+    )
+    .forEach(
+        function(button){
+
+            button.addEventListener(
+                "click",
+                function(){
+
+                    document
+                    .querySelectorAll(
+                        ".mood-option"
+                    )
+                    .forEach(
+                        function(item){
+
+                            item
+                            .classList
+                            .remove(
+                                "active"
+                            );
+
+                        }
+                    );
+
+
+                    button
+                    .classList
+                    .add(
+                        "active"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+
+    /* =====================================================
+       FRASES DE ALIENTO
+    ====================================================== */
+
+    const supportPhrases = [
+
+        "♡ Puedes ir a tu propio ritmo.",
+
+        "♡ Un pequeño paso también cuenta.",
+
+        "♡ Tu bienestar merece un espacio.",
+
+        "♡ Hoy también es una oportunidad para cuidarte.",
+
+        "♡ Está bien darte tiempo.",
+
+        "♡ No necesitas tener todo resuelto hoy.",
+
+        "♡ Cada día puedes comenzar nuevamente.",
+
+        "♡ Tu proceso también merece paciencia."
+
+    ];
+
+
+
+    const dailyPhrases = [
+
+        "Está bien avanzar despacio. Lo importante es seguir cuidando de ti.",
+
+        "No tienes que resolver todo hoy. Un día a la vez también es avanzar.",
+
+        "Escuchar lo que sientes puede ser el primer paso para comprenderte mejor.",
+
+        "Tu proceso no tiene que parecerse al de nadie más. Puedes avanzar a tu manera.",
+
+        "También es productivo descansar cuando tu mente y tu cuerpo lo necesitan.",
+
+        "No todos los días tienen que ser perfectos para que tu proceso siga avanzando.",
+
+        "Date permiso de reconocer todo lo que ya has logrado, incluso los pequeños pasos.",
+
+        "Cuidarte no siempre significa hacer más. Algunas veces significa darte una pausa.",
+
+        "Hoy puedes elegir una pequeña acción que te ayude a sentir un poco más de calma.",
+
+        "Ser paciente contigo también forma parte de aprender a cuidarte."
+
+    ];
+
+
+
+    const doctorPhrases = [
+
+        "♡ Tu acompañamiento puede hacer una diferencia.",
+
+        "♡ Cada conversación puede convertirse en un espacio de apoyo.",
+
+        "♡ Acompañar también significa escuchar con calma.",
+
+        "♡ Gracias por brindar un espacio de atención y confianza.",
+
+        "♡ Cada proceso merece tiempo, respeto y acompañamiento."
+
+    ];
+
+
+
+    function randomItem(array){
+
+        return array[
+            Math.floor(
+                Math.random()
+                *
+                array.length
+            )
+        ];
+
+    }
+
+
+
+    const supportMessage =
+        document.getElementById(
+            "supportMessage"
+        );
+
+
+    const dailyPhrase =
+        document.getElementById(
+            "dailyPhrase"
+        );
+
+
+    const doctorSupport =
+        document.getElementById(
+            "doctorSupport"
+        );
+
+
+
+    if(supportMessage){
+
+        supportMessage.textContent =
+            randomItem(
+                supportPhrases
+            );
+
+    }
+
+
+
+    if(dailyPhrase){
+
+        dailyPhrase.textContent =
+            randomItem(
+                dailyPhrases
+            );
+
+    }
+
+
+
+    if(doctorSupport){
+
+        doctorSupport.textContent =
+            randomItem(
+                doctorPhrases
+            );
+
+    }
+
+
+</script>
+
+{% endblock %}

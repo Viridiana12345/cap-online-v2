@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Entorno virtual
+venv/
+.venv/
+
+# Variables privadas
+.env
+.env.*
+!.env.example
+
+# Base local
+db.sqlite3
+*.sqlite3
+
+# Node / mobile
+node_modules/
+mobile/node_modules/
+
+# Builds
+dist/
+build/
+mobile/dist/
+
+# IDE
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

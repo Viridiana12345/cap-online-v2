@@ -1,0 +1,24 @@
+:root{--g:#388b6f;--gd:#165f4c;--m:#f1f8f4;--bg:#f1f8f4;--t:#00100a;--mut:#42695b;--line:#dceee5}*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:#00100a;color:var(--t)}#app{max-width:430px;min-height:100vh;margin:auto;background:var(--bg);position:relative}.screen{min-height:100vh;padding:calc(24px + env(safe-area-inset-top)) 22px calc(90px + env(safe-area-inset-bottom))}.hidden{display:none!important}.auth-screen{background:#ffffff;text-align:center;padding-top:60px}.logo-mark{width:70px;height:70px;background:var(--m);border-radius:20px;margin:auto;display:grid;place-items:center;color:var(--g);font-size:38px}.auth-screen h1{margin:10px 0 0}.subtitle,.lead,small{color:var(--mut)}.auth-screen h2{font-size:30px;margin:28px 0 8px}.lead{line-height:1.5;margin-bottom:24px}.auth-screen label{display:block;text-align:left;color:var(--gd);font-weight:700;font-size:13px;margin:14px 0 7px}.auth-screen input{width:100%;border:1px solid var(--line);border-radius:15px;background:#f1f8f4;padding:14px;font-size:15px}.primary,.biometric{width:100%;padding:14px;border:0;border-radius:15px;font-weight:800;margin-top:15px}.primary{background:var(--g);color:#ffffff}.biometric{background:var(--m);color:var(--gd)}.link{display:block;color:var(--gd);font-weight:700;font-size:13px;margin-top:16px}.msg{font-size:13px;color:#b93838}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}header h2{margin:2px 0}.icon{border:1px solid var(--line);background:#ffffff;border-radius:13px;width:42px;height:42px}.card{background:#ffffff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:11px 0}.moods{display:flex;justify-content:space-between;font-size:27px;margin-top:12px}.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick button{background:#ffffff;border:1px solid var(--line);border-radius:16px;padding:18px 8px}.quick b{display:block;font-size:22px}.doctor{display:grid;grid-template-columns:58px 1fr;gap:12px}.avatar{width:58px;height:58px;border-radius:16px;background:var(--m);display:grid;place-items:center;font-size:25px}.pill{display:inline-block;background:var(--m);color:var(--gd);border-radius:999px;padding:5px 8px;font-size:10px;font-weight:700}.muted{color:var(--mut);font-size:12px}.search{width:100%;padding:13px;border:1px solid var(--line);border-radius:14px;background:#ffffff;margin-bottom:10px}.row{display:flex;gap:8px}.row>*{flex:1}.smallbtn{border:0;border-radius:11px;padding:9px;background:var(--m);color:var(--gd);font-weight:700}.bubble{padding:10px 12px;border-radius:15px;background:#f1f8f4;max-width:78%;margin:8px 0;font-size:13px}.bubble.me{margin-left:auto;background:#dceee5}.compose{display:flex;gap:8px;position:sticky;bottom:76px}.compose input{flex:1;border:1px solid var(--line);border-radius:999px;padding:12px}.compose button{width:44px;border:0;border-radius:50%;background:var(--g);color:#ffffff}nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:#ffffff;border-top:1px solid var(--line);padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:10}nav button{border:0;background:none;color:#42695b;font-size:10px}nav b{display:block;font-size:18px;margin-bottom:3px}.section-title{font-size:17px;margin:20px 0 8px}.status{font-weight:800;color:var(--gd)}
+
+/* Flexible webview layout, including tablets and landscape. */
+.primary,.compose button{background:#388b6f;color:#00100a}
+/* Keep touch, wheel and keyboard scrolling without visible scrollbars. */
+*{scrollbar-width:none}
+*::-webkit-scrollbar{display:none}
+html{-webkit-text-size-adjust:100%}
+body{overflow-wrap:anywhere}
+#app{width:100%;max-width:960px;min-height:100dvh}
+.screen{min-height:100dvh}
+nav{width:min(960px,100%)}
+input,select,textarea{min-width:0;max-width:100%;font-size:16px}
+.auth-screen input,.search,.compose input{font-size:16px}
+button{max-width:100%;min-height:44px}
+header{gap:12px}
+header>*,.doctor>*,.row>*,.quick>*{min-width:0}
+header .icon{flex-shrink:0}
+.compose input{width:0;flex:1 1 0}
+.compose button{flex:0 0 44px}
+.compose{bottom:calc(76px + env(safe-area-inset-bottom))}
+.bubble{overflow-wrap:anywhere}
+@media(max-width:360px){.screen{padding-left:14px;padding-right:14px}.row{flex-wrap:wrap}.row>*{flex:1 1 120px}}
+@media(min-width:700px){.screen{padding-left:40px;padding-right:40px}.auth-screen{max-width:480px;margin:auto}.quick{grid-template-columns:repeat(4,minmax(0,1fr))}}

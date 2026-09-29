@@ -1,0 +1,944 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crear cuenta | CAP Online</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --navy:#173D36;
+    --teal:#4A9A87;
+    --teal-2:#4A9A87;
+    --mint:#F4F8F6;
+    --mint-2:#F4F8F6;
+    --white:#ffffff;
+    --bg:#F4F8F6;
+    --text:#173D36;
+    --muted:#5E756F;
+    --border:#DDEBE6;
+    --success:#2F6F62;
+    --danger:#b93838;
+    --warning:#4A9A87;
+    --serif:"Fraunces", Georgia, serif;
+    --sans:"Work Sans", "Segoe UI", system-ui, sans-serif;
+    --shadow:0 30px 80px rgba(74,154,135,.16);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+    min-height:100vh;
+    font-family:var(--sans);
+    color:var(--text);
+    background:
+        radial-gradient(circle at 0% 0%, rgba(74,154,135,.20), transparent 30%),
+        radial-gradient(circle at 100% 100%, rgba(74,154,135,.12), transparent 32%),
+        var(--bg);
+    padding:36px 20px 44px;
+    line-height:1.5;
+}
+body.modal-open{overflow:hidden}
+
+.page{width:100%;max-width:1180px;margin:auto}
+
+/* ============ HEADER ============ */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;padding:0 6px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{
+    width:60px;height:60px;padding:6px;background:#ffffff;border-radius:18px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 22px rgba(74,154,135,.12);
+}
+.logo svg{width:100%;height:100%}
+.brand h1{font-family:var(--serif);font-weight:700;font-size:25px;line-height:1;color:var(--navy)}
+.brand p{margin-top:5px;font-size:12px;color:var(--muted)}
+.login-top{font-size:14px;color:var(--muted)}
+.login-top a{color:var(--teal);font-weight:600;text-decoration:none}
+.login-top a:hover{text-decoration:underline}
+
+/* ============ TARJETA ============ */
+.register-shell{
+    display:grid;
+    grid-template-columns:340px minmax(0,1fr);
+    background:#ffffff;
+    border-radius:32px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    border:1px solid rgba(74,154,135,.10);
+}
+
+/* ============ PANEL LATERAL ============ */
+.side{
+    position:relative;
+    overflow:hidden;
+    color:#173D36;
+    padding:44px 34px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:36px;
+    background:
+        radial-gradient(circle at 15% 10%, rgba(255,255,255,.14), transparent 30%),
+        linear-gradient(160deg, #4A9A87 0%, #4A9A87 48%, #4A9A87 100%);
+}
+.side-heart{
+    position:absolute;
+    width:380px;height:380px;
+    right:-150px;bottom:70px;
+    opacity:.09;
+    pointer-events:none;
+}
+.side-content,.quote-card{position:relative;z-index:2}
+
+.small-pill{
+    display:inline-flex;padding:7px 14px;border-radius:999px;margin-bottom:26px;
+    border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);
+    font-size:12px;font-weight:500;
+}
+.side h2{
+    font-family:var(--serif);font-weight:700;
+    font-size:38px;line-height:1.08;letter-spacing:-.4px;margin-bottom:16px;
+}
+.side-description{color:rgba(255,255,255,.86);font-size:14px;line-height:1.7}
+
+.features{display:flex;flex-direction:column;gap:15px;margin-top:32px}
+.feature{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500}
+.feature .tick{
+    width:28px;height:28px;flex:0 0 28px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.16);font-size:13px;
+}
+
+.quote-card{
+    padding:18px;border-radius:18px;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.10);
+    backdrop-filter:blur(8px);
+}
+.quote-card strong{display:block;font-size:14px;margin-bottom:6px}
+.quote-card p{font-size:12.5px;line-height:1.6;color:rgba(255,255,255,.82)}
+
+/* ============ FORMULARIO ============ */
+.form-side{padding:44px 52px 40px}
+.form-wrapper{width:100%;max-width:690px;margin:auto}
+
+.back{display:inline-block;margin-bottom:20px;color:var(--muted);font-size:13px;text-decoration:none}
+.back:hover{color:var(--teal)}
+
+.form-header{margin-bottom:30px}
+.form-header h2{
+    font-family:var(--serif);font-weight:700;
+    font-size:40px;line-height:1.05;letter-spacing:-.5px;color:var(--navy);margin-bottom:10px;
+}
+.form-header p{max-width:560px;color:var(--muted);font-size:14.5px;line-height:1.65}
+
+/* Secciones */
+.form-section{margin-bottom:30px}
+.section-heading{
+    display:flex;align-items:baseline;gap:12px;
+    padding-bottom:12px;margin-bottom:18px;
+    border-bottom:1px solid #DDEBE6;
+}
+.section-heading h3{font-family:var(--serif);font-weight:600;font-size:19px;color:var(--navy)}
+.section-heading p{margin-left:auto;font-size:12px;color:#5E756F}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 18px}
+.full{grid-column:1 / -1}
+
+/* Campos */
+.field{display:flex;flex-direction:column;gap:8px;min-width:0}
+.field label{font-size:13px;font-weight:600;color:#173D36}
+.req{color:var(--danger)}
+.input-wrap{position:relative}
+
+.field input,
+.field textarea,
+.field select{
+    width:100%;min-height:54px;padding:13px 16px;
+    font-family:inherit;font-size:15px;color:var(--text);
+    background:#F4F8F6;border:1.5px solid var(--border);border-radius:15px;
+    outline:none;transition:border-color .18s, box-shadow .18s, background .18s;
+}
+.field textarea{min-height:104px;resize:vertical;line-height:1.55}
+.field input:hover,.field textarea:hover{border-color:#DDEBE6}
+.field input:focus,.field textarea:focus,.field select:focus{
+    border-color:var(--teal);background:#ffffff;
+    box-shadow:0 0 0 4px rgba(74,154,135,.13);
+}
+.field input::placeholder,.field textarea::placeholder{color:#5E756F}
+.password{padding-right:54px !important}
+
+.toggle-password{
+    position:absolute;right:9px;top:50%;transform:translateY(-50%);
+    width:38px;height:38px;border:0;border-radius:11px;background:transparent;
+    color:#5E756F;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.toggle-password:hover{background:var(--mint);color:var(--teal)}
+.toggle-password:focus-visible{outline:2px solid var(--teal)}
+.toggle-password svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.toggle-password .slash{display:none}
+.toggle-password.on .slash{display:block}
+
+/* Mensajes / validación */
+.message{min-height:17px;font-size:12px;line-height:1.4;color:var(--muted)}
+.message.error{color:var(--danger)}
+.message.success{color:var(--success)}
+.field.error input,.field.error textarea{border-color:var(--danger);background:#fff2f2}
+.field.error input:focus{box-shadow:0 0 0 4px rgba(185,56,56,.13)}
+.field.success input,.field.success textarea{border-color:#4A9A87}
+
+/* ============ FUERZA DE CONTRASEÑA ============ */
+.password-box{
+    margin-top:4px;padding:16px 18px;border-radius:16px;
+    border:1px solid #DDEBE6;background:var(--mint-2);
+}
+.password-top{display:flex;justify-content:space-between;margin-bottom:10px;font-size:12px}
+.password-top span:first-child{color:var(--muted)}
+.password-level{font-weight:700}
+.strength{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.strength span{height:5px;border-radius:999px;background:#DDEBE6;transition:background .2s}
+.rules{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px 12px}
+.rule{display:flex;align-items:center;gap:7px;font-size:12px;color:#5E756F}
+.rule-icon{
+    width:18px;height:18px;flex:0 0 18px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:#DDEBE6;font-size:10px;
+}
+.rule.ok{color:var(--success)}
+.rule.ok .rule-icon{background:#DDEBE6;color:var(--success)}
+
+/* ============ PRIVACIDAD ============ */
+.privacy{
+    display:flex;gap:12px;align-items:flex-start;
+    padding:17px 18px;border-radius:16px;
+    border:1px solid #DDEBE6;
+    background:linear-gradient(135deg,#F4F8F6,#F4F8F6);
+}
+.privacy input{width:20px;height:20px;flex:0 0 20px;margin-top:1px;accent-color:var(--teal);cursor:pointer}
+.privacy label{font-size:13px;line-height:1.6;color:#5E756F;cursor:pointer}
+.policy-btn{border:0;padding:0;background:none;color:var(--teal);font:inherit;font-weight:700;cursor:pointer}
+.policy-btn:hover{text-decoration:underline}
+
+/* ============ SUBMIT ============ */
+.form-alert{
+    display:none;margin-top:14px;padding:13px 15px;border-radius:13px;
+    border:1px solid #fff2f2;background:#fff2f2;color:var(--danger);font-size:13px;
+}
+.form-alert.show{display:block}
+
+.submit{
+    width:100%;min-height:58px;margin-top:22px;border:0;border-radius:16px;
+    background:linear-gradient(135deg,#4A9A87,#4A9A87);color:#173D36;
+    font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;
+    box-shadow:0 12px 26px rgba(74,154,135,.22);
+    transition:transform .15s, box-shadow .15s, opacity .15s;
+}
+.submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 16px 32px rgba(74,154,135,.27)}
+.submit:focus-visible{outline:3px solid rgba(74,154,135,.4);outline-offset:3px}
+.submit:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}
+.submit-hint{margin-top:10px;text-align:center;font-size:12px;color:#5E756F}
+
+.bottom{margin-top:22px;text-align:center;font-size:14px;color:var(--muted)}
+.bottom a{color:var(--teal);font-weight:600;text-decoration:none}
+.bottom a:hover{text-decoration:underline}
+.secure{margin-top:12px;text-align:center;font-size:12px;color:#5E756F}
+
+/* ============ MODAL ============ */
+.modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.active{display:flex}
+.overlay{position:absolute;inset:0;background:rgba(74,154,135,.62);backdrop-filter:blur(6px)}
+.modal-card{
+    position:relative;z-index:2;width:100%;max-width:780px;max-height:90vh;
+    display:flex;flex-direction:column;overflow:hidden;border-radius:26px;background:#ffffff;
+    box-shadow:0 35px 100px rgba(0,0,0,.35);
+}
+.modal-header{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+    padding:24px 28px;border-bottom:1px solid #DDEBE6;
+    background:linear-gradient(135deg,#F4F8F6,#F4F8F6);
+}
+.modal-header h2{font-family:var(--serif);font-weight:700;font-size:26px;color:var(--navy)}
+.modal-header p{margin-top:4px;font-size:12px;color:var(--muted)}
+.close-modal{
+    width:40px;height:40px;flex:0 0 40px;border:1px solid var(--border);border-radius:50%;
+    background:#ffffff;color:var(--navy);font-size:22px;line-height:1;cursor:pointer;
+}
+.close-modal:hover{background:var(--mint)}
+.modal-content{overflow-y:auto;padding:28px 32px}
+.policy-section{margin-bottom:26px}
+.policy-section h3{font-family:var(--serif);font-weight:600;font-size:18px;color:var(--navy);margin-bottom:8px}
+.policy-section p,.policy-section li{color:#5E756F;font-size:14px;line-height:1.75}
+.policy-section p + p{margin-top:8px}
+.policy-section ul{margin:8px 0 8px 22px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:17px 28px;border-top:1px solid #DDEBE6}
+.modal-footer button{min-height:46px;padding:0 20px;border-radius:12px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.cancel{border:1px solid #DDEBE6;background:#ffffff;color:#5E756F}
+.cancel:hover{background:var(--mint-2)}
+.accept{border:0;background:linear-gradient(135deg,#4A9A87,#4A9A87);color:#ffffff}
+
+/* ============ RESPONSIVE ============ */
+/* Vista compacta para laptop: todo el registro esencial queda visible. */
+@media(min-width:981px){
+    body{padding:14px 18px 18px}
+    .page{max-width:1240px}
+    .header{margin-bottom:10px}
+    .logo{width:48px;height:48px;border-radius:14px}
+    .brand h1{font-size:22px}
+    .brand p{margin-top:2px}
+    .register-shell{grid-template-columns:300px minmax(0,1fr);border-radius:24px}
+    .side{padding:25px 25px;gap:18px}
+    .small-pill{margin-bottom:14px;padding:6px 11px}
+    .side h2{font-size:31px;margin-bottom:10px}
+    .side-description{line-height:1.5}
+    .features{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+    .feature{gap:7px;font-size:12px}
+    .feature .tick{width:23px;height:23px;flex-basis:23px}
+    .quote-card{padding:13px}
+    .form-side{padding:20px 30px 18px}
+    .form-wrapper{max-width:850px}
+    .back{margin-bottom:7px}
+    .form-header{margin-bottom:13px}
+    .form-header h2{font-size:31px;margin-bottom:4px}
+    .form-header p{font-size:13px;line-height:1.4}
+    .form-section{margin-bottom:13px}
+    .section-heading{padding-bottom:6px;margin-bottom:10px}
+    .section-heading h3{font-size:17px}
+    .grid{gap:9px 13px}
+    #emailField,#bioField,#passwordField,#password2Field{grid-column:auto}
+    .field{gap:4px}
+    .field input,.field textarea,.field select{min-height:43px;padding:9px 12px;border-radius:12px;font-size:14px}
+    .field textarea{height:43px;min-height:43px;resize:none}
+    .message{min-height:14px;font-size:10px;line-height:1.25}
+    .toggle-password{width:34px;height:34px}
+    .password-box{margin-top:1px;padding:8px 10px;border-radius:12px}
+    .password-top{margin-bottom:5px;font-size:10px}
+    .strength{gap:4px;margin-bottom:6px}
+    .strength span{height:4px}
+    .rules{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 7px}
+    .rule{gap:4px;font-size:9px}
+    .rule-icon{width:14px;height:14px;flex-basis:14px;font-size:8px}
+    .privacy{padding:9px 12px;border-radius:12px;gap:9px}
+    .privacy label{font-size:11px;line-height:1.35}
+    .privacy input{width:17px;height:17px;flex-basis:17px}
+    #privacyMessage{min-height:0}
+    .form-alert{margin-top:7px;padding:8px 11px}
+    .submit{min-height:44px;margin-top:9px;border-radius:12px;font-size:14px}
+    .submit-hint{margin-top:4px;font-size:10px}
+    .bottom{margin-top:7px;font-size:12px}
+    .secure{margin-top:4px;font-size:10px}
+}
+@media(min-width:981px) and (max-height:760px){
+    .header{margin-bottom:6px}
+    .brand p,.quote-card{display:none}
+    .form-side{padding-top:14px;padding-bottom:12px}
+    .features{margin-top:12px}
+}
+@media(max-width:980px){
+    .register-shell{grid-template-columns:1fr}
+    .side{display:none}
+    .form-side{padding:34px 28px}
+}
+@media(max-width:640px){
+    body{padding:14px 10px 30px}
+    .header{display:block;text-align:center}
+    .brand{justify-content:center}
+    .login-top{display:none}
+    .register-shell{border-radius:22px}
+    .form-side{padding:26px 18px}
+    .grid{grid-template-columns:1fr}
+    .full{grid-column:auto}
+    .rules{grid-template-columns:1fr 1fr}
+    .form-header{text-align:center}
+    .form-header h2{font-size:32px}
+    .section-heading p{display:none}
+    .modal-content{padding:22px 20px}
+}
+@media(prefers-reduced-motion:reduce){
+    *{transition:none !important}
+}
+</style>
+{% include "includes/responsive_styles.html" %}
+</head>
+
+<body class="registration-page">
+<div class="page">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="brand">
+            <div class="logo">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CAP Online">
+                    <defs>
+                        <clipPath id="capHeart">
+                            <path d="M50 90 C41 81 14 62 9 39 C5 20 19 8 35 10 C43 11 48 16 50 21 C52 16 57 11 65 10 C81 8 95 20 91 39 C86 62 59 81 50 90Z"/>
+                        </clipPath>
+                    </defs>
+                    <g clip-path="url(#capHeart)">
+                        <rect x="0"  y="0" width="50" height="100" fill="#4A9A87"/>
+                        <rect x="50" y="0" width="50" height="100" fill="#2F6F62"/>
+                    </g>
+                    <path d="M50 30 C45 23 34 24 31 31 C24 32 21 41 26 46 C22 53 26 61 33 62 C35 68 44 70 50 65 Z" fill="#DDEBE6"/>
+                    <path d="M50 30 C57 24 67 26 69 33 C74 35 74 41 72 44 L77 50 C75 52 73 52 72 53 C73 59 68 64 62 63 C60 68 55 70 50 65 Z" fill="#4A9A87"/>
+                    <circle cx="62" cy="40" r="2.6" fill="#2F6F62"/>
+                    <circle cx="38" cy="41" r="2.4" fill="#4A9A87"/>
+                </svg>
+            </div>
+            <div>
+                <h1>CAP Online</h1>
+                <p>Centro de Atención Psicológica Online</p>
+            </div>
+        </div>
+
+        <div class="login-top">
+            ¿Ya tienes cuenta?
+            <a href="/login/">Iniciar sesión</a>
+        </div>
+    </header>
+
+    <main class="register-shell">
+
+        <!-- PANEL LATERAL -->
+        <aside class="side">
+            <svg class="side-heart" viewBox="0 0 100 100" aria-hidden="true">
+                <path fill="#ffffff" d="M50 90 C41 81 14 62 9 39 C5 20 19 8 35 10 C43 11 48 16 50 21 C52 16 57 11 65 10 C81 8 95 20 91 39 C86 62 59 81 50 90Z"/>
+            </svg>
+
+            <div class="side-content">
+                <span class="small-pill">Tu bienestar importa</span>
+                <h2>Empieza a cuidarte desde hoy.</h2>
+                <p class="side-description">
+                    Encuentra especialistas, administra tus citas y mantén comunicación
+                    dentro de una plataforma diseñada para acompañarte.
+                </p>
+
+                <div class="features">
+                    <div class="feature"><span class="tick">✓</span>Especialistas verificados</div>
+                    <div class="feature"><span class="tick">✓</span>Citas en línea</div>
+                    <div class="feature"><span class="tick">✓</span>Comunicación privada</div>
+                    <div class="feature"><span class="tick">✓</span>Acceso web y móvil</div>
+                </div>
+            </div>
+
+            <div class="quote-card">
+                <strong>Tu información importa</strong>
+                <p>Protege tu cuenta con una contraseña distinta a las que usas en otros servicios.</p>
+            </div>
+        </aside>
+
+        <!-- FORMULARIO -->
+        <section class="form-side">
+            <div class="form-wrapper">
+
+                <a href="/login/" class="back">← Volver</a>
+
+                <div class="form-header">
+                    <h2>Crea tu cuenta</h2>
+                    <p>Completa tus datos para crear tu perfil de paciente en CAP Online.</p>
+                </div>
+
+                <form method="POST" id="registerForm">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="form-alert show">
+                            {% for error in form.non_field_errors %}{{ error }} {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- DATOS PERSONALES -->
+                    <section class="form-section">
+                        <div class="section-heading">
+                            <h3>Datos personales</h3>
+                            <p>Los campos con <span class="req">*</span> son obligatorios.</p>
+                        </div>
+
+                        <div class="grid">
+
+                            {% if form.full_name %}
+                            <div class="field {% if form.full_name.errors %}error{% endif %}" id="nameField">
+                                <label for="{{ form.full_name.id_for_label }}">Nombre completo <span class="req">*</span></label>
+                                {{ form.full_name }}
+                                <div class="message {% if form.full_name.errors %}error{% endif %}" id="nameMessage">{% if form.full_name.errors %}{{ form.full_name.errors.0 }}{% else %}Escribe tu nombre y apellidos.{% endif %}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if form.telefono %}
+                            <div class="field {% if form.telefono.errors %}error{% endif %}" id="phoneField">
+                                <label for="{{ form.telefono.id_for_label }}">Teléfono (opcional)</label>
+                                {{ form.telefono }}
+                                <div class="message {% if form.telefono.errors %}error{% endif %}" id="phoneMessage">{% if form.telefono.errors %}{{ form.telefono.errors.0 }}{% else %}Mínimo 10 dígitos.{% endif %}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if form.email %}
+                            <div class="field full {% if form.email.errors %}error{% endif %}" id="emailField">
+                                <label for="{{ form.email.id_for_label }}">Correo electrónico <span class="req">*</span></label>
+                                {{ form.email }}
+                                <div class="message {% if form.email.errors %}error{% endif %}" id="emailMessage">{% if form.email.errors %}{{ form.email.errors.0 }}{% else %}Lo usarás para iniciar sesión y recuperar tu cuenta.{% endif %}</div>
+                            </div>
+                            {% endif %}
+
+                            {% if form.biografia %}
+                            <div class="field full" id="bioField">
+                                <label for="{{ form.biografia.id_for_label }}">Sobre ti</label>
+                                {{ form.biografia }}
+                                <div class="message">Opcional. Puedes actualizar esta información después.</div>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </section>
+
+                    <!-- SEGURIDAD -->
+                    <section class="form-section">
+                        <div class="section-heading">
+                            <h3>Seguridad de la cuenta</h3>
+                        </div>
+
+                        <div class="grid">
+
+                            {% if form.password %}
+                            <div class="field full {% if form.password.errors %}error{% endif %}" id="passwordField">
+                                <label for="{{ form.password.id_for_label }}">Contraseña <span class="req">*</span></label>
+
+                                <div class="input-wrap">
+                                    {{ form.password }}
+                                    <button type="button" class="toggle-password" aria-label="Mostrar contraseña"
+                                            onclick="togglePassword('{{ form.password.id_for_label }}', this)">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M4 4l16 16"/></svg>
+                                    </button>
+                                </div>
+
+                                <div class="message {% if form.password.errors %}error{% endif %}" id="passwordMessage" aria-live="polite">{% if form.password.errors %}{{ form.password.errors|join:" " }}{% else %}Usa al menos {{ form.password_min_length }} caracteres. Evita contraseñas comunes, formadas solo por números o parecidas a tus datos personales.{% endif %}</div>
+
+                                <div class="password-box">
+                                    <div class="password-top">
+                                        <span>Recomendaciones de seguridad</span>
+                                        <span class="password-level" id="strengthLabel">Sin contraseña</span>
+                                    </div>
+
+                                    <div class="strength"><span></span><span></span><span></span><span></span></div>
+
+                                    <div class="rules">
+                                        <div class="rule" id="rLength"><span class="rule-icon">•</span>{{ form.password_min_length }} caracteres</div>
+                                        <div class="rule" id="rUpper"><span class="rule-icon">•</span>Una mayúscula</div>
+                                        <div class="rule" id="rLower"><span class="rule-icon">•</span>Una minúscula</div>
+                                        <div class="rule" id="rNumber"><span class="rule-icon">•</span>Un número</div>
+                                        <div class="rule" id="rSpecial"><span class="rule-icon">•</span>Un símbolo</div>
+                                        <div class="rule" id="rSpaces"><span class="rule-icon">•</span>Sin espacios</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if form.password2 %}
+                            <div class="field full {% if form.password2.errors %}error{% endif %}" id="password2Field">
+                                <label for="{{ form.password2.id_for_label }}">Confirmar contraseña <span class="req">*</span></label>
+
+                                <div class="input-wrap">
+                                    {{ form.password2 }}
+                                    <button type="button" class="toggle-password" aria-label="Mostrar contraseña"
+                                            onclick="togglePassword('{{ form.password2.id_for_label }}', this)">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M4 4l16 16"/></svg>
+                                    </button>
+                                </div>
+
+                                <div class="message {% if form.password2.errors %}error{% endif %}" id="password2Message">{% if form.password2.errors %}{{ form.password2.errors.0 }}{% else %}Repite la contraseña.{% endif %}</div>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </section>
+
+                    <!-- PRIVACIDAD -->
+                    <div class="privacy">
+                        {% if form.acepto_politicas %}
+                            {{ form.acepto_politicas }}
+                            <label for="{{ form.acepto_politicas.id_for_label }}">
+                                Confirmo que he leído y acepto la
+                                <button type="button" class="policy-btn" onclick="openPolicy()">Política de Privacidad</button>.
+                            </label>
+                        {% else %}
+                            <input type="checkbox" id="privacy" required>
+                            <label for="privacy">
+                                Confirmo que he leído y acepto la
+                                <button type="button" class="policy-btn" onclick="openPolicy()">Política de Privacidad</button>.
+                            </label>
+                        {% endif %}
+                    </div>
+
+                    <div class="message {% if form.acepto_politicas.errors %}error{% endif %}" id="privacyMessage" aria-live="polite">{{ form.acepto_politicas.errors|join:" " }}</div>
+                    <div class="form-alert" id="formAlert" role="alert">Revisa los campos antes de continuar.</div>
+
+                    <button type="submit" class="submit" id="submitBtn">Crear mi cuenta</button>
+                    <p class="submit-hint" id="submitHint" role="status">Completa todos los campos obligatorios para continuar.</p>
+
+                    <div class="bottom">
+                        ¿Ya tienes cuenta? <a href="/login/">Iniciar sesión</a>
+                    </div>
+                    <div class="secure">🔒 Tu información se mantiene protegida.</div>
+                </form>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+
+<!-- MODAL -->
+<div class="modal" id="policyModal" role="dialog" aria-modal="true" aria-labelledby="policyTitle">
+    <div class="overlay" onclick="closePolicy()"></div>
+
+    <article class="modal-card">
+        <header class="modal-header">
+            <div>
+                <h2 id="policyTitle">Política de Privacidad</h2>
+                <p>CAP Online · Última actualización: septiembre de 2026</p>
+            </div>
+            <button type="button" class="close-modal" aria-label="Cerrar" onclick="closePolicy()">×</button>
+        </header>
+
+        <div class="modal-content">
+
+            <section class="policy-section">
+                <h3>1. Información general</h3>
+                <p>CAP Online es una plataforma digital enfocada en facilitar la comunicación, la administración de citas y el acceso a profesionales de la psicología.</p>
+                <p>La plataforma puede operar mediante una aplicación web y una aplicación móvil conectadas al mismo sistema.</p>
+            </section>
+
+            <section class="policy-section">
+                <h3>2. Información que recopilamos</h3>
+                <p>Podemos solicitar información proporcionada por el usuario para crear y administrar su cuenta.</p>
+                <ul>
+                    <li>Nombre completo.</li>
+                    <li>Correo electrónico.</li>
+                    <li>Teléfono.</li>
+                    <li>Información de perfil.</li>
+                    <li>Información relacionada con citas.</li>
+                    <li>Mensajes generados dentro de CAP Online.</li>
+                </ul>
+            </section>
+
+            <section class="policy-section">
+                <h3>3. Uso de la información</h3>
+                <p>Los datos podrán utilizarse para administrar la cuenta, autenticar al usuario, gestionar citas, permitir la comunicación entre usuarios autorizados, recuperar contraseñas y proporcionar las funcionalidades de CAP Online.</p>
+            </section>
+
+            <section class="policy-section">
+                <h3>4. Información sensible</h3>
+                <p>Determinada información relacionada con la atención psicológica puede requerir controles adicionales de acceso.</p>
+                <p>Las notas clínicas deberán permanecer restringidas a profesionales autorizados y no estarán disponibles para usuarios que no tengan una relación asistencial válida.</p>
+            </section>
+
+            <section class="policy-section">
+                <h3>5. Seguridad de las contraseñas</h3>
+                <p>Las contraseñas se administrarán utilizando los mecanismos de seguridad implementados por Django y no deberán almacenarse en texto visible.</p>
+                <p>El usuario también es responsable de utilizar una contraseña segura y mantener sus credenciales privadas.</p>
+            </section>
+
+            <section class="policy-section">
+                <h3>6. Recuperación de la cuenta</h3>
+                <p>CAP Online podrá enviar al correo registrado enlaces temporales para restablecer la contraseña.</p>
+            </section>
+
+            <section class="policy-section">
+                <h3>7. Aplicación móvil y biometría</h3>
+                <p>Cuando la aplicación móvil permita autenticación mediante Face ID, huella u otros mecanismos biométricos, la verificación será administrada por las funciones de seguridad del dispositivo.</p>
+                <p>CAP Online no necesita almacenar directamente la huella digital ni el rostro del usuario.</p>
+            </section>
+
+            <section class="policy-section">
+                <h3>8. Servicios tecnológicos externos</h3>
+                <p>CAP Online podrá utilizar servicios externos de alojamiento, bases de datos, correo electrónico, almacenamiento o comunicación.</p>
+            </section>
+
+            <section class="policy-section">
+                <h3>9. Derechos y actualización de la información</h3>
+                <p>Los usuarios podrán actualizar determinados datos mediante las opciones disponibles en la plataforma.</p>
+            </section>
+
+            <section class="policy-section">
+                <h3>10. Aceptación</h3>
+                <p>Al presionar “He leído y acepto”, el usuario manifiesta haber tenido acceso a esta política y aceptar el tratamiento de sus datos necesario para utilizar CAP Online.</p>
+            </section>
+
+        </div>
+
+        <footer class="modal-footer">
+            <button type="button" class="cancel" onclick="closePolicy()">Volver</button>
+            <button type="button" class="accept" onclick="acceptPolicy()">He leído y acepto</button>
+        </footer>
+    </article>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const $ = id => document.getElementById(id);
+
+    const el = {
+        email:     {% if form.email %}$("{{ form.email.id_for_label }}"){% else %}null{% endif %},
+        name:      {% if form.full_name %}$("{{ form.full_name.id_for_label }}"){% else %}null{% endif %},
+        phone:     {% if form.telefono %}$("{{ form.telefono.id_for_label }}"){% else %}null{% endif %},
+        password:  {% if form.password %}$("{{ form.password.id_for_label }}"){% else %}null{% endif %},
+        password2: {% if form.password2 %}$("{{ form.password2.id_for_label }}"){% else %}null{% endif %}
+    };
+
+    /* Placeholders y atributos */
+    if (el.email)     { el.email.placeholder = "nombre@correo.com";          el.email.autocomplete = "email"; }
+    if (el.name)      { el.name.placeholder = "Tu nombre y apellidos";       el.name.autocomplete = "name"; }
+    if (el.phone)     { el.phone.placeholder = "81 1234 5678";               el.phone.autocomplete = "tel"; }
+    if (el.password)  { el.password.placeholder = "Crea una contraseña segura"; el.password.classList.add("password"); el.password.autocomplete = "new-password"; }
+    if (el.password2) { el.password2.placeholder = "Repite tu contraseña";   el.password2.classList.add("password"); el.password2.autocomplete = "new-password"; }
+
+    const form = $("registerForm");
+    form.noValidate = true;
+    const privacy = document.querySelector('.privacy input[type="checkbox"]');
+    const submit  = $("submitBtn");
+    const hint    = $("submitHint");
+
+    function nameError() {
+        if (!el.name) return "";
+        const name = el.name.value.normalize("NFC").trim().replace(/\s+/gu, " ");
+        if (!name) return "Ingresa tu nombre completo.";
+        if (name.length > 150) return "El nombre completo debe tener como máximo 150 caracteres.";
+        if (!/^[\p{L}\p{M} '’\-]+$/u.test(name)) return "Usa solo letras en tu nombre y apellidos. Se permiten acentos, espacios, guiones y apóstrofos; no números ni otros símbolos.";
+        if (name.split(" ").length < 2) return "Escribe tu nombre y al menos un apellido, separados por un espacio. Ejemplo: María López.";
+        if (name.split(/[\s\-'’]/u).some(part => !/\p{L}/u.test(part))) return "Revisa los guiones y apóstrofos: deben estar entre las letras del nombre.";
+        if (/(.)\1{3,}/iu.test(name)) return "Revisa tu nombre: hay una letra repetida cuatro o más veces seguidas. Corrige las repeticiones accidentales.";
+        return "";
+    }
+
+    function fieldError(key) {
+        const value = el[key]?.value || "";
+        if (key === "name") return nameError();
+        if (key === "phone") {
+            if (!value.trim()) return "";
+            if (!/^[+()\d\s.-]+$/.test(value)) return "Usa solo dígitos, espacios, guiones, paréntesis o el signo + en el teléfono.";
+            const digits = value.replace(/\D/g, "").length;
+            if (digits < 10) return "El teléfono debe tener al menos 10 dígitos.";
+            if (digits > 15) return "El teléfono no debe tener más de 15 dígitos.";
+        }
+        if (key === "email") {
+            if (!value.trim()) return "Ingresa tu correo.";
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return "El correo no es válido. Usa el formato nombre@correo.com.";
+        }
+        if (key === "password") {
+            if (!value) return "Ingresa una contraseña.";
+            if (value.length < el.password.minLength) return "Usa al menos " + el.password.minLength + " caracteres.";
+            if (/\s/u.test(value)) return "La contraseña no debe contener espacios.";
+            if (/^\p{Nd}+$/u.test(value)) return "La contraseña no puede contener solo números. Agrega letras o símbolos.";
+            if (el.email.value.trim() && value.toLowerCase() === el.email.value.trim().toLowerCase()) return "La contraseña no puede ser tu correo. Elige una diferente.";
+        }
+        if (key === "password2") {
+            if (!value) return "Confirma tu contraseña.";
+            if (value !== el.password.value) return "Las contraseñas no coinciden.";
+        }
+        return "";
+    }
+
+    /* Validaciones */
+    const checks = {
+        name:  () => !nameError(),
+        phone: () => !el.phone || !el.phone.value.trim() || /^[+()\d\s.-]+$/.test(el.phone.value) && el.phone.value.replace(/\D/g, "").length >= 10 && el.phone.value.replace(/\D/g, "").length <= 15,
+        email: () => !el.email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.email.value),
+        password2: () => !el.password || !el.password2 ||
+                         (el.password2.value.length > 0 && el.password.value === el.password2.value)
+    };
+
+    const texts = {
+        name:  { ok: "El formato del nombre es correcto.", bad: "Escribe tu nombre y apellidos." },
+        phone: { ok: "El formato del teléfono es correcto.", bad: "Escribe entre 10 y 15 dígitos o deja este campo vacío." },
+        email: { ok: "El formato del correo es correcto.", bad: "Escribe tu correo en el formato nombre@ejemplo.com." },
+        password2: { ok: "Las contraseñas coinciden.", bad: "Escribe exactamente la misma contraseña en ambos campos." }
+    };
+
+    const touched = {};
+
+    function showState(key) {
+        const field = $(key + "Field");
+        const msg   = $(key + "Message");
+        if (!field || !msg || !el[key] || !touched[key]) return;
+
+        const error = fieldError(key);
+        const ok = !error;
+        el[key].setAttribute("aria-invalid", String(!ok));
+        field.classList.toggle("error", !ok);
+        field.classList.toggle("success", ok);
+        msg.className = "message " + (ok ? "success" : "error");
+        msg.textContent = ok ? (key === "phone" && !el.phone.value.trim() ? "Opcional. Puedes dejarlo vacío." : texts[key].ok) : error;
+    }
+
+    function passwordRules() {
+        const v = el.password ? el.password.value : "";
+        return {
+            length:  v.length >= Number(el.password.minLength > 0 ? el.password.minLength : 8),
+            upper:   /[A-Z]/.test(v),
+            lower:   /[a-z]/.test(v),
+            number:  /\d/.test(v),
+            special: /[^A-Za-z0-9]/.test(v),
+            spaces:  !/\s/.test(v)
+        };
+    }
+
+    const passwordOkay = () => !fieldError("password");
+    checks.password = passwordOkay;
+    Object.keys(checks).forEach(key => { checks[key] = () => !fieldError(key); });
+    texts.password = {
+        ok: "La contraseña cumple estos requisitos. Al enviar el formulario, revisaremos también que no sea común ni parecida a tus datos personales.",
+        bad: "Usa al menos " + el.password.minLength + " caracteres y evita una contraseña formada solo por números."
+    };
+
+    function updateRule(id, valid) {
+        const rule = $(id);
+        if (!rule) return;
+        rule.classList.toggle("ok", valid);
+        rule.querySelector(".rule-icon").textContent = valid ? "✓" : "•";
+    }
+
+    function updateStrength() {
+        if (!el.password) return;
+
+        const r = passwordRules();
+        updateRule("rLength", r.length);
+        updateRule("rUpper", r.upper);
+        updateRule("rLower", r.lower);
+        updateRule("rNumber", r.number);
+        updateRule("rSpecial", r.special);
+        updateRule("rSpaces", r.spaces);
+
+        const score = Object.values(r).filter(Boolean).length;
+        const bars = document.querySelectorAll(".strength span");
+        bars.forEach(b => b.style.background = "#DDEBE6");
+
+        let active = 0, color = "#DDEBE6", text = "Sin contraseña";
+
+        if (el.password.value) {
+            if (score <= 2)      { active = 1; color = "#b93838"; text = "Débil"; }
+            else if (score <= 4) { active = 2; color = "#4A9A87"; text = "Mejorable"; }
+            else if (score === 5){ active = 3; color = "#4A9A87"; text = "Segura"; }
+            else                 { active = 4; color = "#2F6F62"; text = "Muy segura"; }
+        }
+
+        for (let i = 0; i < active; i++) bars[i].style.background = color;
+
+        const label = $("strengthLabel");
+        if (label) { label.textContent = text; label.style.color = color; }
+    }
+
+    function update() {
+        updateStrength();
+        Object.keys(checks).forEach(showState);
+
+        const valid =
+            checks.email() && checks.name() && checks.phone() &&
+            passwordOkay() && checks.password2() &&
+            privacy && privacy.checked;
+
+        if (hint && !submit.disabled) hint.textContent = valid ? "Todo listo para enviar. Comprobaremos tus datos al crear la cuenta." : "Completa los campos obligatorios. Al enviar te indicaremos qué corregir.";
+    }
+
+    /* Eventos */
+    ["email", "name", "phone", "password", "password2"].forEach(key => {
+        const input = el[key];
+        if (!input) return;
+
+        input.addEventListener("input", () => {
+            if (key === "name") touched.name = true;
+            if (key === "password2") touched.password2 = true;
+            if (key === "password" && el.password2 && el.password2.value) touched.password2 = true;
+            update();
+        });
+
+        input.addEventListener("blur", () => { touched[key] = true; update(); });
+    });
+
+    function validatePrivacy() {
+        const valid = privacy.checked;
+        privacy.setAttribute("aria-invalid", String(!valid));
+        $("privacyMessage").classList.toggle("error", !valid);
+        $("privacyMessage").textContent = valid ? "" : "Debes aceptar la Política de Privacidad para crear la cuenta.";
+        return valid;
+    }
+    if (privacy) {
+        privacy.setAttribute("aria-describedby", "privacyMessage");
+        privacy.setAttribute("aria-invalid", String($("privacyMessage").classList.contains("error")));
+        privacy.addEventListener("change", () => { validatePrivacy(); update(); });
+    }
+    Object.keys(el).forEach(key => {
+        if (!el[key]) return;
+        el[key].setAttribute("aria-describedby", key + "Message");
+        $(key + "Message")?.setAttribute("aria-live", "polite");
+        el[key].setAttribute("aria-invalid", String($(key + "Field")?.classList.contains("error") || false));
+    });
+    form.addEventListener("submit", event => {
+        if (submit.disabled) { event.preventDefault(); return; }
+        Object.keys(checks).forEach(key => { touched[key] = true; showState(key); });
+        const invalid = Object.keys(checks).filter(key => !checks[key]());
+        const privacyValid = validatePrivacy();
+        if (invalid.length || !privacyValid) {
+            event.preventDefault();
+            $("formAlert").classList.add("show");
+            (invalid.length ? el[invalid[0]] : privacy).focus();
+            return;
+        }
+        $("formAlert").classList.remove("show");
+        submit.disabled = true;
+        submit.textContent = "Creando cuenta…";
+        form.setAttribute("aria-busy", "true");
+        hint.textContent = "Estamos comprobando tus datos y creando tu cuenta.";
+    });
+    window.addEventListener("pageshow", () => {
+        submit.disabled = false;
+        submit.textContent = "Crear mi cuenta";
+        form.removeAttribute("aria-busy");
+        update();
+    });
+
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closePolicy(); });
+
+    update();
+    const firstError = form.querySelector('.field.error input, [aria-invalid="true"]');
+    firstError?.focus();
+});
+
+
+function togglePassword(id, button) {
+    const input = document.getElementById(id);
+    if (!input) return;
+
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    button.classList.toggle("on", show);
+    button.setAttribute("aria-label", show ? "Ocultar contraseña" : "Mostrar contraseña");
+}
+
+function openPolicy() {
+    document.getElementById("policyModal").classList.add("active");
+    document.body.classList.add("modal-open");
+}
+
+function closePolicy() {
+    document.getElementById("policyModal").classList.remove("active");
+    document.body.classList.remove("modal-open");
+}
+
+function acceptPolicy() {
+    const check = document.querySelector('.privacy input[type="checkbox"]');
+    if (check) {
+        check.checked = true;
+        check.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    closePolicy();
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1444 @@
+{% extends 'portal/base.html' %}
+
+{% block page_title %}
+Psicólogos
+{% endblock %}
+
+{% block extra_styles %}
+
+<style>
+
+    :root{
+        --psy-dark:#173D36;
+        --psy-primary:#4A9A87;
+        --psy-primary-2:#4A9A87;
+
+        --psy-green:#4A9A87;
+        --psy-green-dark:#2F6F62;
+
+        --psy-mint:#F4F8F6;
+        --psy-mint-2:#F4F8F6;
+
+        --psy-white:#ffffff;
+
+        --psy-text:#173D36;
+        --psy-muted:#5E756F;
+
+        --psy-border:#DDEBE6;
+
+        --psy-shadow:
+            0 10px 30px rgba(74,154,135,.055);
+
+        --psy-shadow-hover:
+            0 16px 38px rgba(74,154,135,.09);
+    }
+
+
+    /* =====================================================
+       CONTENEDOR
+    ===================================================== */
+
+    .specialists-page{
+        width:100%;
+    }
+
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+
+    .specialists-hero{
+        position:relative;
+        overflow:hidden;
+
+        margin-bottom:18px;
+        padding:24px 26px;
+
+        border:1px solid var(--psy-border);
+        border-radius:22px;
+
+        background:
+            radial-gradient(
+                circle at 90% 10%,
+                rgba(74,154,135,.10),
+                transparent 28%
+            ),
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #F4F8F6
+            );
+
+        box-shadow:var(--psy-shadow);
+    }
+
+
+    .specialists-hero::after{
+        content:"";
+
+        position:absolute;
+
+        width:170px;
+        height:170px;
+
+        right:-75px;
+        bottom:-90px;
+
+        border-radius:50%;
+
+        background:
+            rgba(74,154,135,.06);
+    }
+
+
+    .hero-content{
+        position:relative;
+        z-index:2;
+
+        max-width:720px;
+    }
+
+
+    .hero-kicker{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+
+        margin-bottom:9px;
+        padding:6px 10px;
+
+        border-radius:999px;
+
+        background:var(--psy-mint);
+
+        color:var(--psy-green-dark);
+
+        font-size:8px;
+        font-weight:700;
+    }
+
+
+    .specialists-hero h2{
+        margin:0;
+
+        color:var(--psy-dark);
+
+        font-size:
+            clamp(
+                24px,
+                3vw,
+                31px
+            );
+
+        line-height:1.08;
+        letter-spacing:-.5px;
+    }
+
+
+    .specialists-hero p{
+        margin-top:9px;
+
+        max-width:610px;
+
+        color:var(--psy-muted);
+
+        font-size:11px;
+        line-height:1.65;
+    }
+
+
+    /* =====================================================
+       SEARCH PANEL
+    ===================================================== */
+
+    .search-panel{
+        margin-bottom:24px;
+        padding:13px;
+
+        border:1px solid var(--psy-border);
+        border-radius:18px;
+
+        background:#ffffff;
+
+        box-shadow:var(--psy-shadow);
+    }
+
+
+    .search-grid{
+        display:grid;
+
+        grid-template-columns:
+            minmax(0,1fr)
+            180px
+            110px;
+
+        gap:9px;
+    }
+
+
+    .search-field{
+        position:relative;
+    }
+
+
+    .search-icon{
+        position:absolute;
+
+        left:13px;
+        top:50%;
+
+        transform:translateY(-50%);
+
+        color:#5E756F;
+
+        font-size:15px;
+
+        pointer-events:none;
+    }
+
+
+    .search-field input{
+        width:100%;
+        min-height:44px;
+
+        padding:
+            10px 13px 10px 38px;
+
+        border:1px solid var(--psy-border);
+        border-radius:12px;
+
+        outline:none;
+
+        background:#F4F8F6;
+
+        color:var(--psy-text);
+
+        font-family:inherit;
+        font-size:11px;
+
+        transition:.2s;
+    }
+
+
+    .search-field input:focus{
+        border-color:
+            rgba(74,154,135,.55);
+
+        background:#ffffff;
+
+        box-shadow:
+            0 0 0 4px
+            rgba(74,154,135,.08);
+    }
+
+
+    .filter-select{
+        width:100%;
+        min-height:44px;
+
+        padding:
+            0 12px;
+
+        border:1px solid var(--psy-border);
+        border-radius:12px;
+
+        outline:none;
+
+        background:#F4F8F6;
+
+        color:var(--psy-text);
+
+        font-family:inherit;
+        font-size:11px;
+    }
+
+
+    .search-button{
+        min-height:44px;
+
+        border:0;
+        border-radius:12px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #4A9A87,
+                #68B39F
+            );
+
+        color:#173D36;
+
+        font-size:10px;
+        font-weight:700;
+
+        cursor:pointer;
+
+        transition:.2s;
+    }
+
+
+    .search-button:hover{
+        transform:translateY(-1px);
+
+        box-shadow:
+            0 8px 18px
+            rgba(74,154,135,.11);
+    }
+
+
+    /* =====================================================
+       RESULTADOS
+    ===================================================== */
+
+    .results-header{
+        display:flex;
+
+        align-items:end;
+        justify-content:space-between;
+
+        gap:15px;
+
+        margin:
+            0 2px 13px;
+    }
+
+
+    .results-header h2{
+        margin:0;
+
+        color:var(--psy-dark);
+
+        font-size:19px;
+    }
+
+
+    .results-header p{
+        margin-top:3px;
+
+        color:var(--psy-muted);
+
+        font-size:9px;
+    }
+
+
+    /* =====================================================
+       DOCTOR GRID
+    ===================================================== */
+
+    .doctor-grid{
+        display:grid;
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+
+        gap:15px;
+    }
+
+
+    /* =====================================================
+       DOCTOR CARD
+    ===================================================== */
+
+    .doctor-card{
+        position:relative;
+        overflow:hidden;
+
+        display:grid;
+
+        grid-template-columns:
+            88px minmax(0,1fr);
+
+        gap:16px;
+
+        padding:17px;
+
+        border:1px solid var(--psy-border);
+        border-radius:21px;
+
+        background:#ffffff;
+
+        box-shadow:var(--psy-shadow);
+
+        transition:.22s ease;
+    }
+
+
+    .doctor-card:hover{
+        transform:translateY(-3px);
+
+        border-color:
+            rgba(74,154,135,.28);
+
+        box-shadow:var(--psy-shadow-hover);
+    }
+
+
+    .doctor-card::after{
+        content:"";
+
+        position:absolute;
+
+        width:100px;
+        height:100px;
+
+        right:-50px;
+        bottom:-55px;
+
+        border-radius:50%;
+
+        background:
+            rgba(74,154,135,.055);
+    }
+
+
+    /* =====================================================
+       FOTO
+    ===================================================== */
+
+    .doctor-photo-wrap{
+        position:relative;
+    }
+
+
+    .doctor-photo{
+        width:88px;
+        height:102px;
+
+        object-fit:cover;
+
+        border-radius:16px;
+
+        background:var(--psy-mint);
+    }
+
+
+    .doctor-photo-fallback{
+        width:88px;
+        height:102px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        border-radius:16px;
+
+        background:
+            linear-gradient(
+                145deg,
+                #F4F8F6,
+                #DDEBE6
+            );
+
+        color:var(--psy-primary);
+
+        font-size:28px;
+    }
+
+
+    .availability-dot{
+        position:absolute;
+
+        right:-2px;
+        bottom:5px;
+
+        width:14px;
+        height:14px;
+
+        border:3px solid white;
+        border-radius:50%;
+
+        background:var(--psy-green);
+    }
+
+
+    /* =====================================================
+       INFO
+    ===================================================== */
+
+    .doctor-info{
+        position:relative;
+        z-index:2;
+
+        min-width:0;
+    }
+
+
+    .doctor-top{
+        display:flex;
+
+        justify-content:space-between;
+        align-items:flex-start;
+
+        gap:10px;
+    }
+
+
+    .doctor-name{
+        margin:0;
+
+        color:var(--psy-dark);
+
+        font-size:15px;
+        font-weight:700;
+        line-height:1.25;
+    }
+
+
+    .doctor-specialty{
+        margin-top:4px;
+
+        color:var(--psy-primary);
+
+        font-size:9px;
+        font-weight:600;
+    }
+
+
+    .availability-badge{
+        display:inline-flex;
+
+        align-items:center;
+        gap:5px;
+
+        min-height:24px;
+
+        padding:
+            0 8px;
+
+        border-radius:999px;
+
+        background:#F4F8F6;
+
+        color:var(--psy-green-dark);
+
+        font-size:7px;
+        font-weight:700;
+
+        white-space:nowrap;
+    }
+
+
+    .availability-badge::before{
+        content:"";
+
+        width:5px;
+        height:5px;
+
+        border-radius:50%;
+
+        background:var(--psy-green);
+    }
+
+
+    /* =====================================================
+       META
+    ===================================================== */
+
+    .doctor-meta{
+        display:flex;
+        flex-wrap:wrap;
+
+        gap:6px;
+
+        margin-top:11px;
+    }
+
+
+    .meta-pill{
+        display:inline-flex;
+
+        align-items:center;
+
+        min-height:25px;
+
+        padding:
+            0 8px;
+
+        border:1px solid var(--psy-border);
+        border-radius:999px;
+
+        background:#ffffff;
+
+        color:#5E756F;
+
+        font-size:7px;
+        font-weight:600;
+    }
+
+
+    /* =====================================================
+       BIO
+    ===================================================== */
+
+    .doctor-bio{
+        margin-top:11px;
+
+        color:var(--psy-muted);
+
+        font-size:8px;
+        line-height:1.55;
+    }
+
+
+    /* =====================================================
+       ACCIONES
+    ===================================================== */
+
+    .doctor-actions{
+        grid-column:1/-1;
+
+        position:relative;
+        z-index:2;
+
+        display:grid;
+
+        grid-template-columns:
+            repeat(4,1fr);
+
+        gap:7px;
+
+        margin-top:2px;
+    }
+
+
+    .doctor-action{
+        min-height:39px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        gap:5px;
+
+        padding:
+            0 8px;
+
+        border-radius:10px;
+
+        font-size:8px;
+        font-weight:700;
+
+        transition:.2s;
+
+        white-space:nowrap;
+    }
+
+
+    .doctor-action:hover{
+        transform:translateY(-1px);
+    }
+
+
+    .doctor-action.primary{
+        border:1px solid transparent;
+
+        background:
+            linear-gradient(
+                135deg,
+                #4A9A87,
+                #68B39F
+            );
+
+        color:#173D36 !important;
+    }
+
+
+    .doctor-action.secondary{
+        border:1px solid var(--psy-border);
+
+        background:#ffffff;
+
+        color:var(--psy-primary) !important;
+    }
+
+
+    .doctor-action.soft{
+        border:1px solid #DDEBE6;
+
+        background:var(--psy-mint-2);
+
+        color:var(--psy-green-dark) !important;
+    }
+
+
+    /* =====================================================
+       EMPTY
+    ===================================================== */
+
+    .empty-state{
+        grid-column:1/-1;
+
+        display:flex;
+
+        align-items:center;
+
+        gap:14px;
+
+        padding:23px;
+
+        border:1px solid var(--psy-border);
+        border-radius:20px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #F4F8F6
+            );
+
+        box-shadow:var(--psy-shadow);
+    }
+
+
+    .empty-state-icon{
+        width:52px;
+        height:52px;
+
+        flex:0 0 52px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        border-radius:16px;
+
+        background:var(--psy-mint);
+
+        color:var(--psy-primary);
+
+        font-size:22px;
+    }
+
+
+    .empty-state h3{
+        margin:0 0 4px;
+
+        color:var(--psy-dark);
+
+        font-size:12px;
+    }
+
+
+    .empty-state p{
+        margin:0;
+
+        color:var(--psy-muted);
+
+        font-size:9px;
+    }
+
+
+    /* =====================================================
+       HELP
+    ===================================================== */
+
+    .help-card{
+        margin-top:21px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:space-between;
+
+        gap:18px;
+
+        padding:
+            18px 20px;
+
+        border:1px solid #DDEBE6;
+        border-radius:19px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #F4F8F6,
+                #F4F8F6
+            );
+    }
+
+
+    .help-left{
+        display:flex;
+
+        align-items:center;
+
+        gap:11px;
+    }
+
+
+    .help-icon{
+        width:40px;
+        height:40px;
+
+        flex:0 0 40px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        border-radius:13px;
+
+        background:#ffffff;
+
+        color:var(--psy-green-dark);
+
+        box-shadow:
+            0 5px 14px
+            rgba(74,154,135,.045);
+    }
+
+
+    .help-card h3{
+        margin:0;
+
+        color:var(--psy-dark);
+
+        font-size:11px;
+    }
+
+
+    .help-card p{
+        margin-top:3px;
+
+        color:var(--psy-muted);
+
+        font-size:8px;
+        line-height:1.5;
+    }
+
+
+    .help-card a{
+        min-height:38px;
+
+        display:flex;
+
+        align-items:center;
+
+        padding:
+            0 12px;
+
+        border:1px solid var(--psy-border);
+        border-radius:10px;
+
+        background:#ffffff;
+
+        color:var(--psy-primary) !important;
+
+        font-size:8px;
+        font-weight:700;
+
+        white-space:nowrap;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media(max-width:1050px){
+
+        .doctor-grid{
+            grid-template-columns:1fr;
+        }
+
+    }
+
+
+    @media(max-width:720px){
+
+        .search-grid{
+            grid-template-columns:1fr;
+        }
+
+
+        .search-button{
+            width:100%;
+        }
+
+
+        .doctor-actions{
+            grid-template-columns:
+                repeat(2,1fr);
+        }
+
+
+        .help-card{
+            flex-direction:column;
+            align-items:flex-start;
+        }
+
+    }
+
+
+    @media(max-width:520px){
+
+        .specialists-hero{
+            padding:20px 18px;
+
+            border-radius:19px;
+        }
+
+
+        .doctor-card{
+            grid-template-columns:
+                70px minmax(0,1fr);
+
+            gap:12px;
+
+            padding:14px;
+        }
+
+
+        .doctor-photo,
+        .doctor-photo-fallback{
+            width:70px;
+            height:81px;
+
+            border-radius:13px;
+        }
+
+
+        .doctor-top{
+            flex-direction:column;
+
+            gap:6px;
+        }
+
+
+        .doctor-actions{
+            grid-template-columns:
+                1fr 1fr;
+        }
+
+
+        .doctor-action{
+            min-height:41px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="specialists-page">
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="specialists-hero">
+
+
+        <div class="hero-content">
+
+
+            <span class="hero-kicker">
+
+                ♡ Profesionales CAP Online
+
+            </span>
+
+
+            <h2>
+
+                Encuentra un especialista para ti
+
+            </h2>
+
+
+            <p>
+
+                Explora perfiles, conoce la experiencia de cada profesional
+                y elige con calma a quien mejor se adapte a lo que necesitas.
+
+            </p>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         BUSCADOR
+    ====================================================== -->
+
+    <form
+        class="search-panel"
+        method="get"
+    >
+
+
+        <div class="search-grid">
+
+
+            <!-- BUSCAR -->
+
+            <div class="search-field">
+
+
+                <span class="search-icon">
+                    ⌕
+                </span>
+
+
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ q }}"
+                    placeholder="Buscar por nombre o especialidad..."
+                >
+
+
+            </div>
+
+
+
+            <!-- MODALIDAD -->
+
+            <select
+                name="modalidad"
+                class="filter-select"
+            >
+
+
+                <option value="">
+
+                    Todas las modalidades
+
+                </option>
+
+
+                <option
+                    value="online"
+                    {% if modalidad == 'online' %}
+                        selected
+                    {% endif %}
+                >
+
+                    Online
+
+                </option>
+
+
+                <option
+                    value="presencial"
+                    {% if modalidad == 'presencial' %}
+                        selected
+                    {% endif %}
+                >
+
+                    Presencial
+
+                </option>
+
+
+                <option
+                    value="ambos"
+                    {% if modalidad == 'ambos' %}
+                        selected
+                    {% endif %}
+                >
+
+                    Ambas
+
+                </option>
+
+
+            </select>
+
+
+
+            <button
+                type="submit"
+                class="search-button"
+            >
+
+                Buscar
+
+            </button>
+
+
+        </div>
+
+
+    </form>
+
+
+
+    <!-- =====================================================
+         RESULTADOS
+    ====================================================== -->
+
+    <div class="results-header">
+
+
+        <div>
+
+
+            <h2>
+
+                Especialistas disponibles
+
+            </h2>
+
+
+            <p>
+
+                Revisa los perfiles y elige con calma.
+
+            </p>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         DOCTORES
+    ====================================================== -->
+
+    <div class="doctor-grid">
+
+
+        {% for d in doctores %}
+
+
+        <article class="doctor-card">
+
+
+            <!-- FOTO -->
+
+            <div class="doctor-photo-wrap">
+
+
+                {% if d.foto %}
+
+
+                    <img
+                        class="doctor-photo"
+                        src="{{ d.foto.url }}"
+                        alt="{{ d.user.get_full_name|default:d.user.username }}"
+                    >
+
+
+                {% else %}
+
+
+                    <div class="doctor-photo-fallback">
+
+                        ♡
+
+                    </div>
+
+
+                {% endif %}
+
+
+
+                <span
+                    class="availability-dot"
+                    title="Disponible"
+                ></span>
+
+
+            </div>
+
+
+
+            <!-- INFO -->
+
+            <div class="doctor-info">
+
+
+                <div class="doctor-top">
+
+
+                    <div>
+
+
+                        <h3 class="doctor-name">
+
+                            {{ d.user.get_full_name|default:d.user.username }}
+
+                        </h3>
+
+
+                        <div class="doctor-specialty">
+
+                            {{ d.especialidad|default:'Psicología' }}
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <span class="availability-badge">
+
+                        Disponible
+
+                    </span>
+
+
+                </div>
+
+
+
+                <!-- META -->
+
+                <div class="doctor-meta">
+
+
+                    <span class="meta-pill">
+
+                        {{ d.get_modalidad_display }}
+
+                    </span>
+
+
+                    {% if d.experiencia_anios %}
+
+                    <span class="meta-pill">
+
+                        {{ d.experiencia_anios }}
+                        años de experiencia
+
+                    </span>
+
+                    {% endif %}
+
+
+                    {% if d.idiomas %}
+
+                    <span class="meta-pill">
+
+                        {{ d.idiomas }}
+
+                    </span>
+
+                    {% endif %}
+
+
+                    {% if d.costo_consulta %}
+
+                    <span class="meta-pill">
+
+                        ${{ d.costo_consulta }}
+
+                    </span>
+
+                    {% endif %}
+
+
+                </div>
+
+
+
+                <!-- BIO -->
+
+                <p class="doctor-bio">
+
+
+                    {% if d.biografia %}
+
+
+                        {{ d.biografia|truncatechars:120 }}
+
+
+                    {% else %}
+
+
+                        Profesional de la salud mental disponible para
+                        brindarte acompañamiento dentro de CAP Online.
+
+
+                    {% endif %}
+
+
+                </p>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 ACCIONES
+            ================================================== -->
+
+            <div class="doctor-actions">
+
+
+                <!-- PERFIL -->
+
+                <a
+                    class="doctor-action secondary"
+                    href="{% url 'portal_profile' d.id %}"
+                >
+
+                    ♙ Ver perfil
+
+                </a>
+
+
+
+                <!-- AGENDAR -->
+
+                <a
+                    class="doctor-action primary"
+                    href="{% url 'portal_calendar_patient' %}"
+                >
+
+                    ◷ Agendar
+
+                </a>
+
+
+
+                <!-- CHAT -->
+
+                <a
+                    class="doctor-action soft"
+                    href="{% url 'portal_chat' %}"
+                >
+
+                    ◌ Mensaje
+
+                </a>
+
+
+
+                <!-- DISPONIBILIDAD -->
+
+                <a
+                    class="doctor-action secondary"
+                    href="{% url 'portal_profile' d.id %}"
+                >
+
+                    ▣ Horarios
+
+                </a>
+
+
+            </div>
+
+
+        </article>
+
+
+
+        {% empty %}
+
+
+        <div class="empty-state">
+
+
+            <div class="empty-state-icon">
+
+                ♡
+
+            </div>
+
+
+            <div>
+
+
+                <h3>
+
+                    No encontramos especialistas
+
+                </h3>
+
+
+                <p>
+
+                    Prueba con otro nombre,
+                    especialidad o modalidad.
+
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         AYUDA
+    ====================================================== -->
+
+    <section class="help-card">
+
+
+        <div class="help-left">
+
+
+            <div class="help-icon">
+
+                ♡
+
+            </div>
+
+
+            <div>
+
+
+                <h3>
+
+                    ¿No sabes qué especialista elegir?
+
+                </h3>
+
+
+                <p>
+
+                    Puedes revisar cada perfil,
+                    comparar experiencia y consultar
+                    sus horarios antes de agendar.
+
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <a href="{% url 'portal_chat' %}">
+
+            Ir a mensajes →
+
+        </a>
+
+
+    </section>
+
+
+</div>
+
+{% endblock %}

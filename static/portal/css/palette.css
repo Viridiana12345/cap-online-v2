@@ -1,0 +1,84 @@
+/* Logo green palette across public pages, authentication and the portal. */
+:root {
+    --cap-brand: #4A9A87;
+    --cap-ink: #173D36;
+    --cap-muted: #5E756F;
+    --cap-surface: #F4F8F6;
+    --cap-border: #DDEBE6;
+    --cap-link: #2F6F62;
+    --cap-danger: #b93838;
+    --cap-danger-soft: #fff2f2;
+}
+
+/* Menta uniforme: navegación clara, tranquila y con contraste accesible. */
+body .btn-primary { background: var(--cap-brand); color: #ffffff; }
+body.portal-body { background: #F4FAF7; }
+body.portal-body .sidebar {
+    background: linear-gradient(180deg, #E5F4EE 0%, #D6ECE4 52%, #C7E4DB 100%);
+    border-right: 1px solid #B8D9CF;
+    box-shadow: 5px 0 24px rgba(47,111,98,.10);
+}
+body.portal-body .sidebar-logo {
+    background: rgba(255,255,255,.72);
+    border-color: rgba(74,154,135,.18);
+}
+body.portal-body .nav a,
+body.portal-body .profile-link { color: #356b60; }
+body.portal-body .nav a:hover,
+body.portal-body .profile-link:hover {
+    color: #205f53;
+    background: rgba(255,255,255,.52);
+}
+body.portal-body .nav a.active {
+    color: #174f45;
+    background: rgba(255,255,255,.68);
+    box-shadow: 0 8px 20px rgba(47,111,98,.10);
+}
+body.portal-body .nav a.active::before { background: #4A9A87; }
+body.portal-body .sidebar-footer { border-top-color: rgba(47,111,98,.18); }
+body.portal-body .user-avatar {
+    color: #205f53;
+    background: rgba(255,255,255,.58);
+    border-color: rgba(47,111,98,.28);
+}
+body.portal-body .user-avatar:hover { background: rgba(255,255,255,.82); }
+body.portal-body .topbar {
+    background: rgba(239,248,244,.94);
+    border-bottom-color: #D7EAE4;
+}
+body.portal-body .portal-content { background: #F4FAF7; }
+body.portal-body :is(.notification-btn, .hamburger, .search-box input) {
+    border-color: #CBE2DB;
+    background: rgba(255,255,255,.74);
+}
+body.portal-body .nav-badge, body.portal-body .notification-count {
+    background: var(--cap-ink); color: #ffffff;
+}
+body.portal-body .welcome-card, body.portal-body .breathing-card,
+body.portal-body .doctor-welcome { color: var(--cap-ink); }
+body.portal-body :is(.welcome-card, .breathing-card, .doctor-welcome)
+    :is(h2, h3, p, span, strong, .welcome-date, .support-message, .doctor-welcome-date, .doctor-support) {
+    color: var(--cap-ink);
+}
+body.portal-body .daily-support p, body.portal-body .mood-label,
+body.portal-body .status-pill.warn { color: var(--cap-link); }
+body.portal-body .bubble.me, body.portal-body .bubble.me .bubble-time { color: var(--cap-ink); }
+body.portal-body .chat-send, body.portal-body .search-button,
+body.portal-body .reschedule-submit { background: var(--cap-brand); color: var(--cap-ink); }
+body.portal-body .cal-day.selected { color: var(--cap-ink) !important; }
+body.portal-body .slot-btn { background: #ffffff; }
+body.portal-body .slot-btn.selected-slot { background: var(--cap-brand); border-color: var(--cap-ink); }
+body.portal-body .slot-btn.selected-slot :is(.slot-time, .slot-sub) { color: var(--cap-ink); }
+body.portal-body .slot-btn.busy { background: var(--cap-danger-soft); }
+body.portal-body .slot-btn.past { background: var(--cap-surface); }
+body.portal-body .pending-badge, body.portal-body .chip-pending,
+body.portal-body .chip-approved, body.portal-body .availability-badge,
+body.portal-body .hero-kicker { color: var(--cap-link); }
+body.portal-body .specialist-page .appointment-card p { color: var(--cap-ink); }
+
+body.landing-page .support-quote, body.landing-page .support-quote p,
+body.landing-page .cta p, body.landing-page .cta-outline { color: var(--cap-ink); }
+body.landing-page .cta-outline { border-color: var(--cap-ink); }
+body.registration-page .side, body.registration-page .side-description,
+body.registration-page .side .quote-card p { color: var(--cap-ink); }
+body.registration-page .side .quote-card { border-color: rgba(0,16,10,.2); }

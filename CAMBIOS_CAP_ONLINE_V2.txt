@@ -1,0 +1,40 @@
+CAP ONLINE V2 - RESUMEN
+
+Se conservó el proyecto Django existente y se amplió sin borrar las migraciones históricas.
+
+NUEVO / ACTUALIZADO
+- Rediseño responsive en verde CAP Online, siguiendo las pantallas móviles proporcionadas.
+- Landing web informativa separada del acceso móvil.
+- Login, registro y recuperación de contraseña.
+- Roles Paciente, Doctor y Administrador con permisos reforzados.
+- Perfil profesional de psicólogo con foto.
+- Catálogo/búsqueda de psicólogos.
+- Citas con modalidad, aprobación, cancelación y reprogramación.
+- Disponibilidad semanal del psicólogo.
+- Chat por conversación autorizada.
+- Notificaciones persistentes.
+- Notas clínicas solo para doctores con relación de atención.
+- Videollamada WebRTC vinculada a cita online aprobada.
+- API móvil /api/v1 con bearer tokens almacenados como hash en servidor.
+- Cliente móvil Capacitor/Vite.
+- Biometría preparada con Face ID / biometría Android.
+- Docker/Render corregido para usar Gunicorn.
+- Script run_local.bat / run_local.ps1.
+- Comando seed_demo y load_demo.bat opcional.
+
+BASE DE DATOS
+- Migración 0010 conservada.
+- Migración 0011 agrega MobileToken.
+- La SQLite incluida fue migrada a 0011 sin borrar registros.
+
+VALIDACIÓN
+- django check: OK
+- makemigrations --check --dry-run: sin cambios pendientes
+- 49 pruebas: OK
+- 21 plantillas activas compiladas correctamente
+
+NOTAS
+- Para videollamada en producción, una red restrictiva puede requerir TURN.
+- Para fotos en Render se recomienda storage persistente/externo.
+- iOS requiere macOS/Xcode para compilar y firmar.
+- Antes de un uso clínico real se necesita revisión legal, privacidad y seguridad adicional.

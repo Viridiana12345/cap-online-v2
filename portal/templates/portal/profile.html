@@ -1,0 +1,1220 @@
+{% extends 'portal/base.html' %}
+
+{% block page_title %}
+Perfil del especialista
+{% endblock %}
+
+{% block content %}
+
+<style>
+    :root{
+        --primary:#4A9A87;
+        --primary-dark:#173D36;
+        --primary-soft:#F4F8F6;
+        --primary-soft-2:#F4F8F6;
+
+        --white:#ffffff;
+
+        --text:#173D36;
+        --muted:#5E756F;
+
+        --border:#DDEBE6;
+
+        --success:#2F6F62;
+
+        --shadow:
+            0 18px 50px rgba(74,154,135,.10);
+
+        --shadow-soft:
+            0 8px 28px rgba(74,154,135,.07);
+    }
+
+
+    /* =======================================
+       CONTENEDOR GENERAL
+    ======================================= */
+
+    .specialist-page{
+        width:100%;
+        max-width:1180px;
+        margin:0 auto;
+        padding:20px 10px 45px;
+    }
+
+
+    /* =======================================
+       BREADCRUMB
+    ======================================= */
+
+    .specialist-back{
+        display:inline-flex;
+        align-items:center;
+        gap:7px;
+
+        margin-bottom:18px;
+
+        color:var(--muted);
+
+        font-size:13px;
+
+        text-decoration:none;
+
+        transition:.2s;
+    }
+
+    .specialist-back:hover{
+        color:var(--primary);
+    }
+
+
+    /* =======================================
+       HERO DEL DOCTOR
+    ======================================= */
+
+    .specialist-hero{
+        position:relative;
+
+        display:grid;
+
+        grid-template-columns:
+            210px 1fr;
+
+        gap:34px;
+
+        align-items:center;
+
+        overflow:hidden;
+
+        padding:36px;
+
+        border:
+            1px solid rgba(74,154,135,.11);
+
+        border-radius:30px;
+
+        background:
+            radial-gradient(
+                circle at 8% 12%,
+                rgba(74,154,135,.12),
+                transparent 27%
+            ),
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #F4F8F6
+            );
+
+        box-shadow:var(--shadow);
+    }
+
+    .specialist-hero::after{
+        content:"";
+
+        position:absolute;
+
+        width:260px;
+        height:260px;
+
+        right:-110px;
+        bottom:-130px;
+
+        border-radius:50%;
+
+        background:
+            rgba(74,154,135,.06);
+    }
+
+
+    /* FOTO */
+
+    .photo-wrap{
+        position:relative;
+        z-index:2;
+
+        display:flex;
+        justify-content:center;
+    }
+
+    .doctor-photo{
+        width:185px;
+        height:185px;
+
+        object-fit:cover;
+
+        border-radius:34px;
+
+        border:
+            7px solid #ffffff;
+
+        background:
+            linear-gradient(
+                135deg,
+                #F4F8F6,
+                #DDEBE6
+            );
+
+        box-shadow:
+            0 15px 35px
+            rgba(74,154,135,.16);
+    }
+
+    .doctor-photo-fallback{
+        width:185px;
+        height:185px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        border:
+            7px solid white;
+
+        border-radius:34px;
+
+        background:
+            linear-gradient(
+                145deg,
+                #4A9A87,
+                #68B39F
+            );
+
+        box-shadow:
+            0 15px 35px
+            rgba(74,154,135,.16);
+    }
+
+
+    /* LOGO DENTRO DEL FALLBACK */
+
+    .fallback-logo{
+        width:100px;
+        height:100px;
+    }
+
+
+    /* INFORMACIÓN */
+
+    .hero-info{
+        position:relative;
+        z-index:2;
+    }
+
+    .availability-status{
+        display:inline-flex;
+        align-items:center;
+        gap:7px;
+
+        margin-bottom:12px;
+
+        padding:7px 11px;
+
+        border-radius:999px;
+
+        background:#F4F8F6;
+
+        color:var(--success);
+
+        font-size:11px;
+        font-weight:700;
+    }
+
+    .availability-dot{
+        width:7px;
+        height:7px;
+
+        border-radius:50%;
+
+        background:var(--success);
+
+        box-shadow:
+            0 0 0 4px rgba(74,154,135,.10);
+    }
+
+    .hero-info h1{
+        margin:0;
+
+        color:var(--primary-dark);
+
+        font-size:
+            clamp(
+                30px,
+                4vw,
+                45px
+            );
+
+        line-height:1.05;
+
+        letter-spacing:-.8px;
+    }
+
+    .specialty{
+        margin-top:8px;
+
+        color:var(--primary);
+
+        font-size:16px;
+        font-weight:700;
+    }
+
+
+    /* META */
+
+    .doctor-meta{
+        display:flex;
+        flex-wrap:wrap;
+
+        gap:9px;
+
+        margin-top:18px;
+    }
+
+    .profile-pill{
+        display:inline-flex;
+        align-items:center;
+
+        padding:8px 12px;
+
+        border:
+            1px solid #DDEBE6;
+
+        border-radius:999px;
+
+        background:rgba(255,255,255,.85);
+
+        color:#5E756F;
+
+        font-size:11px;
+
+        box-shadow:
+            0 4px 15px
+            rgba(74,154,135,.04);
+    }
+
+
+    /* BIO */
+
+    .doctor-bio{
+        max-width:720px;
+
+        margin-top:20px;
+
+        color:var(--muted);
+
+        font-size:14px;
+
+        line-height:1.8;
+    }
+
+
+    /* ACTIONS */
+
+    .hero-actions{
+        display:flex;
+        flex-wrap:wrap;
+
+        gap:11px;
+
+        margin-top:24px;
+    }
+
+    .appointment-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+
+        min-height:49px;
+
+        padding:
+            0 20px;
+
+        border-radius:14px;
+
+        color:#173D36;
+
+        font-size:13px;
+        font-weight:700;
+
+        text-decoration:none;
+
+        background:
+            linear-gradient(
+                135deg,
+                #4A9A87,
+                #68B39F
+            );
+
+        box-shadow:
+            0 10px 24px
+            rgba(74,154,135,.19);
+
+        transition:.2s;
+    }
+
+    .appointment-btn:hover{
+        transform:
+            translateY(-1px);
+
+        box-shadow:
+            0 14px 30px
+            rgba(74,154,135,.24);
+
+        color:white;
+    }
+
+    .secondary-profile-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+
+        min-height:49px;
+
+        padding:
+            0 18px;
+
+        border:
+            1px solid var(--border);
+
+        border-radius:14px;
+
+        background:#ffffff;
+
+        color:var(--primary);
+
+        font-size:13px;
+        font-weight:700;
+
+        text-decoration:none;
+    }
+
+
+    /* =======================================
+       CONTENIDO
+    ======================================= */
+
+    .profile-content{
+        display:grid;
+
+        grid-template-columns:
+            1.35fr .65fr;
+
+        gap:24px;
+
+        margin-top:26px;
+    }
+
+
+    /* TARJETA GENERAL */
+
+    .profile-card{
+        background:#ffffff;
+
+        border:
+            1px solid rgba(74,154,135,.10);
+
+        border-radius:24px;
+
+        box-shadow:var(--shadow-soft);
+
+        padding:27px;
+    }
+
+    .card-heading{
+        display:flex;
+        align-items:center;
+
+        gap:11px;
+
+        margin-bottom:18px;
+    }
+
+    .card-icon{
+        width:38px;
+        height:38px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        border-radius:12px;
+
+        background:var(--primary-soft);
+
+        color:var(--primary);
+
+        font-size:17px;
+    }
+
+    .card-heading h2{
+        margin:0;
+
+        color:var(--primary-dark);
+
+        font-size:19px;
+    }
+
+    .card-heading p{
+        margin-top:3px;
+
+        color:var(--muted);
+
+        font-size:10px;
+    }
+
+
+    /* =======================================
+       DISPONIBILIDAD
+    ======================================= */
+
+    .availability-grid{
+        display:grid;
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+
+        gap:11px;
+    }
+
+    .availability-chip{
+        position:relative;
+
+        display:flex;
+        align-items:center;
+
+        gap:9px;
+
+        min-height:52px;
+
+        padding:
+            10px 13px;
+
+        border:
+            1px solid #DDEBE6;
+
+        border-radius:14px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #F4F8F6,
+                #F4F8F6
+            );
+
+        color:#5E756F;
+
+        font-size:12px;
+
+        transition:.2s;
+    }
+
+    .availability-chip::before{
+        content:"";
+
+        width:8px;
+        height:8px;
+
+        flex:0 0 8px;
+
+        border-radius:50%;
+
+        background:var(--success);
+
+        box-shadow:
+            0 0 0 4px
+            rgba(74,154,135,.09);
+    }
+
+    .availability-chip:hover{
+        transform:
+            translateY(-2px);
+
+        border-color:
+            rgba(74,154,135,.28);
+    }
+
+    .empty-availability{
+        grid-column:
+            1 / -1;
+
+        padding:18px;
+
+        border-radius:14px;
+
+        background:#F4F8F6;
+
+        color:var(--muted);
+
+        font-size:12px;
+
+        text-align:center;
+    }
+
+
+    /* =======================================
+       INFO LATERAL
+    ======================================= */
+
+    .quick-info{
+        display:flex;
+        flex-direction:column;
+
+        gap:13px;
+    }
+
+    .info-item{
+        display:flex;
+        align-items:flex-start;
+
+        gap:11px;
+
+        padding:14px;
+
+        border-radius:15px;
+
+        background:#F4F8F6;
+    }
+
+    .info-icon{
+        width:32px;
+        height:32px;
+
+        flex:0 0 32px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        border-radius:10px;
+
+        background:#F4F8F6;
+
+        color:var(--primary);
+    }
+
+    .info-item strong{
+        display:block;
+
+        color:var(--primary-dark);
+
+        font-size:11px;
+    }
+
+    .info-item p{
+        margin-top:2px;
+
+        color:var(--muted);
+
+        font-size:10px;
+
+        line-height:1.5;
+    }
+
+
+    /* CTA PEQUEÑO */
+
+    .appointment-card{
+        margin-top:18px;
+
+        padding:20px;
+
+        border-radius:18px;
+
+        text-align:center;
+
+        color:#173D36;
+
+        background:
+            linear-gradient(
+                145deg,
+                #4A9A87,
+                #68B39F
+            );
+    }
+
+    .appointment-card h3{
+        font-size:16px;
+    }
+
+    .appointment-card p{
+        margin-top:7px;
+
+        color:
+            rgba(255,255,255,.78);
+
+        font-size:10px;
+
+        line-height:1.55;
+    }
+
+    .appointment-card a{
+        display:flex;
+        justify-content:center;
+        align-items:center;
+
+        min-height:43px;
+
+        margin-top:15px;
+
+        border-radius:12px;
+
+        background:#ffffff;
+
+        color:var(--primary-dark);
+
+        text-decoration:none;
+
+        font-size:11px;
+        font-weight:700;
+    }
+
+
+    /* =======================================
+       RESPONSIVE
+    ======================================= */
+
+    @media(max-width:850px){
+
+        .specialist-hero{
+            grid-template-columns:1fr;
+
+            text-align:center;
+        }
+
+        .hero-info{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+        }
+
+        .doctor-meta{
+            justify-content:center;
+        }
+
+        .hero-actions{
+            justify-content:center;
+        }
+
+        .profile-content{
+            grid-template-columns:1fr;
+        }
+    }
+
+    @media(max-width:560px){
+
+        .specialist-page{
+            padding:
+                10px 3px 35px;
+        }
+
+        .specialist-hero{
+            padding:
+                27px 18px;
+
+            border-radius:23px;
+        }
+
+        .doctor-photo,
+        .doctor-photo-fallback{
+            width:145px;
+            height:145px;
+
+            border-radius:27px;
+        }
+
+        .fallback-logo{
+            width:78px;
+            height:78px;
+        }
+
+        .hero-info h1{
+            font-size:30px;
+        }
+
+        .profile-card{
+            padding:20px 16px;
+
+            border-radius:20px;
+        }
+
+        .availability-grid{
+            grid-template-columns:1fr;
+        }
+
+        .hero-actions{
+            width:100%;
+        }
+
+        .appointment-btn,
+        .secondary-profile-btn{
+            width:100%;
+        }
+    }
+
+</style>
+
+
+<div class="specialist-page">
+
+
+    <!-- REGRESAR -->
+
+    <a
+        href="{% url 'portal_specialists' %}"
+        class="specialist-back"
+    >
+        ← Volver a especialistas
+    </a>
+
+
+
+    <!-- ====================================
+         HERO
+    ===================================== -->
+
+    <section class="specialist-hero">
+
+
+        <!-- FOTO -->
+
+        <div class="photo-wrap">
+
+            {% if doctor.foto %}
+
+                <img
+                    class="doctor-photo"
+                    src="{{ doctor.foto.url }}"
+                    alt="Foto de {{ doctor.user.get_full_name|default:doctor.user.username }}"
+                >
+
+            {% else %}
+
+                <div class="doctor-photo-fallback">
+
+                    <!-- LOGO CAP ONLINE -->
+
+                    <svg
+                        class="fallback-logo"
+                        viewBox="0 0 100 100"
+                    >
+
+                        <defs>
+
+                            <linearGradient
+                                id="doctorLogoGradient"
+                                x1="0"
+                                y1="0"
+                                x2="1"
+                                y2="1"
+                            >
+
+                                <stop
+                                    offset="0%"
+                                    stop-color="#4A9A87"
+                                />
+
+                                <stop
+                                    offset="100%"
+                                    stop-color="#2F6F62"
+                                />
+
+                            </linearGradient>
+
+                        </defs>
+
+
+                        <!-- CORAZÓN -->
+
+                        <path
+                            d="
+                            M50 88
+                            C42 79 16 61 11 39
+                            C7 21 20 10 35 12
+                            C43 13 48 18 50 23
+                            C53 18 59 13 67 12
+                            C83 10 94 22 90 40
+                            C86 61 60 79 50 88Z
+                            "
+                            fill="url(#doctorLogoGradient)"
+                        />
+
+
+                        <!-- CEREBRO -->
+
+                        <path
+                            d="
+                            M47 29
+                            C39 20 27 27 30 37
+                            C21 40 23 54 32 56
+                            C28 66 37 73 47 70Z
+                            "
+                            fill="none"
+                            stroke="#ffffff"
+                            stroke-width="6"
+                            stroke-linecap="round"
+                        />
+
+
+                        <path
+                            d="
+                            M53 29
+                            C61 20 73 27 70 37
+                            C79 40 77 54 68 56
+                            C72 66 63 73 53 70Z
+                            "
+                            fill="none"
+                            stroke="#ffffff"
+                            stroke-width="6"
+                            stroke-linecap="round"
+                        />
+
+
+                        <path
+                            d="M50 26 L50 75"
+                            stroke="#ffffff"
+                            stroke-width="5"
+                            stroke-linecap="round"
+                        />
+
+                    </svg>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- INFORMACIÓN -->
+
+        <div class="hero-info">
+
+            <div class="availability-status">
+
+                <span class="availability-dot"></span>
+
+                Especialista CAP Online
+
+            </div>
+
+
+            <h1>
+
+                {{ doctor.user.get_full_name|default:doctor.user.username }}
+
+            </h1>
+
+
+            <div class="specialty">
+
+                {{ doctor.especialidad }}
+
+            </div>
+
+
+            <div class="doctor-meta">
+
+
+                {% if doctor.experiencia_anios %}
+
+                    <span class="profile-pill">
+
+                        {{ doctor.experiencia_anios }}
+                        años de experiencia
+
+                    </span>
+
+                {% endif %}
+
+
+                {% if doctor.modalidad %}
+
+                    <span class="profile-pill">
+
+                        {{ doctor.get_modalidad_display }}
+
+                    </span>
+
+                {% endif %}
+
+
+                {% if doctor.idiomas %}
+
+                    <span class="profile-pill">
+
+                        {{ doctor.idiomas }}
+
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <p class="doctor-bio">
+
+                {{ doctor.biografia|default:'Profesional de la salud mental en CAP Online comprometido con brindar acompañamiento profesional y atención personalizada.' }}
+
+            </p>
+
+
+            <div class="hero-actions">
+
+                <a
+                    class="appointment-btn"
+                    href="{% url 'portal_calendar_patient' %}"
+                >
+                    Agendar una cita →
+                </a>
+
+
+                <a
+                    class="secondary-profile-btn"
+                    href="{% url 'portal_specialists' %}"
+                >
+                    Ver otros especialistas
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ====================================
+         INFORMACIÓN INFERIOR
+    ===================================== -->
+
+    <section class="profile-content">
+
+
+        <!-- DISPONIBILIDAD -->
+
+        <div class="profile-card">
+
+            <div class="card-heading">
+
+                <div class="card-icon">
+                    ◷
+                </div>
+
+                <div>
+
+                    <h2>
+                        Disponibilidad
+                    </h2>
+
+                    <p>
+                        Horarios publicados por el especialista
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="availability-grid">
+
+
+                {% for a in availability %}
+
+                    <div class="availability-chip">
+
+                        <strong>
+                            {{ a.get_weekday_display }}
+                        </strong>
+
+                        <span>
+
+                            {{ a.start_time|time:'H:i' }}
+                            –
+                            {{ a.end_time|time:'H:i' }}
+
+                        </span>
+
+                    </div>
+
+
+                {% empty %}
+
+                    <div class="empty-availability">
+
+                        Este especialista aún no ha publicado
+                        horarios fijos de disponibilidad.
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+
+        <!-- INFORMACIÓN RÁPIDA -->
+
+        <aside class="profile-card">
+
+            <div class="card-heading">
+
+                <div class="card-icon">
+                    ♡
+                </div>
+
+                <div>
+
+                    <h2>
+                        Información
+                    </h2>
+
+                    <p>
+                        Datos generales de atención
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="quick-info">
+
+
+                <div class="info-item">
+
+                    <div class="info-icon">
+                        ◉
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Especialidad
+                        </strong>
+
+                        <p>
+                            {{ doctor.especialidad|default:'Psicología' }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-item">
+
+                    <div class="info-icon">
+                        ◷
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Experiencia
+                        </strong>
+
+                        <p>
+
+                            {% if doctor.experiencia_anios %}
+
+                                {{ doctor.experiencia_anios }}
+                                años de experiencia
+
+                            {% else %}
+
+                                Información no disponible
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-item">
+
+                    <div class="info-icon">
+                        ⌂
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Modalidad
+                        </strong>
+
+                        <p>
+
+                            {% if doctor.modalidad %}
+
+                                {{ doctor.get_modalidad_display }}
+
+                            {% else %}
+
+                                Consultar disponibilidad
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {% if doctor.idiomas %}
+
+                <div class="info-item">
+
+                    <div class="info-icon">
+                        ◌
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Idiomas
+                        </strong>
+
+                        <p>
+                            {{ doctor.idiomas }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="appointment-card">
+
+                <h3>
+                    ¿Te gustaría agendar?
+                </h3>
+
+                <p>
+                    Consulta la agenda y selecciona
+                    una fecha disponible.
+                </p>
+
+                <a
+                    href="{% url 'portal_calendar_patient' %}"
+                >
+                    Consultar agenda
+                </a>
+
+            </div>
+
+        </aside>
+
+    </section>
+
+</div>
+
+{% endblock %}

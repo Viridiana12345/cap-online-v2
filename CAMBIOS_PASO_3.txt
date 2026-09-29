@@ -1,0 +1,30 @@
+CAP Online - Etapa 1 / Paso 3 (checkpoint)
+Fecha: 2026-09-21
+
+Este checkpoint completa y revisa la parte de autenticación/roles/permisos que quedó interrumpida.
+
+Ajustes de cierre realizados:
+- Se corrigió el manejo de ValidationError de los validadores de contraseña.
+- El login ahora rechaza cuentas autenticadas que no tengan un rol válido de CAP Online (Paciente, Doctor o Administrador).
+- Se corrigieron textos dañados por codificación en mensajes del backend.
+- Se agregó una prueba para confirmar que un usuario sin rol no inicia sesión en el portal.
+- Se verificó sintaxis Python de forms.py, views.py, permissions.py, admin.py, test_permissions.py y models.py.
+
+Cambios anteriores de Codex conservados:
+- Registro público restringido a Pacientes.
+- Creación de Doctores restringida a administradores.
+- Validación de correo único y contraseñas Django.
+- Permisos por rol reutilizables.
+- Citas limitadas por propietario/doctor asignado.
+- Chat limitado a relaciones válidas y conversaciones.
+- Notas clínicas limitadas a doctores con relación asistencial.
+- Migración 0010_prepare_cap_models.py conservada.
+
+IMPORTANTE:
+- No se aplicaron migraciones a Render.
+- No se modificó PostgreSQL de producción.
+- No se implementó todavía DRF/JWT/app móvil/videollamada.
+- En este entorno no fue posible ejecutar Django tests porque Django no está instalado; sí se verificó sintaxis con py_compile.
+
+Siguiente checkpoint recomendado:
+Etapa 1 - Paso 4: API REST /api/v1/ para conectar la futura app móvil con el mismo backend y base de datos.

@@ -1,0 +1,44 @@
+.login-field-error { color: var(--cap-danger); font-size: 13px; line-height: 1.5; margin: 6px 0 0; }
+.login-field-error:empty { display: none; }
+.field input[aria-invalid="true"] { border-color: var(--cap-danger); background: var(--cap-danger-soft); }
+.field input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgba(185,56,56,.15); }
+.login-password-wrap { position: relative; }
+.login-password-wrap:has(button:not([hidden])) input { padding-right: 90px; }
+.login-password-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); min-height: 44px; padding: 0 10px; border: 0; border-radius: 10px; background: transparent; color: var(--cap-link); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.login-password-toggle:hover { background: var(--cap-surface); }
+.login-password-toggle:focus-visible { outline: 2px solid var(--cap-link); }
+.login-hint { color: var(--cap-muted); font-size: 13px; line-height: 1.5; margin-top: 8px; }
+.login-submit { width: 100%; }
+.login-submit:disabled { cursor: wait; opacity: .75; }
+#login-error { line-height: 1.6; }
+#login-error a { display: block; font-weight: 700; text-decoration: underline; margin-top: 8px; }
+
+/* Acceso compacto: cabe completo en una laptop y conserva buena lectura. */
+.auth-page { padding: 14px; min-height: 100vh; min-height: 100dvh; }
+.auth-page .phone-auth {
+  width: min(100%, 430px);
+  padding: 22px 28px;
+  border-radius: 26px;
+  max-height: calc(100dvh - 28px);
+  overflow-y: auto;
+}
+.auth-page .auth-brand img { width: 60px; margin-inline: auto; }
+.auth-page .auth-brand h1 { margin-top: 4px; font-size: 25px; }
+.auth-page .auth-title { margin: 15px 0 4px; font-size: 30px; }
+.auth-page .auth-sub { margin-bottom: 14px; font-size: 13px; line-height: 1.4; }
+.auth-page .field { margin: 9px 0; }
+.auth-page .field label { margin-bottom: 5px; }
+.auth-page .field input { min-height: 46px; padding: 11px 13px; }
+.auth-page .login-field-error { margin-top: 3px; line-height: 1.25; }
+.auth-page .auth-links { margin: 6px 0 11px; }
+.auth-page .login-submit { min-height: 46px; }
+.auth-page .biometric-demo { margin-top: 9px; }
+.auth-page .auth-foot { margin-top: 10px; }
+.auth-page .message { margin: 7px 0; padding: 9px 11px; line-height: 1.35; }
+.auth-page #login-error a { display: inline; margin-left: 5px; }
+
+@media (max-width: 480px) {
+  .auth-page { padding: 10px; }
+  .auth-page .phone-auth { padding: 20px 18px; max-height: none; border-radius: 22px; }
+  .auth-page .field input { min-height: 48px; font-size: 16px; }
+}

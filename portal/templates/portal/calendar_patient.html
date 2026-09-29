@@ -1,0 +1,3462 @@
+{% extends "portal/base.html" %}
+
+{% block title %}
+Mis citas | CAP Online
+{% endblock %}
+
+{% block page_title %}
+Mis citas
+{% endblock %}
+
+
+{% block extra_styles %}
+
+<style>
+
+    :root{
+
+        /* CAP ONLINE - PALETA VERDE DEL LOGO */
+
+        --cita-dark:#173D36;
+        --cita-primary:#4A9A87;
+        --cita-primary-2:#4A9A87;
+
+        --cita-green:#4A9A87;
+        --cita-green-dark:#2F6F62;
+
+        --cita-mint:#DDEBE6;
+        --cita-mint-2:#4A9A87;
+        --cita-mint-3:#DDEBE6;
+
+        --cita-white:#ffffff;
+
+        --cita-text:#173D36;
+        --cita-muted:#5E756F;
+
+        --cita-border:#DDEBE6;
+
+        --cita-danger:#b93838;
+        --cita-danger-soft:#fff2f2;
+
+        --cita-warning:#4A9A87;
+        --cita-warning-soft:#F4F8F6;
+
+        --cita-success:#4A9A87;
+        --cita-success-soft:#F4F8F6;
+
+        --cita-shadow:
+            0 10px 30px
+            rgba(74,154,135,.055);
+
+        --cita-shadow-hover:
+            0 17px 40px
+            rgba(74,154,135,.095);
+
+    }
+
+
+
+    /* =====================================================
+       GENERAL
+    ===================================================== */
+
+    .citas-page{
+        width:100%;
+    }
+
+
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+
+    .citas-hero{
+
+        position:relative;
+
+        overflow:hidden;
+
+        margin-bottom:20px;
+
+        padding:24px 26px;
+
+        border:
+            1px solid var(--cita-border);
+
+        border-radius:22px;
+
+        background:
+
+            radial-gradient(
+                circle at 91% 10%,
+                rgba(74,154,135,.11),
+                transparent 29%
+            ),
+
+            linear-gradient(
+                135deg,
+                #F4F8F6,
+                #F4F8F6
+            );
+
+        box-shadow:
+            var(--cita-shadow);
+
+    }
+
+
+    .citas-hero::after{
+
+        content:"";
+
+        position:absolute;
+
+        width:170px;
+        height:170px;
+
+        right:-80px;
+        bottom:-95px;
+
+        border-radius:50%;
+
+        background:
+            rgba(74,154,135,.06);
+
+    }
+
+
+    .hero-content{
+
+        position:relative;
+
+        z-index:2;
+
+        max-width:720px;
+
+    }
+
+
+    .hero-kicker{
+
+        display:inline-flex;
+
+        align-items:center;
+
+        gap:6px;
+
+        margin-bottom:9px;
+
+        padding:
+            6px 10px;
+
+        border-radius:999px;
+
+        background:
+            var(--cita-mint);
+
+        color:
+            var(--cita-green-dark);
+
+        font-size:8px;
+
+        font-weight:700;
+
+    }
+
+
+    .citas-hero h2{
+
+        margin:0;
+
+        color:
+            var(--cita-dark);
+
+        font-size:
+            clamp(
+                24px,
+                3vw,
+                31px
+            );
+
+        line-height:1.08;
+
+        letter-spacing:-.5px;
+
+    }
+
+
+    .citas-hero p{
+
+        max-width:620px;
+
+        margin-top:9px;
+
+        color:
+            var(--cita-muted);
+
+        font-size:11px;
+
+        line-height:1.65;
+
+    }
+
+
+
+    /* =====================================================
+       GRID
+    ===================================================== */
+
+    .citas-wrap{
+
+        display:grid;
+
+        grid-template-columns:
+            minmax(0,1.08fr)
+            minmax(0,.92fr);
+
+        gap:20px;
+
+        align-items:start;
+
+    }
+
+
+
+    /* =====================================================
+       CARD
+    ===================================================== */
+
+    .citas-card{
+
+        overflow:hidden;
+
+        border:
+            1px solid
+            var(--cita-border);
+
+        border-radius:22px;
+
+        background:
+            #ffffff;
+
+        box-shadow:
+            var(--cita-shadow);
+
+    }
+
+
+    .card-head{
+
+        display:flex;
+
+        align-items:center;
+
+        gap:11px;
+
+        padding:
+            18px 20px;
+
+        border-bottom:
+            1px solid
+            #F4F8F6;
+
+        background:
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #ffffff
+            );
+
+    }
+
+
+    .card-head-icon{
+
+        width:42px;
+        height:42px;
+
+        flex:0 0 42px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:13px;
+
+        background:
+            var(--cita-mint);
+
+        color:
+            var(--cita-primary);
+
+        font-size:18px;
+
+    }
+
+
+    .card-head-label{
+
+        margin-bottom:2px;
+
+        color:
+            var(--cita-muted);
+
+        font-size:7px;
+
+        font-weight:700;
+
+        letter-spacing:1.2px;
+
+        text-transform:uppercase;
+
+    }
+
+
+    .card-head-title{
+
+        color:
+            var(--cita-dark);
+
+        font-size:15px;
+
+        font-weight:700;
+
+    }
+
+
+    .card-body{
+
+        padding:20px;
+
+    }
+
+
+
+    /* =====================================================
+       CAMPOS
+    ===================================================== */
+
+    .field-group{
+
+        margin-bottom:16px;
+
+    }
+
+
+    .field-label{
+
+        display:block;
+
+        margin-bottom:7px;
+
+        color:
+            var(--cita-dark);
+
+        font-size:8px;
+
+        font-weight:700;
+
+        letter-spacing:.5px;
+
+        text-transform:uppercase;
+
+    }
+
+
+    .field-input{
+
+        width:100%;
+
+        min-height:46px;
+
+        padding:
+            10px 12px;
+
+        border:
+            1px solid
+            var(--cita-border);
+
+        border-radius:12px;
+
+        outline:none;
+
+        background:
+            #F4F8F6;
+
+        color:
+            var(--cita-text);
+
+        font-family:inherit;
+
+        font-size:10px;
+
+        transition:.2s;
+
+    }
+
+
+    .field-input:focus{
+
+        border-color:
+            rgba(74,154,135,.58);
+
+        background:#ffffff;
+
+        box-shadow:
+            0 0 0 4px
+            rgba(74,154,135,.08);
+
+    }
+
+
+    .notes-field{
+
+        min-height:80px;
+
+        resize:vertical;
+
+    }
+
+
+
+    /* =====================================================
+       CALENDARIO
+    ===================================================== */
+
+    .calendar-box{
+
+        margin-top:7px;
+
+        padding:15px;
+
+        border:
+            1px solid
+            var(--cita-border);
+
+        border-radius:17px;
+
+        background:
+            #ffffff;
+
+    }
+
+
+    .cal-nav{
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:space-between;
+
+        margin-bottom:13px;
+
+    }
+
+
+    .cal-nav-btn{
+
+        width:34px;
+        height:34px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border:
+            1px solid
+            var(--cita-border);
+
+        border-radius:10px;
+
+        background:#ffffff;
+
+        color:
+            var(--cita-primary);
+
+        font-size:17px;
+
+        cursor:pointer;
+
+        transition:.2s;
+
+    }
+
+
+    .cal-nav-btn:hover{
+
+        background:
+            var(--cita-mint);
+
+        border-color:
+            var(--cita-primary-2);
+
+    }
+
+
+    .cal-month{
+
+        color:
+            var(--cita-dark);
+
+        font-size:13px;
+
+        font-weight:700;
+
+    }
+
+
+    .cal-grid{
+
+        display:grid;
+
+        grid-template-columns:
+            repeat(7,1fr);
+
+        gap:4px;
+
+    }
+
+
+    .cal-dow{
+
+        padding:
+            4px 0 7px;
+
+        text-align:center;
+
+        color:
+            var(--cita-muted);
+
+        font-size:7px;
+
+        font-weight:700;
+
+        text-transform:uppercase;
+
+    }
+
+
+    .cal-day{
+
+        position:relative;
+
+        aspect-ratio:1;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:10px;
+
+        color:
+            var(--cita-text);
+
+        font-size:10px;
+
+        font-weight:600;
+
+        cursor:pointer;
+
+        user-select:none;
+
+        transition:.17s;
+
+    }
+
+
+    .cal-day:hover:not(.disabled):not(.empty){
+
+        background:
+            var(--cita-mint);
+
+        color:
+            var(--cita-primary);
+
+    }
+
+
+    .cal-day.empty{
+
+        pointer-events:none;
+
+    }
+
+
+    .cal-day.disabled{
+
+        color:#DDEBE6;
+
+        cursor:not-allowed;
+
+    }
+
+
+    .cal-day.today{
+
+        color:
+            var(--cita-primary);
+
+        font-weight:800;
+
+    }
+
+
+    .cal-day.today::after{
+
+        content:"";
+
+        position:absolute;
+
+        bottom:4px;
+        left:50%;
+
+        width:4px;
+        height:4px;
+
+        transform:
+            translateX(-50%);
+
+        border-radius:50%;
+
+        background:
+            var(--cita-green);
+
+    }
+
+
+    .cal-day.selected{
+
+        background:
+            var(--cita-primary) !important;
+
+        color:#ffffff !important;
+
+        box-shadow:
+            0 5px 13px
+            rgba(74,154,135,.22);
+
+    }
+
+
+    .cal-day.has-busy::before{
+
+        content:"";
+
+        position:absolute;
+
+        top:4px;
+        right:4px;
+
+        width:5px;
+        height:5px;
+
+        border-radius:50%;
+
+        background:
+            #4A9A87;
+
+    }
+
+
+
+    /* =====================================================
+       HORARIOS
+    ===================================================== */
+
+    .slot-section{
+
+        margin-top:17px;
+
+    }
+
+
+    .slots-date-title{
+
+        margin-bottom:9px;
+
+        color:
+            var(--cita-primary);
+
+        font-size:8px;
+
+        font-weight:700;
+
+        letter-spacing:.7px;
+
+        text-transform:uppercase;
+
+    }
+
+
+    .slots-grid{
+
+        display:grid;
+
+        grid-template-columns:
+            repeat(3,1fr);
+
+        gap:7px;
+
+    }
+
+
+    .slot-btn{
+
+        min-height:51px;
+
+        padding:
+            7px 5px;
+
+        border:
+            1px solid
+            var(--cita-border);
+
+        border-radius:11px;
+
+        background:
+            #4A9A87;
+
+        cursor:pointer;
+
+        transition:.18s;
+
+    }
+
+
+    .slot-btn:hover:not(.busy):not(.past){
+
+        border-color:
+            var(--cita-primary-2);
+
+        background:
+            var(--cita-mint);
+
+    }
+
+
+    .slot-time{
+
+        display:block;
+
+        color:
+            var(--cita-dark);
+
+        font-size:9px;
+
+        font-weight:700;
+
+    }
+
+
+    .slot-sub{
+
+        display:block;
+
+        margin-top:3px;
+
+        color:
+            var(--cita-muted);
+
+        font-size:7px;
+
+    }
+
+
+    .slot-btn.selected-slot{
+
+        border-color:
+            var(--cita-primary);
+
+        background:
+            var(--cita-primary);
+
+    }
+
+
+    .slot-btn.selected-slot
+    .slot-time{
+
+        color:#4A9A87;
+
+    }
+
+
+    .slot-btn.selected-slot
+    .slot-sub{
+
+        color:
+            rgba(0, 0, 0, 0.75);
+
+    }
+
+
+    .slot-btn.busy{
+
+        border-color:
+            #fff2f2;
+
+        background:
+            #fff2f2;
+
+        cursor:not-allowed;
+
+    }
+
+
+    .slot-btn.busy
+    .slot-time{
+
+        color:
+            var(--cita-danger);
+
+    }
+
+
+    .slot-btn.busy
+    .slot-sub{
+
+        color:#b93838;
+
+    }
+
+
+    .slot-btn.past{
+
+        opacity:.45;
+
+        cursor:not-allowed;
+
+        background:#F4F8F6;
+
+    }
+
+
+
+    /* =====================================================
+       SUMMARY
+    ===================================================== */
+
+    .sel-summary{
+
+        display:none;
+
+        margin-top:16px;
+
+        padding:13px 14px;
+
+        border:
+            1px solid
+            #DDEBE6;
+
+        border-radius:13px;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #F4F8F6,
+                #F4F8F6
+            );
+
+    }
+
+
+    .sel-summary.visible{
+
+        display:block;
+
+    }
+
+
+    .sel-summary-label{
+
+        margin-bottom:4px;
+
+        color:
+            var(--cita-green-dark);
+
+        font-size:7px;
+
+        font-weight:700;
+
+        letter-spacing:.7px;
+
+        text-transform:uppercase;
+
+    }
+
+
+    .sel-summary-val{
+
+        color:
+            var(--cita-dark);
+
+        font-size:12px;
+
+        font-weight:700;
+
+    }
+
+
+    .sel-summary-sub{
+
+        margin-top:3px;
+
+        color:
+            var(--cita-muted);
+
+        font-size:8px;
+
+    }
+
+
+
+    /* =====================================================
+       SUBMIT
+    ===================================================== */
+
+    .submit-row{
+
+        display:flex;
+
+        align-items:center;
+
+        gap:10px;
+
+        flex-wrap:wrap;
+
+        margin-top:18px;
+
+    }
+
+
+    .btn-submit{
+
+        min-height:43px;
+
+        padding:
+            0 18px;
+
+        border:0;
+
+        border-radius:11px;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #4A9A87,
+                #68B39F
+            );
+
+        color:#173D36;
+
+        font-family:inherit;
+
+        font-size:9px;
+
+        font-weight:700;
+
+        cursor:pointer;
+
+        box-shadow:
+            0 7px 17px
+            rgba(74,154,135,.10);
+
+        transition:.2s;
+
+    }
+
+
+    .btn-submit:hover:not(:disabled){
+
+        transform:
+            translateY(-1px);
+
+    }
+
+
+    .btn-submit:disabled{
+
+        opacity:.45;
+
+        cursor:not-allowed;
+
+    }
+
+
+    .pending-badge{
+
+        display:inline-flex;
+
+        align-items:center;
+
+        gap:5px;
+
+        min-height:30px;
+
+        padding:
+            0 10px;
+
+        border-radius:999px;
+
+        background:
+            var(--cita-warning-soft);
+
+        color:
+            var(--cita-warning);
+
+        font-size:7px;
+
+        font-weight:600;
+
+    }
+
+
+
+    /* =====================================================
+       HISTORIAL
+    ===================================================== */
+
+    .history-list{
+
+        display:flex;
+
+        flex-direction:column;
+
+        gap:10px;
+
+    }
+
+
+    .hist-item{
+
+        overflow:hidden;
+
+        border:
+            1px solid
+            var(--cita-border);
+
+        border-radius:15px;
+
+        background:#ffffff;
+
+        transition:.2s;
+
+    }
+
+
+    .hist-item:hover{
+
+        transform:
+            translateY(-2px);
+
+        box-shadow:
+            var(--cita-shadow-hover);
+
+    }
+
+
+    .hist-bar{
+
+        height:3px;
+
+    }
+
+
+    .bar-pending{
+
+        background:#4A9A87;
+
+    }
+
+
+    .bar-approved{
+
+        background:#4A9A87;
+
+    }
+
+
+    .bar-rejected{
+
+        background:#b93838;
+
+    }
+
+
+    .hist-body{
+
+        padding:14px;
+
+    }
+
+
+    .hist-top{
+
+        display:flex;
+
+        justify-content:space-between;
+
+        gap:12px;
+
+        align-items:flex-start;
+
+    }
+
+
+    .hist-datetime{
+
+        color:
+            var(--cita-dark);
+
+        font-size:11px;
+
+        font-weight:700;
+
+    }
+
+
+    .hist-doctor{
+
+        margin-top:5px;
+
+        color:
+            var(--cita-muted);
+
+        font-size:8px;
+
+    }
+
+
+    .hist-notes{
+
+        margin-top:9px;
+
+        padding-top:8px;
+
+        border-top:
+            1px dashed
+            var(--cita-border);
+
+        color:
+            #5E756F;
+
+        font-size:8px;
+
+        line-height:1.5;
+
+    }
+
+
+
+    /* =====================================================
+       STATUS
+    ===================================================== */
+
+    .status-chip{
+
+        display:inline-flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        min-height:25px;
+
+        padding:
+            0 9px;
+
+        border-radius:999px;
+
+        font-size:7px;
+
+        font-weight:700;
+
+        white-space:nowrap;
+
+    }
+
+
+    .chip-pending{
+
+        background:
+            var(--cita-warning-soft);
+
+        color:
+            var(--cita-warning);
+
+    }
+
+
+    .chip-approved{
+
+        background:
+            var(--cita-success-soft);
+
+        color:
+            var(--cita-success);
+
+    }
+
+
+    .chip-rejected{
+
+        background:
+            var(--cita-danger-soft);
+
+        color:
+            var(--cita-danger);
+
+    }
+
+
+
+    /* =====================================================
+       ACTIONS
+    ===================================================== */
+
+    .hist-actions{
+
+        display:flex;
+
+        flex-wrap:wrap;
+
+        gap:6px;
+
+        margin-top:12px;
+
+    }
+
+
+    .hist-action{
+
+        min-height:35px;
+
+        display:inline-flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        padding:
+            0 10px;
+
+        border:
+            1px solid
+            var(--cita-border);
+
+        border-radius:10px;
+
+        background:#ffffff;
+
+        color:
+            var(--cita-primary);
+
+        font-family:inherit;
+
+        font-size:7px;
+
+        font-weight:700;
+
+        cursor:pointer;
+
+        text-decoration:none;
+
+        transition:.2s;
+
+    }
+
+
+    .hist-action:hover{
+
+        transform:
+            translateY(-1px);
+
+    }
+
+
+    .hist-action.video{
+
+        border-color:transparent;
+
+        background:
+            linear-gradient(
+                135deg,
+                #4A9A87,
+                #68B39F
+            );
+
+        color:#173D36 !important;
+
+    }
+
+
+    .hist-action.cancel{
+
+        border-color:
+            #fff2f2;
+
+        background:
+            #fff2f2;
+
+        color:
+            var(--cita-danger);
+
+    }
+
+
+    .hist-action.reschedule{
+
+        background:
+            var(--cita-mint);
+
+        color:
+            var(--cita-primary);
+
+    }
+
+
+
+    /* =====================================================
+       DETAILS REPROGRAMAR
+    ===================================================== */
+
+    .reschedule-details{
+
+        margin-top:0;
+
+    }
+
+
+    .reschedule-details summary{
+
+        list-style:none;
+
+    }
+
+
+    .reschedule-details summary::-webkit-details-marker{
+
+        display:none;
+
+    }
+
+
+    .reschedule-form{
+
+        width:100%;
+
+        margin-top:7px;
+
+        padding:10px;
+
+        display:grid;
+
+        gap:7px;
+
+        border:
+            1px solid
+            var(--cita-border);
+
+        border-radius:11px;
+
+        background:
+            #F4F8F6;
+
+    }
+
+
+    .reschedule-form input{
+
+        width:100%;
+
+        min-height:38px;
+
+        padding:
+            7px 9px;
+
+        border:
+            1px solid
+            var(--cita-border);
+
+        border-radius:9px;
+
+        outline:none;
+
+        background:#ffffff;
+
+        color:
+            var(--cita-text);
+
+        font-family:inherit;
+
+        font-size:8px;
+
+    }
+
+
+    .reschedule-submit{
+
+        min-height:37px;
+
+        border:0;
+
+        border-radius:9px;
+
+        background:
+            var(--cita-primary);
+
+        color:#ffffff;
+
+        font-size:8px;
+
+        font-weight:700;
+
+        cursor:pointer;
+
+    }
+
+
+
+    /* =====================================================
+       VACÍO
+    ===================================================== */
+
+    .hist-empty{
+
+        padding:
+            35px 15px;
+
+        display:flex;
+
+        flex-direction:column;
+
+        align-items:center;
+
+        gap:7px;
+
+        text-align:center;
+
+    }
+
+
+    .hist-empty-icon{
+
+        width:52px;
+        height:52px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        border-radius:16px;
+
+        background:
+            var(--cita-mint);
+
+        font-size:20px;
+
+    }
+
+
+    .hist-empty-text{
+
+        color:
+            var(--cita-muted);
+
+        font-size:9px;
+
+    }
+
+
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media(max-width:950px){
+
+        .citas-wrap{
+
+            grid-template-columns:1fr;
+
+        }
+
+    }
+
+
+    @media(max-width:650px){
+
+        .citas-hero{
+
+            padding:
+                20px 18px;
+
+            border-radius:19px;
+
+        }
+
+
+        .card-body{
+
+            padding:16px;
+
+        }
+
+
+        .slots-grid{
+
+            grid-template-columns:
+                repeat(3,1fr);
+
+        }
+
+
+        .submit-row{
+
+            flex-direction:column;
+
+            align-items:stretch;
+
+        }
+
+
+        .btn-submit{
+
+            width:100%;
+
+        }
+
+
+        .pending-badge{
+
+            justify-content:center;
+
+        }
+
+
+        .hist-top{
+
+            flex-direction:column;
+
+        }
+
+    }
+
+
+    @media(max-width:390px){
+
+        .slots-grid{
+
+            grid-template-columns:
+                repeat(2,1fr);
+
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<div class="citas-page">
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="citas-hero">
+
+
+        <div class="hero-content">
+
+
+            <span class="hero-kicker">
+
+                ◷ Tu espacio de atención
+
+            </span>
+
+
+            <h2>
+
+                Agenda tu próxima cita con tranquilidad
+
+            </h2>
+
+
+            <p>
+
+                Selecciona a tu especialista, elige un día y consulta
+                los horarios disponibles. Tu solicitud quedará pendiente
+                hasta que el profesional la confirme.
+
+            </p>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         GRID
+    ====================================================== -->
+
+    <div class="citas-wrap">
+
+
+
+        <!-- =================================================
+             SOLICITAR CITA
+        ================================================== -->
+
+        <section class="citas-card">
+
+
+            <header class="card-head">
+
+
+                <div class="card-head-icon">
+
+                    ◷
+
+                </div>
+
+
+                <div>
+
+
+                    <div class="card-head-label">
+
+                        Nueva cita
+
+                    </div>
+
+
+                    <div class="card-head-title">
+
+                        Selecciona fecha y horario
+
+                    </div>
+
+
+                </div>
+
+
+            </header>
+
+
+
+            <div class="card-body">
+
+
+                <form
+                    method="post"
+                    action="{% url 'appointment_create' %}"
+                    id="citaForm"
+                >
+
+
+                    {% csrf_token %}
+
+
+
+                    <!-- =====================================
+                         DOCTOR
+                    ====================================== -->
+
+                    <div class="field-group">
+
+
+                        <label class="field-label">
+
+                            Especialista
+
+                        </label>
+
+
+                        {{ form.doctor }}
+
+
+                        {% if form.doctor.errors %}
+
+                            <div class="form-errors">
+
+                                {{ form.doctor.errors|striptags }}
+
+                            </div>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+
+                    <!-- =====================================
+                         MODALIDAD
+                    ====================================== -->
+
+                    {% if form.modalidad %}
+
+                    <div class="field-group">
+
+
+                        <label class="field-label">
+
+                            Modalidad
+
+                        </label>
+
+
+                        {{ form.modalidad }}
+
+
+                        {% if form.modalidad.errors %}
+
+                            <div class="form-errors">
+
+                                {{ form.modalidad.errors|striptags }}
+
+                            </div>
+
+                        {% endif %}
+
+
+                    </div>
+
+                    {% endif %}
+
+
+
+                    <!-- =====================================
+                         NOTAS
+                    ====================================== -->
+
+                    <div class="field-group">
+
+
+                        <label class="field-label">
+
+                            Motivo de la consulta
+
+                        </label>
+
+
+                        {{ form.notes }}
+
+
+                        {% if form.notes.errors %}
+
+                            <div class="form-errors">
+
+                                {{ form.notes.errors|striptags }}
+
+                            </div>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+
+                    <!-- CAMPOS REALES PARA DJANGO -->
+
+                    <input
+                        type="hidden"
+                        name="start_at"
+                        id="hidden_start"
+                        value="{{ form.start_at.value|default:'' }}"
+                    >
+
+
+                    <input
+                        type="hidden"
+                        name="end_at"
+                        id="hidden_end"
+                        value="{{ form.end_at.value|default:'' }}"
+                    >
+
+
+
+                    <!-- =====================================
+                         CALENDARIO
+                    ====================================== -->
+
+                    <div class="field-group">
+
+
+                        <label class="field-label">
+
+                            Selecciona el día
+
+                        </label>
+
+
+                        <div class="calendar-box">
+
+
+                            <div class="cal-nav">
+
+
+                                <button
+                                    type="button"
+                                    class="cal-nav-btn"
+                                    id="prevMonth"
+                                    aria-label="Mes anterior"
+                                >
+
+                                    ‹
+
+                                </button>
+
+
+                                <span
+                                    class="cal-month"
+                                    id="calMonthLabel"
+                                ></span>
+
+
+                                <button
+                                    type="button"
+                                    class="cal-nav-btn"
+                                    id="nextMonth"
+                                    aria-label="Mes siguiente"
+                                >
+
+                                    ›
+
+                                </button>
+
+
+                            </div>
+
+
+
+                            <div
+                                class="cal-grid"
+                                id="calGrid"
+                            ></div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =====================================
+                         HORARIOS
+                    ====================================== -->
+
+                    <section
+                        class="slot-section"
+                        id="slotSection"
+                        style="display:none"
+                    >
+
+
+                        <div
+                            class="slots-date-title"
+                            id="slotDateTitle"
+                        ></div>
+
+
+                        <div
+                            class="slots-grid"
+                            id="slotsGrid"
+                        ></div>
+
+
+                    </section>
+
+
+
+                    <!-- =====================================
+                         RESUMEN
+                    ====================================== -->
+
+                    <div
+                        class="sel-summary"
+                        id="selSummary"
+                    >
+
+
+                        <div class="sel-summary-label">
+
+                            Tu selección
+
+                        </div>
+
+
+                        <div
+                            class="sel-summary-val"
+                            id="summaryVal"
+                        >
+
+                            —
+
+                        </div>
+
+
+                        <div
+                            class="sel-summary-sub"
+                            id="summarySub"
+                        >
+
+                            Duración aproximada: 1 hora
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =====================================
+                         SUBMIT
+                    ====================================== -->
+
+                    <div class="submit-row">
+
+
+                        <button
+                            class="btn-submit"
+                            type="submit"
+                            id="submitBtn"
+                            disabled
+                        >
+
+                            Solicitar cita
+
+                        </button>
+
+
+                        <span class="pending-badge">
+
+                            ◷ La cita quedará pendiente de aprobación
+
+                        </span>
+
+
+                    </div>
+
+
+                </form>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             HISTORIAL
+        ================================================== -->
+
+        <section class="citas-card">
+
+
+            <header class="card-head">
+
+
+                <div class="card-head-icon">
+
+                    ♡
+
+                </div>
+
+
+                <div>
+
+
+                    <div class="card-head-label">
+
+                        Mis sesiones
+
+                    </div>
+
+
+                    <div class="card-head-title">
+
+                        Historial y próximas citas
+
+                    </div>
+
+
+                </div>
+
+
+            </header>
+
+
+
+            <div class="card-body">
+
+
+                <div class="history-list">
+
+
+                    {% for a in appointments %}
+
+
+                    <article class="hist-item">
+
+
+                        <div
+                            class="
+                                hist-bar
+
+                                {% if a.status == 'approved' %}
+                                    bar-approved
+                                {% elif a.status == 'rejected' or a.status == 'cancelled' %}
+                                    bar-rejected
+                                {% else %}
+                                    bar-pending
+                                {% endif %}
+                            "
+                        ></div>
+
+
+
+                        <div class="hist-body">
+
+
+                            <div class="hist-top">
+
+
+                                <div>
+
+
+                                    <div class="hist-datetime">
+
+                                        {{ a.start_at|date:"d M Y · H:i" }}
+
+                                        –
+
+                                        {{ a.end_at|date:"H:i" }}
+
+                                    </div>
+
+
+                                    <div class="hist-doctor">
+
+                                        ♙
+                                        {{ a.doctor.get_full_name|default:a.doctor.username }}
+
+                                        ·
+
+                                        {{ a.get_modalidad_display|default:"Sin modalidad" }}
+
+                                    </div>
+
+
+                                </div>
+
+
+
+                                <span
+                                    class="
+                                        status-chip
+
+                                        {% if a.status == 'approved' %}
+                                            chip-approved
+                                        {% elif a.status == 'rejected' or a.status == 'cancelled' %}
+                                            chip-rejected
+                                        {% else %}
+                                            chip-pending
+                                        {% endif %}
+                                    "
+                                >
+
+                                    {{ a.get_status_display }}
+
+                                </span>
+
+
+                            </div>
+
+
+
+                            {% if a.notes %}
+
+                                <div class="hist-notes">
+
+                                    {{ a.notes }}
+
+                                </div>
+
+                            {% endif %}
+
+
+
+                            <!-- =============================
+                                 ACCIONES
+                            ============================== -->
+
+                            <div class="hist-actions">
+
+
+                                {% if a.status == 'approved' and a.modalidad == 'online' %}
+
+                                    <a
+                                        class="hist-action video"
+                                        href="{% url 'video_room' a.id %}"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+
+                                        🎥 Videollamada
+
+                                    </a>
+
+                                {% endif %}
+
+
+
+                                {% if a.status == 'pending' or a.status == 'approved' %}
+
+
+                                    <!-- CANCELAR -->
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'appointment_cancel' a.id %}"
+                                    >
+
+                                        {% csrf_token %}
+
+
+                                        <input
+                                            type="hidden"
+                                            name="reason"
+                                            value="Cancelada por paciente"
+                                        >
+
+
+                                        <button
+                                            type="submit"
+                                            class="hist-action cancel"
+                                        >
+
+                                            Cancelar
+
+                                        </button>
+
+
+                                    </form>
+
+
+
+                                    <!-- REPROGRAMAR -->
+
+                                    <details class="reschedule-details">
+
+
+                                        <summary
+                                            class="hist-action reschedule"
+                                        >
+
+                                            Reprogramar
+
+                                        </summary>
+
+
+                                        <form
+                                            class="reschedule-form"
+                                            method="post"
+                                            action="{% url 'appointment_reschedule' a.id %}"
+                                        >
+
+                                            {% csrf_token %}
+
+
+                                            <input
+                                                type="datetime-local"
+                                                name="start_at"
+                                                required
+                                            >
+
+
+                                            <input
+                                                type="datetime-local"
+                                                name="end_at"
+                                                required
+                                            >
+
+
+                                            <button
+                                                class="reschedule-submit"
+                                                type="submit"
+                                            >
+
+                                                Enviar solicitud
+
+                                            </button>
+
+
+                                        </form>
+
+
+                                    </details>
+
+
+                                {% endif %}
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </article>
+
+
+                    {% empty %}
+
+
+                    <div class="hist-empty">
+
+
+                        <div class="hist-empty-icon">
+
+                            ◷
+
+                        </div>
+
+
+                        <div class="hist-empty-text">
+
+                            Aún no tienes citas agendadas.
+
+                        </div>
+
+
+                    </div>
+
+
+                    {% endfor %}
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     HORARIOS OCUPADOS DESDE DJANGO
+===================================================== -->
+
+{{ occupied_slots_json|json_script:"occupied-slots-data" }}
+
+
+
+<script>
+
+
+    /* =====================================================
+       DATOS
+    ====================================================== */
+
+    const occupiedElement =
+        document.getElementById(
+            "occupied-slots-data"
+        );
+
+
+    const OCCUPIED =
+        occupiedElement
+        ?
+        new Set(
+            JSON.parse(
+                occupiedElement.textContent
+            )
+        )
+        :
+        new Set();
+
+
+
+    /* =====================================================
+       CONFIGURACIÓN
+    ====================================================== */
+
+    const SLOT_DURATION_MINUTES = 60;
+
+    /* 8:00 AM */
+    const HOUR_START = 8;
+
+    /* último inicio 8:00 PM */
+    const HOUR_END = 20;
+
+    /* intervalos de media hora */
+    const SLOT_STEP_MIN = 30;
+
+
+
+    const MONTHS_ES = [
+
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre"
+
+    ];
+
+
+    const DAYS_ES = [
+
+        "Dom",
+        "Lun",
+        "Mar",
+        "Mié",
+        "Jue",
+        "Vie",
+        "Sáb"
+
+    ];
+
+
+
+    /* =====================================================
+       STATE
+    ====================================================== */
+
+    let viewYear;
+
+    let viewMonth;
+
+    let selectedDate = null;
+
+    let selectedSlot = null;
+
+
+
+    const today =
+        new Date();
+
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    viewYear =
+        today.getFullYear();
+
+
+    viewMonth =
+        today.getMonth();
+
+
+
+    /* =====================================================
+       HELPERS
+    ====================================================== */
+
+    function pad2(number){
+
+        return String(number)
+        .padStart(
+            2,
+            "0"
+        );
+
+    }
+
+
+
+    function dateKey(
+        date,
+        hour,
+        minute
+    ){
+
+        return (
+            date.getFullYear()
+            +
+            "-"
+            +
+            pad2(
+                date.getMonth() + 1
+            )
+            +
+            "-"
+            +
+            pad2(
+                date.getDate()
+            )
+            +
+            "T"
+            +
+            pad2(hour)
+            +
+            ":"
+            +
+            pad2(minute)
+            +
+            ":00"
+        );
+
+    }
+
+
+
+    function formatTime(
+        hour,
+        minute
+    ){
+
+        const suffix =
+            hour < 12
+            ?
+            "AM"
+            :
+            "PM";
+
+
+        const hour12 =
+            hour % 12 || 12;
+
+
+        return (
+            hour12
+            +
+            ":"
+            +
+            pad2(minute)
+            +
+            " "
+            +
+            suffix
+        );
+
+    }
+
+
+
+    function buildDateTime(
+        date,
+        hour,
+        minute
+    ){
+
+        const result =
+            new Date(date);
+
+
+        result.setHours(
+            hour,
+            minute,
+            0,
+            0
+        );
+
+
+        return result;
+
+    }
+
+
+
+    function formatDjangoDateTime(
+        date
+    ){
+
+        return (
+            date.getFullYear()
+            +
+            "-"
+            +
+            pad2(
+                date.getMonth() + 1
+            )
+            +
+            "-"
+            +
+            pad2(
+                date.getDate()
+            )
+            +
+            " "
+            +
+            pad2(
+                date.getHours()
+            )
+            +
+            ":"
+            +
+            pad2(
+                date.getMinutes()
+            )
+        );
+
+    }
+
+
+
+    function isSlotOccupied(
+        date,
+        hour,
+        minute
+    ){
+
+        return OCCUPIED.has(
+            dateKey(
+                date,
+                hour,
+                minute
+            )
+        );
+
+    }
+
+
+
+    function isSlotPast(
+        date,
+        hour,
+        minute
+    ){
+
+        const slotDate =
+            buildDateTime(
+                date,
+                hour,
+                minute
+            );
+
+
+        return (
+            slotDate <=
+            new Date()
+        );
+
+    }
+
+
+
+    /* =====================================================
+       DÍAS CON HORARIOS OCUPADOS
+    ====================================================== */
+
+    function busyDaysInMonth(
+        year,
+        month
+    ){
+
+        const busy =
+            new Set();
+
+
+        OCCUPIED
+        .forEach(
+            function(iso){
+
+                const date =
+                    new Date(iso);
+
+
+                if(
+                    date.getFullYear() === year
+                    &&
+                    date.getMonth() === month
+                ){
+
+                    busy.add(
+                        date.getDate()
+                    );
+
+                }
+
+            }
+        );
+
+
+        return busy;
+
+    }
+
+
+
+    /* =====================================================
+       CALENDARIO
+    ====================================================== */
+
+    function renderCalendar(){
+
+        const grid =
+            document.getElementById(
+                "calGrid"
+            );
+
+
+        const label =
+            document.getElementById(
+                "calMonthLabel"
+            );
+
+
+        label.textContent =
+            MONTHS_ES[
+                viewMonth
+            ]
+            +
+            " "
+            +
+            viewYear;
+
+
+
+        const busy =
+            busyDaysInMonth(
+                viewYear,
+                viewMonth
+            );
+
+
+        const firstDay =
+            new Date(
+                viewYear,
+                viewMonth,
+                1
+            )
+            .getDay();
+
+
+        const daysInMonth =
+            new Date(
+                viewYear,
+                viewMonth + 1,
+                0
+            )
+            .getDate();
+
+
+
+        let html = "";
+
+
+
+        DAYS_ES.forEach(
+            function(day){
+
+                html +=
+                    '<div class="cal-dow">'
+                    +
+                    day
+                    +
+                    "</div>";
+
+            }
+        );
+
+
+
+        for(
+            let i = 0;
+            i < firstDay;
+            i++
+        ){
+
+            html +=
+                '<div class="cal-day empty"></div>';
+
+        }
+
+
+
+        for(
+            let day = 1;
+            day <= daysInMonth;
+            day++
+        ){
+
+            const date =
+                new Date(
+                    viewYear,
+                    viewMonth,
+                    day
+                );
+
+
+            date.setHours(
+                0,
+                0,
+                0,
+                0
+            );
+
+
+            const isToday =
+                date.getTime()
+                ===
+                today.getTime();
+
+
+            const isPast =
+                date < today;
+
+
+            const isSelected =
+                selectedDate
+                &&
+                date.getTime()
+                ===
+                selectedDate.getTime();
+
+
+            const hasBusy =
+                busy.has(day);
+
+
+
+            let classes =
+                "cal-day";
+
+
+            if(isPast){
+
+                classes +=
+                    " disabled";
+
+            }
+
+
+            if(isToday){
+
+                classes +=
+                    " today";
+
+            }
+
+
+            if(isSelected){
+
+                classes +=
+                    " selected";
+
+            }
+
+
+            if(hasBusy){
+
+                classes +=
+                    " has-busy";
+
+            }
+
+
+
+            html +=
+                '<div class="'
+                +
+                classes
+                +
+                '" data-day="'
+                +
+                day
+                +
+                '">'
+                +
+                day
+                +
+                "</div>";
+
+        }
+
+
+
+        grid.innerHTML =
+            html;
+
+
+
+        grid
+        .querySelectorAll(
+            ".cal-day:not(.disabled):not(.empty)"
+        )
+        .forEach(
+            function(element){
+
+                element.addEventListener(
+                    "click",
+                    function(){
+
+                        const day =
+                            parseInt(
+                                element.dataset.day
+                            );
+
+
+                        selectedDate =
+                            new Date(
+                                viewYear,
+                                viewMonth,
+                                day
+                            );
+
+
+                        selectedSlot =
+                            null;
+
+
+                        clearSummary();
+
+                        renderCalendar();
+
+                        renderSlots();
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       HORARIOS
+    ====================================================== */
+
+    function renderSlots(){
+
+        const section =
+            document.getElementById(
+                "slotSection"
+            );
+
+
+        if(!selectedDate){
+
+            section.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        section.style.display =
+            "block";
+
+
+
+        document
+        .getElementById(
+            "slotDateTitle"
+        )
+        .textContent =
+
+            DAYS_ES[
+                selectedDate.getDay()
+            ]
+
+            +
+
+            ", "
+
+            +
+
+            selectedDate.getDate()
+
+            +
+
+            " de "
+
+            +
+
+            MONTHS_ES[
+                selectedDate.getMonth()
+            ];
+
+
+
+        const grid =
+            document.getElementById(
+                "slotsGrid"
+            );
+
+
+        let html = "";
+
+
+        let hour =
+            HOUR_START;
+
+
+        let minute =
+            0;
+
+
+
+        while(
+            hour <= HOUR_END
+        ){
+
+            const occupied =
+                isSlotOccupied(
+                    selectedDate,
+                    hour,
+                    minute
+                );
+
+
+            const past =
+                isSlotPast(
+                    selectedDate,
+                    hour,
+                    minute
+                );
+
+
+            const selected =
+                selectedSlot
+                &&
+                selectedSlot.hour === hour
+                &&
+                selectedSlot.minute === minute;
+
+
+
+            const start =
+                buildDateTime(
+                    selectedDate,
+                    hour,
+                    minute
+                );
+
+
+            const end =
+                new Date(
+                    start.getTime()
+                    +
+                    SLOT_DURATION_MINUTES
+                    *
+                    60000
+                );
+
+
+            let classes =
+                "slot-btn";
+
+
+            if(occupied){
+
+                classes +=
+                    " busy";
+
+            }
+
+            else if(past){
+
+                classes +=
+                    " past";
+
+            }
+
+            else if(selected){
+
+                classes +=
+                    " selected-slot";
+
+            }
+
+
+
+            html +=
+
+                '<button type="button" class="'
+                +
+                classes
+                +
+                '" data-hour="'
+                +
+                hour
+                +
+                '" data-minute="'
+                +
+                minute
+                +
+                '" '
+                +
+                (
+                    occupied || past
+                    ?
+                    "disabled"
+                    :
+                    ""
+                )
+                +
+                ">"
+
+                +
+
+                '<span class="slot-time">'
+                +
+                formatTime(
+                    hour,
+                    minute
+                )
+                +
+                "</span>"
+
+                +
+
+                '<span class="slot-sub">hasta '
+                +
+                formatTime(
+                    end.getHours(),
+                    end.getMinutes()
+                )
+                +
+                "</span>"
+
+                +
+
+                "</button>";
+
+
+
+            minute +=
+                SLOT_STEP_MIN;
+
+
+            if(
+                minute >= 60
+            ){
+
+                hour++;
+
+                minute -= 60;
+
+            }
+
+        }
+
+
+
+        grid.innerHTML =
+            html;
+
+
+
+        grid
+        .querySelectorAll(
+            ".slot-btn:not(.busy):not(.past)"
+        )
+        .forEach(
+            function(button){
+
+                button.addEventListener(
+                    "click",
+                    function(){
+
+                        selectedSlot = {
+
+                            hour:
+                                parseInt(
+                                    button.dataset.hour
+                                ),
+
+                            minute:
+                                parseInt(
+                                    button.dataset.minute
+                                )
+
+                        };
+
+
+                        renderSlots();
+
+                        updateSummary();
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       RESUMEN
+    ====================================================== */
+
+    function updateSummary(){
+
+        if(
+            !selectedDate
+            ||
+            !selectedSlot
+        ){
+
+            return;
+
+        }
+
+
+
+        const start =
+            buildDateTime(
+                selectedDate,
+                selectedSlot.hour,
+                selectedSlot.minute
+            );
+
+
+        const end =
+            new Date(
+                start.getTime()
+                +
+                SLOT_DURATION_MINUTES
+                *
+                60000
+            );
+
+
+
+        const dateText =
+
+            selectedDate.getDate()
+
+            +
+
+            " de "
+
+            +
+
+            MONTHS_ES[
+                selectedDate.getMonth()
+            ]
+
+            +
+
+            " "
+
+            +
+
+            selectedDate.getFullYear();
+
+
+
+        document
+        .getElementById(
+            "summaryVal"
+        )
+        .textContent =
+
+            dateText
+
+            +
+
+            " · "
+
+            +
+
+            formatTime(
+                start.getHours(),
+                start.getMinutes()
+            );
+
+
+
+        document
+        .getElementById(
+            "summarySub"
+        )
+        .textContent =
+
+            "Finaliza: "
+
+            +
+
+            formatTime(
+                end.getHours(),
+                end.getMinutes()
+            )
+
+            +
+
+            " · Duración: 1 hora";
+
+
+
+        document
+        .getElementById(
+            "selSummary"
+        )
+        .classList
+        .add(
+            "visible"
+        );
+
+
+
+        document
+        .getElementById(
+            "hidden_start"
+        )
+        .value =
+            formatDjangoDateTime(
+                start
+            );
+
+
+
+        document
+        .getElementById(
+            "hidden_end"
+        )
+        .value =
+            formatDjangoDateTime(
+                end
+            );
+
+
+
+        document
+        .getElementById(
+            "submitBtn"
+        )
+        .disabled =
+            false;
+
+    }
+
+
+
+    function clearSummary(){
+
+        document
+        .getElementById(
+            "selSummary"
+        )
+        .classList
+        .remove(
+            "visible"
+        );
+
+
+        document
+        .getElementById(
+            "hidden_start"
+        )
+        .value =
+            "";
+
+
+        document
+        .getElementById(
+            "hidden_end"
+        )
+        .value =
+            "";
+
+
+        document
+        .getElementById(
+            "submitBtn"
+        )
+        .disabled =
+            true;
+
+    }
+
+
+
+    /* =====================================================
+       NAVEGACIÓN DE MES
+    ====================================================== */
+
+    document
+    .getElementById(
+        "prevMonth"
+    )
+    .addEventListener(
+        "click",
+        function(){
+
+            viewMonth--;
+
+
+            if(
+                viewMonth < 0
+            ){
+
+                viewMonth = 11;
+
+                viewYear--;
+
+            }
+
+
+            selectedDate =
+                null;
+
+
+            selectedSlot =
+                null;
+
+
+            clearSummary();
+
+            renderCalendar();
+
+
+            document
+            .getElementById(
+                "slotSection"
+            )
+            .style.display =
+                "none";
+
+        }
+    );
+
+
+
+    document
+    .getElementById(
+        "nextMonth"
+    )
+    .addEventListener(
+        "click",
+        function(){
+
+            viewMonth++;
+
+
+            if(
+                viewMonth > 11
+            ){
+
+                viewMonth = 0;
+
+                viewYear++;
+
+            }
+
+
+            selectedDate =
+                null;
+
+
+            selectedSlot =
+                null;
+
+
+            clearSummary();
+
+            renderCalendar();
+
+
+            document
+            .getElementById(
+                "slotSection"
+            )
+            .style.display =
+                "none";
+
+        }
+    );
+
+
+
+    /* =====================================================
+       FORMULARIO DJANGO
+    ====================================================== */
+
+    document
+    .querySelectorAll(
+        "#citaForm select, #citaForm textarea"
+    )
+    .forEach(
+        function(element){
+
+            element
+            .classList
+            .add(
+                "field-input"
+            );
+
+
+            if(
+                element.tagName ===
+                "TEXTAREA"
+            ){
+
+                element
+                .classList
+                .add(
+                    "notes-field"
+                );
+
+            }
+
+        }
+    );
+
+
+
+    /* =====================================================
+       INICIAR
+    ====================================================== */
+
+    renderCalendar();
+
+
+</script>
+
+
+{% endblock %}

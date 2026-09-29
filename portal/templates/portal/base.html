@@ -1,0 +1,2018 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        {% block title %}CAP Online{% endblock %}
+    </title>
+
+
+    <!-- FUENTES -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- Iconos SVG integrados: no requieren descargar fuentes externas. -->
+
+
+    <!-- CSS ORIGINAL -->
+
+    <link
+        rel="stylesheet"
+        href="{% static 'portal/css/app.css' %}"
+    >
+
+
+    <style>
+
+        :root{
+
+            /* =================================================
+               CAP ONLINE - PALETA VERDE DEL LOGO
+            ================================================= */
+
+            --primary:#173D36;
+            --secondary:#4A9A87;
+            --accent:#4A9A87;
+
+            --green:#4A9A87;
+            --green-dark:#2F6F62;
+
+            --mint:#eefaf6;
+            --mint-2:#e1f4ed;
+
+            --white:#ffffff;
+
+            --text:#173D36;
+            --muted:#5E756F;
+
+            --border:#DDEBE6;
+
+            --danger:#b93838;
+
+            --sidebar-width:86px;
+
+            --shadow:
+                0 12px 32px
+                rgba(74,154,135,.07);
+
+        }
+
+
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+        }
+
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+
+        body.portal-body{
+
+            min-height:100vh;
+
+            font-family:
+                "DM Sans",
+                "Segoe UI",
+                sans-serif;
+
+            color:var(--text);
+
+            background:#F4F8F6;
+
+            overflow-x:hidden;
+        }
+
+
+        a{
+            text-decoration:none;
+        }
+
+
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .sidebar{
+
+            position:fixed;
+
+            left:0;
+            top:0;
+
+            width:var(--sidebar-width);
+            height:100vh;
+
+            z-index:1000;
+
+            display:flex;
+
+            flex-direction:column;
+
+            align-items:center;
+
+            padding:
+                17px 8px 13px;
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    #3D7E70 0%,
+                    #579B8B 55%,
+                    #79B5A5 100%
+                );
+
+            box-shadow:
+                5px 0 22px
+                rgba(74,154,135,.14);
+
+            transition:
+                left .28s ease,
+                width .28s ease;
+
+        }
+
+
+
+        /* =====================================================
+           LOGO
+        ===================================================== */
+
+        .sidebar-logo{
+
+            width:54px;
+            height:54px;
+
+            flex:0 0 54px;
+
+            display:flex;
+
+            align-items:center;
+            justify-content:center;
+
+            margin-bottom:25px;
+
+            border-radius:17px;
+
+            background:
+                rgba(255,255,255,.14);
+
+            border:
+                1px solid
+                rgba(255,255,255,.17);
+
+            box-shadow:
+                0 8px 22px
+                rgba(0,0,0,.10);
+
+        }
+
+
+        .sidebar-logo img{
+
+            width:43px;
+            height:43px;
+
+            object-fit:contain;
+
+        }
+
+
+
+        /* =====================================================
+           NAV
+        ===================================================== */
+
+        .nav{
+
+            width:100%;
+
+            display:flex;
+
+            flex-direction:column;
+
+            gap:5px;
+
+            flex:1;
+
+        }
+
+
+        .nav a{
+
+            position:relative;
+
+            min-height:60px;
+
+            display:flex;
+
+            flex-direction:column;
+
+            align-items:center;
+
+            justify-content:center;
+
+            gap:5px;
+
+            padding:
+                8px 3px;
+
+            border-radius:14px;
+
+            color:
+                rgba(255,255,255,.62);
+
+            transition:.18s ease;
+
+        }
+
+
+        .nav a:hover{
+
+            color:#ffffff;
+
+            background:
+                rgba(255,255,255,.10);
+
+        }
+
+
+        .nav a.active{
+
+            color:#ffffff;
+
+            background:
+                rgba(255,255,255,.16);
+
+        }
+
+
+        .nav a.active::before{
+
+            content:"";
+
+            position:absolute;
+
+            left:-8px;
+
+            top:12px;
+            bottom:12px;
+
+            width:3px;
+
+            border-radius:
+                0 4px 4px 0;
+
+            background:#ffffff;
+
+        }
+
+
+        .ui-icon{
+            width:21px;
+            height:21px;
+            display:block;
+            flex:0 0 auto;
+            fill:none;
+            stroke:currentColor;
+            stroke-width:1.9;
+            stroke-linecap:round;
+            stroke-linejoin:round;
+        }
+
+
+        .nav-label{
+
+            font-size:9px;
+
+            font-weight:600;
+
+            line-height:1;
+
+            letter-spacing:.2px;
+
+            text-align:center;
+
+        }
+
+
+        /* NOTIFICATION BADGE */
+
+        .nav-badge{
+
+            position:absolute;
+
+            top:5px;
+            right:6px;
+
+            min-width:17px;
+            height:17px;
+
+            padding:
+                0 4px;
+
+            display:flex;
+
+            align-items:center;
+            justify-content:center;
+
+            border:
+                2px solid #4A9A87;
+
+            border-radius:999px;
+
+            background:#b93838;
+
+            color:#ffffff;
+
+            font-size:8px;
+
+            font-weight:700;
+
+        }
+
+
+
+        /* =====================================================
+           FOOTER SIDEBAR
+        ===================================================== */
+
+        .sidebar-footer{
+
+            width:100%;
+
+            padding-top:13px;
+
+            border-top:
+                1px solid
+                rgba(255,255,255,.12);
+
+            display:flex;
+
+            flex-direction:column;
+
+            align-items:center;
+
+            gap:8px;
+
+        }
+
+
+        .avatar-wrap{
+
+            position:relative;
+
+            width:100%;
+
+            display:flex;
+
+            flex-direction:column;
+
+            align-items:center;
+
+        }
+
+
+        .user-avatar{
+
+            width:42px;
+            height:42px;
+
+            display:flex;
+
+            align-items:center;
+            justify-content:center;
+
+            border-radius:50%;
+
+            border:
+                2px solid
+                rgba(255,255,255,.28);
+
+            background:
+                rgba(255,255,255,.16);
+
+            color:#ffffff;
+
+            font-size:11px;
+
+            font-weight:700;
+
+            cursor:pointer;
+
+            transition:.2s;
+
+        }
+
+
+        .user-avatar:hover{
+
+            background:
+                rgba(255,255,255,.25);
+
+            transform:
+                translateY(-1px);
+
+        }
+
+
+
+        /* =====================================================
+           PERFIL ABAJO
+        ===================================================== */
+
+        .profile-link{
+
+            width:100%;
+
+            min-height:47px;
+
+            display:flex;
+
+            flex-direction:column;
+
+            align-items:center;
+
+            justify-content:center;
+
+            gap:4px;
+
+            border-radius:12px;
+
+            color:
+                rgba(255,255,255,.58);
+
+            font-size:9px;
+
+            font-weight:600;
+
+            transition:.2s;
+
+        }
+
+
+        .profile-link .ui-icon,
+        .drop-item .ui-icon{
+            width:18px;
+            height:18px;
+        }
+
+
+        .profile-link:hover{
+
+            color:#ffffff;
+
+            background:
+                rgba(255,255,255,.10);
+
+        }
+
+
+
+        /* =====================================================
+           DROPDOWN AVATAR
+        ===================================================== */
+
+        .profile-dropdown{
+
+            display:none;
+
+            position:absolute;
+
+            left:63px;
+            bottom:0;
+
+            width:245px;
+
+            overflow:hidden;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:18px;
+
+            background:#ffffff;
+
+            box-shadow:
+                0 18px 50px
+                rgba(74,154,135,.17);
+
+            z-index:9999;
+
+        }
+
+
+        .dropdown-header{
+
+            padding:
+                17px 17px 14px;
+
+            border-bottom:
+                1px solid
+                #F4F8F6;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #F4F8F6,
+                    #F4F8F6
+                );
+
+        }
+
+
+        .dropdown-header strong{
+
+            display:block;
+
+            color:
+                var(--primary);
+
+            font-size:12px;
+
+        }
+
+
+        .dropdown-header small{
+
+            display:block;
+
+            margin-top:4px;
+
+            color:
+                var(--muted);
+
+            font-size:9px;
+
+        }
+
+
+        .drop-item{
+
+            width:100%;
+
+            min-height:47px;
+
+            display:flex;
+
+            align-items:center;
+
+            gap:10px;
+
+            padding:
+                0 15px;
+
+            border:0;
+
+            background:#ffffff;
+
+            color:
+                var(--text);
+
+            font-family:inherit;
+
+            font-size:11px;
+
+            font-weight:600;
+
+            cursor:pointer;
+
+            transition:.15s;
+
+        }
+
+
+        .drop-item .ui-icon{
+            color:var(--accent);
+        }
+
+
+        .drop-item:hover{
+
+            background:
+                var(--mint-2);
+
+        }
+
+
+        .drop-danger{
+
+            color:
+                #b93838;
+
+        }
+
+
+        .drop-danger i{
+
+            color:
+                #b93838;
+
+        }
+
+
+        .drop-divider{
+
+            border:0;
+
+            border-top:
+                1px solid
+                #F4F8F6;
+
+        }
+
+
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .main{
+
+            margin-left:
+                var(--sidebar-width);
+
+            min-height:100vh;
+
+            display:flex;
+
+            flex-direction:column;
+
+        }
+
+
+
+        /* =====================================================
+           TOPBAR
+        ===================================================== */
+
+        .topbar{
+
+            position:sticky;
+
+            top:0;
+
+            z-index:100;
+
+            min-height:78px;
+
+            padding:
+                13px 25px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:space-between;
+
+            gap:20px;
+
+            border-bottom:
+                1px solid
+                var(--border);
+
+            background:
+                rgba(255,255,255,.95);
+
+            backdrop-filter:
+                blur(15px);
+
+        }
+
+
+        .page-heading{
+
+            display:flex;
+
+            flex-direction:column;
+
+            gap:3px;
+
+        }
+
+
+        .page-subtitle{
+
+            color:
+                var(--muted);
+
+            font-size:9px;
+
+            font-weight:600;
+
+        }
+
+
+        .page-title{
+
+            color:
+                var(--primary);
+
+            font-family:
+                "Playfair Display",
+                serif;
+
+            font-size:27px;
+
+            font-weight:700;
+
+            line-height:1.1;
+
+        }
+
+
+
+        /* =====================================================
+           TOP ACTIONS
+        ===================================================== */
+
+        .top-actions{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:10px;
+
+        }
+
+
+        .search-box{
+
+            position:relative;
+
+            width:300px;
+
+            max-width:34vw;
+
+        }
+
+
+        .search-box input{
+
+            width:100%;
+
+            min-height:42px;
+
+            padding:
+                9px 15px 9px 38px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:999px;
+
+            outline:none;
+
+            background:#F4F8F6;
+
+            color:
+                var(--text);
+
+            font-family:inherit;
+
+            font-size:10px;
+
+            transition:.2s;
+
+        }
+
+
+        .search-box input:focus{
+
+            border-color:
+                rgba(74,154,135,.5);
+
+            box-shadow:
+                0 0 0 4px
+                rgba(74,154,135,.08);
+
+        }
+
+
+        .search-box .ui-icon{
+
+            position:absolute;
+
+            left:13px;
+            top:50%;
+
+            transform:
+                translateY(-50%);
+
+            color:
+                #5E756F;
+
+            width:16px;
+            height:16px;
+
+        }
+
+
+        .notification-btn{
+
+            position:relative;
+
+            width:42px;
+            height:42px;
+
+            flex:0 0 42px;
+
+            display:flex;
+
+            align-items:center;
+            justify-content:center;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:50%;
+
+            background:#F4F8F6;
+
+            color:
+                var(--primary);
+
+            font-size:17px;
+
+            transition:.2s;
+
+        }
+
+
+        .notification-btn:hover{
+
+            background:
+                var(--mint);
+
+        }
+
+
+        .notification-count{
+
+            position:absolute;
+
+            right:-2px;
+            top:-3px;
+
+            min-width:17px;
+            height:17px;
+
+            display:flex;
+
+            align-items:center;
+            justify-content:center;
+
+            border:
+                2px solid white;
+
+            border-radius:999px;
+
+            background:#b93838;
+
+            color:white;
+
+            font-size:8px;
+
+            font-weight:700;
+
+        }
+
+
+
+        /* =====================================================
+           CONTENT
+        ===================================================== */
+
+        .portal-content{
+
+            flex:1;
+
+            width:100%;
+
+            padding:
+                24px 25px 45px;
+
+        }
+
+
+        .portal-content-inner{
+
+            width:100%;
+
+            max-width:1400px;
+
+            margin:0 auto;
+
+        }
+
+
+
+        /* =====================================================
+           MESSAGES
+        ===================================================== */
+
+        .django-messages{
+
+            display:grid;
+
+            gap:10px;
+
+            margin-bottom:17px;
+
+        }
+
+
+        .django-message{
+
+            padding:
+                12px 14px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-left:
+                4px solid
+                var(--accent);
+
+            border-radius:12px;
+
+            background:white;
+
+            color:#5E756F;
+
+            font-size:10px;
+
+        }
+
+
+
+        /* =====================================================
+           HAMBURGER
+        ===================================================== */
+
+        .hamburger{
+
+            display:none;
+
+            width:40px;
+            height:40px;
+
+            flex-direction:column;
+
+            align-items:center;
+            justify-content:center;
+
+            gap:5px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:11px;
+
+            background:#F4F8F6;
+
+            cursor:pointer;
+
+        }
+
+
+        .hamburger span{
+
+            width:18px;
+            height:2px;
+
+            display:block;
+
+            border-radius:99px;
+
+            background:
+                var(--primary);
+
+            transition:.25s;
+
+        }
+
+
+        .hamburger.active
+        span:nth-child(1){
+
+            transform:
+                translateY(7px)
+                rotate(45deg);
+
+        }
+
+
+        .hamburger.active
+        span:nth-child(2){
+
+            opacity:0;
+
+        }
+
+
+        .hamburger.active
+        span:nth-child(3){
+
+            transform:
+                translateY(-7px)
+                rotate(-45deg);
+
+        }
+
+
+
+        /* =====================================================
+           OVERLAY MOBILE
+        ===================================================== */
+
+        .sidebar-overlay{
+
+            display:none;
+
+            position:fixed;
+
+            inset:0;
+
+            z-index:900;
+
+            background:
+                rgba(74,154,135,.38);
+
+            backdrop-filter:
+                blur(3px);
+
+        }
+
+
+        .sidebar-overlay.visible{
+
+            display:block;
+
+        }
+
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media(max-width:768px){
+
+            :root{
+
+                --sidebar-width:0px;
+
+            }
+
+
+            .sidebar{
+
+                width:240px;
+
+                left:-255px;
+
+                align-items:stretch;
+
+                padding:
+                    21px 14px;
+
+            }
+
+
+            .sidebar.open{
+
+                left:0;
+
+            }
+
+
+            .sidebar-logo{
+
+                margin:
+                    0 auto 24px;
+
+            }
+
+
+            .nav a{
+
+                flex-direction:row;
+
+                justify-content:flex-start;
+
+                min-height:49px;
+
+                padding:
+                    0 13px;
+
+                gap:13px;
+
+            }
+
+
+            .nav a.active::before{
+
+                left:-14px;
+
+            }
+
+
+            .nav .ui-icon{
+
+                width:24px;
+
+                text-align:center;
+
+            }
+
+
+            .nav-label{
+
+                font-size:12px;
+
+            }
+
+
+            .sidebar-footer{
+
+                align-items:stretch;
+
+            }
+
+
+            .user-avatar{
+
+                margin:auto;
+
+            }
+
+
+            .profile-link{
+
+                flex-direction:row;
+
+                min-height:45px;
+
+            }
+
+
+            .profile-dropdown{
+
+                left:15px;
+                right:15px;
+                bottom:60px;
+
+                width:auto;
+
+            }
+
+
+            .main{
+
+                margin-left:0;
+
+            }
+
+
+            .hamburger{
+
+                display:flex;
+
+            }
+
+
+            .topbar{
+
+                min-height:69px;
+
+                padding:
+                    11px 14px;
+
+            }
+
+
+            .page-subtitle{
+
+                display:none;
+
+            }
+
+
+            .page-title{
+
+                font-size:21px;
+
+            }
+
+
+            .search-box{
+
+                display:none;
+
+            }
+
+
+            .top-actions{
+
+                margin-left:auto;
+
+            }
+
+
+            .portal-content{
+
+                padding:
+                    16px 14px 35px;
+
+            }
+
+        }
+
+
+        @media(max-width:480px){
+
+            .page-title{
+
+                font-size:19px;
+
+            }
+
+
+            .portal-content{
+
+                padding:
+                    13px 10px 30px;
+
+            }
+
+        }
+
+
+    </style>
+
+    {% block extra_styles %}{% endblock %}
+
+{% include "includes/responsive_styles.html" %}
+</head>
+
+
+<body class="portal-body">
+
+
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
+
+<aside
+    class="sidebar"
+    id="sidebar"
+>
+
+
+    <!-- LOGO -->
+
+    <a
+        href="{% if role_is_admin %}{% url 'doctor_list' %}{% else %}{% url 'portal_dashboard' %}{% endif %}"
+        class="sidebar-logo"
+        title="CAP Online"
+    >
+
+        <img
+            src="{% static 'portal/img/cap-online-logo.png' %}"
+            alt="CAP Online"
+        >
+
+    </a>
+
+
+
+    <!-- =====================================================
+         NAVEGACIÓN
+    ====================================================== -->
+
+    <nav class="nav">
+
+        {% if role_is_admin %}
+        <a href="{% url 'doctor_list' %}" class="{% if request.resolver_match.url_name == 'doctor_list' or request.resolver_match.url_name == 'doctor_create' %}active{% endif %}">
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M18 8v6M15 11h6"/></svg>
+            <span class="nav-label">Doctores</span>
+        </a>
+        {% else %}
+
+
+        <!-- INICIO -->
+
+        <a
+            href="{% url 'portal_dashboard' %}"
+            class="
+                {% if request.resolver_match.url_name == 'portal_dashboard' %}
+                    active
+                {% endif %}
+            "
+        >
+
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10M9.5 20v-6h5v6"/></svg>
+
+            <span class="nav-label">
+                Inicio
+            </span>
+
+        </a>
+
+
+
+        <!-- PSICÓLOGOS -->
+
+        {% if not role_is_doctor %}
+
+        <a
+            href="{% url 'portal_specialists' %}"
+            class="
+                {% if request.resolver_match.url_name == 'portal_specialists' %}
+                    active
+                {% endif %}
+            "
+        >
+
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M16.5 8.5c1.2-1.6 4-1 4 1.2 0 2.2-4 4.3-4 4.3s-4-2.1-4-4.3c0-2.2 2.8-2.8 4-1.2Z"/></svg>
+
+            <span class="nav-label">
+                Psicólogos
+            </span>
+
+        </a>
+
+        {% endif %}
+
+
+
+        <!-- CITAS -->
+
+        <a
+            href="{% url 'portal_calendar' %}"
+            class="
+                {% if request.resolver_match.url_name == 'portal_calendar' %}
+                    active
+                {% endif %}
+            "
+        >
+
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01"/></svg>
+
+            <span class="nav-label">
+                Citas
+            </span>
+
+        </a>
+
+
+
+        <!-- VIDEOLLAMADAS -->
+
+        <a
+            href="{% url 'video_calls' %}"
+            class="{% if request.resolver_match.url_name == 'video_calls' or request.resolver_match.url_name == 'video_room' %}active{% endif %}"
+        >
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>
+            <span class="nav-label">Llamadas</span>
+        </a>
+
+
+
+        <!-- CHAT -->
+
+        <a
+            href="{% url 'portal_chat' %}"
+            class="
+                {% if request.resolver_match.url_name == 'portal_chat' %}
+                    active
+                {% endif %}
+            "
+        >
+
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.6 9.6 0 0 1-4-.9L3 21l1.7-4.4A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>
+
+            <span class="nav-label">
+                Chat
+            </span>
+
+        </a>
+
+
+
+        <!-- AVISOS -->
+
+        <a
+            href="{% url 'portal_notifications' %}"
+            class="
+                {% if request.resolver_match.url_name == 'portal_notifications' %}
+                    active
+                {% endif %}
+            "
+        >
+
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+
+            <span class="nav-label">
+                Avisos
+            </span>
+
+
+            {% if notifications_count %}
+
+                <span class="nav-badge">
+
+                    {{ notifications_count }}
+
+                </span>
+
+            {% endif %}
+
+        </a>
+
+
+
+        <!-- NOTAS CLÍNICAS -->
+
+        {% if role_is_doctor %}
+
+        <a
+            href="{% url 'mis_notas_clinicas' %}"
+            class="
+                {% if request.resolver_match.url_name == 'mis_notas_clinicas' %}
+                    active
+                {% endif %}
+            "
+        >
+
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M12 17s-4-2.1-4-4.5c0-2 2.6-2.7 4-1 1.4-1.7 4-1 4 1 0 2.4-4 4.5-4 4.5Z"/></svg>
+
+            <span class="nav-label">
+                Notas
+            </span>
+
+        </a>
+
+        {% endif %}
+
+        {% endif %}
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         PARTE INFERIOR
+    ====================================================== -->
+
+    <div class="sidebar-footer">
+
+
+        <!-- AVATAR -->
+
+        <div class="avatar-wrap">
+
+
+            <div
+                class="user-avatar"
+                id="userAvatar"
+                title="Mi cuenta"
+            >
+
+                {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+
+                {{ request.user.last_name|slice:":1"|upper }}
+
+            </div>
+
+
+
+            <!-- DROPDOWN -->
+
+            <div
+                class="profile-dropdown"
+                id="profileDropdown"
+            >
+
+
+                <div class="dropdown-header">
+
+                    <strong>
+
+                        {{ request.user.get_full_name|default:request.user.username }}
+
+                    </strong>
+
+                    <small>
+
+                        Cuenta CAP Online
+
+                    </small>
+
+                </div>
+
+
+
+                <!-- SOLO PERFIL -->
+
+                {% if not role_is_admin %}<a
+                    class="drop-item"
+                    href="{% url 'portal_settings' %}"
+                >
+
+                    <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+
+                    Mi perfil
+
+                </a>{% endif %}
+
+
+
+                <hr class="drop-divider">
+
+
+
+                <!-- LOGOUT -->
+
+                <a
+                    class="drop-item drop-danger"
+                    href="{% url 'logout' %}"
+                >
+
+                    <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M14 4h4a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-4"/></svg>
+
+                    Cerrar sesión
+
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             PERFIL
+             YA NO DICE CONFIG
+        ================================================== -->
+
+        {% if role_is_admin %}
+        <a class="profile-link" href="{% url 'logout' %}">
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M14 4h4a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-4"/></svg>
+            <span>Salir</span>
+        </a>
+        {% else %}<a
+            class="profile-link"
+            href="{% url 'portal_settings' %}"
+        >
+
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+
+            <span>
+                Perfil
+            </span>
+
+        </a>{% endif %}
+
+
+    </div>
+
+
+</aside>
+
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="main">
+
+
+    <!-- TOPBAR -->
+
+    <header class="topbar">
+
+
+        <!-- MOBILE MENU -->
+
+        <button
+            class="hamburger"
+            id="hamburgerBtn"
+            type="button"
+            aria-label="Abrir menú"
+        >
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </button>
+
+
+
+        <!-- TITLE -->
+
+        <div class="page-heading">
+
+
+            <span class="page-subtitle">
+
+                CAP Online · Tu espacio de bienestar
+
+            </span>
+
+
+            <div class="page-title">
+
+                {% block page_title %}
+
+                    Inicio
+
+                {% endblock %}
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ACTIONS -->
+
+        <div class="top-actions">
+
+
+            {% if not role_is_admin %}<div class="search-box">
+
+                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+
+                <input
+                    type="search"
+                    placeholder="Buscar..."
+                >
+
+            </div>{% endif %}
+
+
+
+            {% if not role_is_admin %}<a
+                class="notification-btn"
+                href="{% url 'portal_notifications' %}"
+                title="Notificaciones"
+            >
+
+                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+
+
+                {% if notifications_count %}
+
+                    <span class="notification-count">
+
+                        {{ notifications_count }}
+
+                    </span>
+
+                {% endif %}
+
+
+            </a>{% endif %}
+
+
+        </div>
+
+
+    </header>
+
+
+
+    <!-- CONTENT -->
+
+    <section class="portal-content">
+
+        <div class="portal-content-inner">
+
+
+            {% if messages %}
+
+                <div class="django-messages">
+
+                    {% for message in messages %}
+
+                        <div
+                            class="
+                                django-message
+                                {{ message.tags }}
+                            "
+                        >
+
+                            {{ message }}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+
+            {% block content %}
+            {% endblock %}
+
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<!-- =========================================================
+     MOBILE OVERLAY
+========================================================= -->
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+></div>
+
+
+
+<!-- =========================================================
+     JS
+========================================================= -->
+
+<script>
+
+    /* =====================================================
+       AVATAR MENU
+    ====================================================== */
+
+    const userAvatar =
+        document.getElementById(
+            "userAvatar"
+        );
+
+
+    const profileDropdown =
+        document.getElementById(
+            "profileDropdown"
+        );
+
+
+    userAvatar?.addEventListener(
+        "click",
+        function(event){
+
+            event.stopPropagation();
+
+
+            if(
+                profileDropdown.style.display ===
+                "block"
+            ){
+
+                profileDropdown.style.display =
+                    "none";
+
+            }
+            else{
+
+                profileDropdown.style.display =
+                    "block";
+
+            }
+
+        }
+    );
+
+
+    document.addEventListener(
+        "click",
+        function(event){
+
+            if(
+                profileDropdown
+                &&
+                userAvatar
+                &&
+                !profileDropdown.contains(
+                    event.target
+                )
+                &&
+                !userAvatar.contains(
+                    event.target
+                )
+            ){
+
+                profileDropdown.style.display =
+                    "none";
+
+            }
+
+        }
+    );
+
+
+
+    /* =====================================================
+       MOBILE SIDEBAR
+    ====================================================== */
+
+    const hamburgerBtn =
+        document.getElementById(
+            "hamburgerBtn"
+        );
+
+
+    const sidebar =
+        document.getElementById(
+            "sidebar"
+        );
+
+
+    const sidebarOverlay =
+        document.getElementById(
+            "sidebarOverlay"
+        );
+
+
+    function openSidebar(){
+
+        sidebar.inert = false;
+        hamburgerBtn.setAttribute("aria-expanded", "true");
+
+        sidebar.classList.add(
+            "open"
+        );
+
+        sidebarOverlay.classList.add(
+            "visible"
+        );
+
+        hamburgerBtn.classList.add(
+            "active"
+        );
+
+        document.body.style.overflow =
+            "hidden";
+
+    }
+
+
+    function closeSidebar(){
+
+        sidebar.inert = window.innerWidth <= 768;
+        hamburgerBtn.setAttribute("aria-expanded", "false");
+
+        sidebar.classList.remove(
+            "open"
+        );
+
+        sidebarOverlay.classList.remove(
+            "visible"
+        );
+
+        hamburgerBtn.classList.remove(
+            "active"
+        );
+
+        document.body.style.overflow =
+            "";
+
+    }
+
+
+    hamburgerBtn.setAttribute("aria-controls", "sidebar");
+    closeSidebar();
+    document.addEventListener("keydown", function(event){
+        if(event.key === "Escape" && sidebar.classList.contains("open")){
+            closeSidebar();
+            hamburgerBtn.focus();
+        }
+    });
+
+    hamburgerBtn?.addEventListener(
+        "click",
+        function(){
+
+            if(
+                sidebar.classList.contains(
+                    "open"
+                )
+            ){
+
+                closeSidebar();
+
+            }
+            else{
+
+                openSidebar();
+
+            }
+
+        }
+    );
+
+
+    sidebarOverlay?.addEventListener(
+        "click",
+        closeSidebar
+    );
+
+
+    document
+    .querySelectorAll(
+        ".nav a"
+    )
+    .forEach(
+        function(link){
+
+            link.addEventListener(
+                "click",
+                function(){
+
+                    if(
+                        window.innerWidth <= 768
+                    ){
+
+                        closeSidebar();
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    window.addEventListener(
+        "resize",
+        function(){
+
+            sidebar.inert = window.innerWidth <= 768 && !sidebar.classList.contains("open");
+
+            if(
+                window.innerWidth > 768
+            ){
+
+                closeSidebar();
+
+            }
+
+        }
+    );
+
+</script>
+
+
+{% block scripts %}
+{% endblock %}
+
+
+</body>
+
+</html>

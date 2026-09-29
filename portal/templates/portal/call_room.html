@@ -1,0 +1,58 @@
+{% extends 'portal/base.html' %}
+{% block title %}Videollamada | CAP Online{% endblock %}
+{% block page_title %}Videollamada{% endblock %}
+{% block extra_styles %}<style>
+.video-shell{max-width:1100px;margin:0 auto;padding:18px;border-radius:25px;background:#173d36;color:#fff;box-shadow:0 18px 45px rgba(23,61,54,.2)}.video-top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:13px}.video-status{display:flex;align-items:center;gap:9px;margin:0;color:#e5f4ee;text-align:left}.status-dot{width:9px;height:9px;border-radius:50%;background:#e7b65e;box-shadow:0 0 0 4px rgba(231,182,94,.15)}.video-status.connected .status-dot{background:#79c9ad}.video-status.error .status-dot{background:#ef7f75}.video-security{font-size:12px;color:#b9d8cf}.video-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.video-frame{position:relative;overflow:hidden;min-width:0;border-radius:19px;background:#0d2924;aspect-ratio:16/10}.video-frame video{display:block;width:100%;height:100%;object-fit:cover;background:#0d2924}.video-frame small{position:absolute;left:12px;bottom:11px;padding:6px 9px;border-radius:999px;background:rgba(0,0,0,.5);color:#fff;font-size:12px}.video-waiting{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;color:#cde3dc;background:radial-gradient(circle,rgba(74,154,135,.18),transparent 60%)}.video-waiting.hidden{display:none}.video-controls{display:flex;align-items:center;justify-content:center;gap:11px;margin-top:15px}.control-btn{display:grid;place-items:center;width:48px;height:48px;border:0;border-radius:50%;background:#f4faf7;color:#245d51;font-size:19px;cursor:pointer;transition:.18s}.control-btn:hover{transform:translateY(-2px)}.control-btn.off{background:#e4a39d;color:#642d28}.control-btn.end{background:#c94f48;color:#fff}.control-btn:disabled{opacity:.45;cursor:not-allowed}.video-help{margin-top:12px;text-align:center;color:#b9d8cf;font-size:12px}.retry-btn{display:none;margin:11px auto 0;padding:9px 14px;border:1px solid rgba(255,255,255,.28);border-radius:11px;background:transparent;color:#fff;font-weight:700;cursor:pointer}.retry-btn.show{display:block}@media(max-width:760px){.video-shell{padding:11px;border-radius:18px}.video-top{align-items:flex-start;flex-direction:column}.video-security{display:none}.video-grid{grid-template-columns:1fr}.video-frame{aspect-ratio:4/3}.video-frame.local-frame{position:absolute;right:20px;bottom:90px;z-index:5;width:115px;border:2px solid #fff;box-shadow:0 8px 22px rgba(0,0,0,.3)}.video-frame.remote-frame{min-height:56dvh}.video-controls{position:relative;z-index:6}.control-btn{width:50px;height:50px}}
+.activation-panel{margin:14px auto 0;text-align:center}.activation-btn{min-height:46px;padding:0 20px;border:0;border-radius:13px;background:#79c9ad;color:#123b33;font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.16)}.activation-btn:hover{background:#a0dec9}.activation-btn:disabled{opacity:.6;cursor:wait}
+</style>{% endblock %}
+{% block content %}
+<main class="video-shell"><header class="video-top"><div class="video-status" id="status" role="status"><span class="status-dot"></span><span id="statusText">Preparando cámara y micrófono…</span></div><div class="video-security">Conexión privada entre los participantes de la cita</div></header><section class="video-grid"><div class="video-frame local-frame"><video id="local" autoplay muted playsinline></video><small>Tú</small></div><div class="video-frame remote-frame"><video id="remote" autoplay playsinline></video><div class="video-waiting" id="waiting">Esperando al otro participante…</div><small>{% if role_is_doctor %}Paciente{% else %}Psicólogo{% endif %}</small></div></section><div class="video-controls"><button class="control-btn" id="mute" type="button" title="Activar o desactivar micrófono" aria-pressed="false" disabled>🎙️</button><button class="control-btn" id="camera" type="button" title="Activar o desactivar cámara" aria-pressed="false" disabled>📷</button><form method="post" action="{% url 'video_end' appointment.id %}" id="endForm">{% csrf_token %}<button class="control-btn end" type="submit" title="Finalizar llamada">☎</button></form></div><button class="retry-btn" id="retry" type="button">Intentar de nuevo</button><p class="video-help">Permite el acceso a cámara y micrófono. En dispositivos externos utiliza HTTPS.</p></main>
+<div class="activation-panel" id="activationPanel"><button class="activation-btn" id="activateMedia" type="button">Activar c&aacute;mara y micr&oacute;fono</button></div>
+{{ ice_servers|json_script:"ice-config" }}
+{% endblock %}
+{% block scripts %}<script>
+(() => {
+  const room = '{{ room_key|escapejs }}';
+  const isInitiator = {{ is_initiator|yesno:'true,false' }};
+  const pullUrl = '{% url "call_signals_pull" room_key %}', pushUrl = '{% url "call_signals_push" room_key %}';
+  const iceServers = JSON.parse(document.getElementById('ice-config').textContent);
+  const status = document.getElementById('status'), statusText = document.getElementById('statusText');
+  const localVideo = document.getElementById('local'), remoteVideo = document.getElementById('remote');
+  const waiting = document.getElementById('waiting'), muteBtn = document.getElementById('mute');
+  const cameraBtn = document.getElementById('camera'), retryBtn = document.getElementById('retry');
+  const activationPanel = document.getElementById('activationPanel'), activateMedia = document.getElementById('activateMedia');
+  let pc = null, localStream = null, lastSignal = 0, polling = false;
+  let offerSent = false, pendingCandidates = [], stopped = false;
+  let negotiationId = null, readyTimer = null;
+  function setStatus(text, kind=''){statusText.textContent=text;status.classList.toggle('connected',kind==='connected');status.classList.toggle('error',kind==='error')}
+  function csrfToken(){return document.querySelector('#endForm input[name="csrfmiddlewaretoken"]').value}
+  async function push(payload){const response=await fetch(pushUrl,{method:'POST',credentials:'same-origin',headers:{'X-CSRFToken':csrfToken(),'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!response.ok)throw new Error('signal')}
+  async function flushCandidates(){if(!pc?.remoteDescription)return;const keep=[];for(const item of pendingCandidates){if(item.negotiation===negotiationId){try{await pc.addIceCandidate(item.candidate)}catch(_){}}else keep.push(item)}pendingCandidates=keep}
+  async function handleSignal(payload){
+    if(!pc||!payload)return;
+    if(payload.type==='ready'&&isInitiator){if(pc.signalingState==='stable'&&pc.connectionState!=='connected'&&!offerSent)await sendOffer()}
+    else if(payload.type==='offer'&&!isInitiator){if(pc.signalingState!=='stable')return;negotiationId=payload.negotiation;await pc.setRemoteDescription(payload.sdp);await flushCandidates();const answer=await pc.createAnswer();await pc.setLocalDescription(answer);await push({type:'answer',negotiation:negotiationId,sdp:pc.localDescription});setStatus('Conectando…')}
+    else if(payload.type==='answer'&&isInitiator&&payload.negotiation===negotiationId&&pc.signalingState==='have-local-offer'){await pc.setRemoteDescription(payload.sdp);await flushCandidates();setStatus('Conectando…')}
+    else if(payload.type==='ice'&&payload.candidate){const item={negotiation:payload.negotiation,candidate:new RTCIceCandidate(payload.candidate)};if(pc.remoteDescription&&item.negotiation===negotiationId)await pc.addIceCandidate(item.candidate);else pendingCandidates.push(item)}
+  }
+  async function poll(){if(polling||stopped)return;polling=true;try{const response=await fetch(`${pullUrl}?after=${lastSignal}`,{credentials:'same-origin',cache:'no-store'});if(!response.ok)throw new Error();const data=await response.json();for(const signal of data.signals||[]){lastSignal=Math.max(lastSignal,signal.id);await handleSignal(signal.payload)}}catch(_){if(!stopped)setStatus('Reconectando señal…')}finally{polling=false;if(!stopped)window.setTimeout(poll,850)}}
+  async function sendOffer(){if(!isInitiator||offerSent||!pc)return;offerSent=true;negotiationId=crypto.randomUUID?.()||`${Date.now()}-${Math.random()}`;const offer=await pc.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:true});await pc.setLocalDescription(offer);await push({type:'offer',negotiation:negotiationId,sdp:pc.localDescription});setStatus('Esperando al paciente…')}
+  function stopMedia(){stopped=true;if(readyTimer)window.clearInterval(readyTimer);localStream?.getTracks().forEach(track=>track.stop());pc?.close()}
+  async function start(){
+    stopped=false;offerSent=false;pendingCandidates=[];lastSignal=0;retryBtn.classList.remove('show');setStatus('Solicitando permisos…');
+    try{
+      if(!navigator.mediaDevices?.getUserMedia)throw new Error('secure-context');
+      localStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:'user'},audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+      localVideo.srcObject=localStream;muteBtn.disabled=false;cameraBtn.disabled=false;activationPanel.hidden=true;
+      pc=new RTCPeerConnection({iceServers,iceCandidatePoolSize:10});localStream.getTracks().forEach(track=>pc.addTrack(track,localStream));
+      pc.ontrack=event=>{remoteVideo.srcObject=event.streams[0];waiting.classList.add('hidden')};
+      pc.onicecandidate=event=>{if(event.candidate&&negotiationId)push({type:'ice',negotiation:negotiationId,candidate:event.candidate}).catch(()=>{})};
+      pc.onconnectionstatechange=()=>{const state=pc.connectionState;if(state==='connected'){if(readyTimer)window.clearInterval(readyTimer);setStatus('Conectado','connected');waiting.classList.add('hidden')}else if(state==='failed'){offerSent=false;setStatus('No se pudo conectar. Intenta nuevamente.','error');retryBtn.classList.add('show')}else if(state==='disconnected')setStatus('Conexión interrumpida. Reconectando…');else if(state==='closed')setStatus('Llamada finalizada.')};
+      setStatus(isInitiator?'Esperando al paciente…':'Esperando al doctor…');poll();if(!isInitiator){const announce=()=>push({type:'ready'}).catch(()=>{});announce();readyTimer=window.setInterval(announce,2000)}
+    }catch(error){const insecure=!window.isSecureContext&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1';setStatus(insecure?'La cámara requiere HTTPS en este dispositivo.':'Permite el acceso a cámara y micrófono.','error');retryBtn.classList.add('show')}
+  }
+  muteBtn.addEventListener('click',()=>{const track=localStream?.getAudioTracks()[0];if(!track)return;track.enabled=!track.enabled;muteBtn.classList.toggle('off',!track.enabled);muteBtn.setAttribute('aria-pressed',String(!track.enabled));muteBtn.textContent=track.enabled?'🎙️':'🔇'});
+  cameraBtn.addEventListener('click',()=>{const track=localStream?.getVideoTracks()[0];if(!track)return;track.enabled=!track.enabled;cameraBtn.classList.toggle('off',!track.enabled);cameraBtn.setAttribute('aria-pressed',String(!track.enabled));cameraBtn.textContent=track.enabled?'📷':'🚫'});
+  activateMedia.addEventListener('click',start);retryBtn.addEventListener('click',()=>{stopMedia();window.setTimeout(start,150)});document.getElementById('endForm').addEventListener('submit',stopMedia);window.addEventListener('pagehide',stopMedia);setStatus('Presiona Activar camara y microfono para comenzar.');
+})();
+</script>{% endblock %}
