@@ -175,28 +175,34 @@ class PasswordResetFlowTests(TestCase):
     @override_settings(
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
         DEBUG=False,
-        RENDER_EXTERNAL_HOSTNAME="cap-online.onrender.com",
+        ALLOWED_HOSTS=["testserver", "cap-online-v2.onrender.com"],
         DEFAULT_FROM_EMAIL="viridianahernandez02635@gmail.com",
     )
     def test_password_reset_email_is_sent_for_registered_user(self):
-        response = self.client.post(reverse("password_reset"), {"email": self.email})
+        response = self.client.post(
+            reverse("password_reset"), {"email": self.email},
+            secure=True, HTTP_HOST="cap-online-v2.onrender.com",
+        )
         self.assertRedirects(response, reverse("password_reset_done"))
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn(self.email, mail.outbox[0].to)
         self.assertTrue(mail.outbox[0].subject.strip())
         self.assertNotIn("\n", mail.outbox[0].subject)
-        self.assertIn("https://cap-online.onrender.com/reset/", mail.outbox[0].body)
+        self.assertIn("https://cap-online-v2.onrender.com/reset/", mail.outbox[0].body)
         self.assertNotIn("localhost", mail.outbox[0].body)
         self.assertNotIn("127.0.0.1", mail.outbox[0].body)
 
     @override_settings(
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
         DEBUG=False,
-        RENDER_EXTERNAL_HOSTNAME="cap-online.onrender.com",
+        ALLOWED_HOSTS=["testserver", "cap-online-v2.onrender.com"],
         DEFAULT_FROM_EMAIL="viridianahernandez02635@gmail.com",
     )
     def test_password_reset_link_changes_password_and_allows_login(self):
-        self.client.post(reverse("password_reset"), {"email": self.email})
+        self.client.post(
+            reverse("password_reset"), {"email": self.email},
+            secure=True, HTTP_HOST="cap-online-v2.onrender.com",
+        )
         self.assertEqual(len(mail.outbox), 1)
 
         reset_url = next(
@@ -204,7 +210,7 @@ class PasswordResetFlowTests(TestCase):
             for line in mail.outbox[0].body.splitlines()
             if line.strip().startswith("https://")
         )
-        self.assertEqual(urlsplit(reset_url).netloc, "cap-online.onrender.com")
+        self.assertEqual(urlsplit(reset_url).netloc, "cap-online-v2.onrender.com")
         reset_path = urlsplit(reset_url).path
 
         response = self.client.get(reset_path, follow=True)

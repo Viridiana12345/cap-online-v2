@@ -40,13 +40,8 @@ class LoggingPasswordResetView(auth_views.PasswordResetView):
     def form_valid(self, form):
         email = form.cleaned_data.get("email")
         logger.info("Password reset requested for %s", email)
-        use_https = self.request.is_secure()
-        domain_override = None
-        if not settings.DEBUG:
-            use_https = True
-            domain_override = settings.RENDER_EXTERNAL_HOSTNAME or "cap-online.onrender.com"
         opts = {
-            "use_https": use_https,
+            "use_https": self.request.is_secure() or not settings.DEBUG,
             "token_generator": self.token_generator,
             "from_email": self.from_email,
             "email_template_name": self.email_template_name,
@@ -55,8 +50,6 @@ class LoggingPasswordResetView(auth_views.PasswordResetView):
             "html_email_template_name": self.html_email_template_name,
             "extra_email_context": self.extra_email_context,
         }
-        if domain_override:
-            opts["domain_override"] = domain_override
         try:
             form.save(**opts)
         except Exception:
