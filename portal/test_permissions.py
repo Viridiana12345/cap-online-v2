@@ -92,7 +92,8 @@ class RolePermissionTests(TestCase):
     def test_signup_rolls_back_user_if_profile_fails(self):
         with patch("portal.views.PatientProfile.objects.create", side_effect=IntegrityError):
             response = self.registration()
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["form"].errors)
         self.assertFalse(User.objects.filter(email="new@example.com").exists())
 
     def test_doctor_creation_requires_admin(self):
@@ -146,7 +147,7 @@ class RolePermissionTests(TestCase):
             {"email": self.unassigned.email, "password": self.password},
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "perfil habilitado")
+        self.assertContains(response, "Acceso no habilitado")
         self.assertNotIn("_auth_user_id", self.client.session)
 
     def test_admin_email_form_rejects_duplicate(self):

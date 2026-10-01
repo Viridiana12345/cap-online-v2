@@ -1,10 +1,14 @@
 from urllib.parse import urlsplit
 from datetime import timedelta
+from unittest.mock import patch
 
+import cloudinary
+from cloudinary import CloudinaryResource
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core import mail
 from django.core.mail import send_mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -13,6 +17,106 @@ from .models import Appointment, CallSignal, DoctorProfile, PatientProfile, Vide
 from .forms import SecureSetPasswordForm
 
 User = get_user_model()
+
+
+ONE_PIXEL_PNG = (
+    b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01"
+    b"\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89"
+    b"\x00\x00\x00\rIDAT\x08\xd7c\xf8\xcf\xc0\xf0\x1f\x00\x05"
+    b"\x00\x01\xff\x89\x99=\x1d\x00\x00\x00\x00IEND\xaeB`\x82"
+)
+
+
+class DoctorPhotoCloudinaryTests(TestCase):
+    def setUp(self):
+        cloudinary.config(cloud_name="cap-online-tests", secure=True)
+        self.admin = User.objects.create_superuser(
+            username="admin-fotos", email="admin@example.com", password="AdminTest123!"
+        )
+        self.doctor_user = User.objects.create_user(
+            username="doctor-fotos", email="doctor@example.com", password="DoctorTest123!"
+        )
+        self.client.force_login(self.admin)
+
+    @staticmethod
+    def uploaded_photo():
+        return SimpleUploadedFile("doctora.png", ONE_PIXEL_PNG, content_type="image/png")
+
+    @staticmethod
+    def cloudinary_result():
+        return CloudinaryResource(
+            public_id="cap_online/doctores/doctora",
+            format="png",
+            version="123456",
+            resource_type="image",
+            type="upload",
+        )
+
+    @patch("cloudinary.models.uploader.upload_resource")
+    def test_admin_can_create_and_edit_doctor_with_cloudinary_photo(self, upload_resource):
+        upload_resource.return_value = self.cloudinary_result()
+        response = self.client.post(reverse("admin:portal_doctorprofile_add"), {
+            "user": self.doctor_user.pk,
+            "especialidad": "Psicología clínica",
+            "cedula": "TEST-CLOUD-1",
+            "biografia": "Acompañamiento empático",
+            "experiencia_anios": 4,
+            "telefono": "8131305420",
+            "modalidad": "online",
+            "duracion_sesion": 60,
+            "idiomas": "Español",
+            "costo_consulta": "500.00",
+            "foto": self.uploaded_photo(),
+            "activo": "on",
+            "_save": "Guardar",
+        })
+        self.assertEqual(response.status_code, 302)
+        doctor = DoctorProfile.objects.get(user=self.doctor_user)
+        self.assertEqual(doctor.foto.public_id, "cap_online/doctores/doctora")
+        self.assertTrue(doctor.foto.url.startswith("https://res.cloudinary.com/"))
+        upload_resource.assert_called_once()
+
+        response = self.client.post(
+            reverse("admin:portal_doctorprofile_change", args=[doctor.pk]),
+            {
+                "user": self.doctor_user.pk,
+                "especialidad": "Psicología familiar",
+                "cedula": "TEST-CLOUD-1",
+                "biografia": "Perfil actualizado",
+                "experiencia_anios": 5,
+                "telefono": "8131305420",
+                "modalidad": "online",
+                "duracion_sesion": 60,
+                "idiomas": "Español",
+                "costo_consulta": "550.00",
+                "activo": "on",
+                "_save": "Guardar",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        doctor.refresh_from_db()
+        self.assertEqual(doctor.especialidad, "Psicología familiar")
+        self.assertEqual(doctor.foto.public_id, "cap_online/doctores/doctora")
+
+    def test_doctor_list_uses_default_avatar_without_photo(self):
+        DoctorProfile.objects.create(
+            user=self.doctor_user, especialidad="Psicología", cedula="SIN-FOTO"
+        )
+        response = self.client.get(reverse("doctor_list"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<div class="doctor-avatar">D</div>', html=True)
+        self.assertNotContains(response, "res.cloudinary.com")
+
+    def test_doctor_list_renders_cloudinary_photo(self):
+        DoctorProfile.objects.create(
+            user=self.doctor_user,
+            especialidad="Psicología",
+            cedula="CON-FOTO",
+            foto=self.cloudinary_result(),
+        )
+        response = self.client.get(reverse("doctor_list"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "https://res.cloudinary.com/")
 
 
 class BaseStabilityTests(TestCase):
@@ -185,6 +289,12 @@ class PasswordResetFlowTests(TestCase):
         )
         self.assertRedirects(response, reverse("password_reset_done"))
         self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0]
+        self.assertEqual(len(message.alternatives), 1)
+        html, mimetype = message.alternatives[0]
+        self.assertEqual(mimetype, "text/html")
+        self.assertIn("Restablecer mi contraseña", html)
+        self.assertIn('<a href="https://cap-online-v2.onrender.com/reset/', html)
         self.assertIn(self.email, mail.outbox[0].to)
         self.assertTrue(mail.outbox[0].subject.strip())
         self.assertNotIn("\n", mail.outbox[0].subject)

@@ -51,6 +51,7 @@ if RENDER_EXTERNAL_HOSTNAME:
         CSRF_TRUSTED_ORIGINS.append(origin)
 
 INSTALLED_APPS = [
+    "cloudinary",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -117,6 +118,14 @@ STORAGES = {
 }
 MEDIA_URL = os.environ.get("MEDIA_URL", "/media/")
 MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", str(BASE_DIR / "media")))
+
+# Cloudinary lee CLOUDINARY_URL directamente del entorno. Forzar HTTPS evita
+# contenido mixto tanto en Render como durante las pruebas locales.
+CLOUDINARY_URL = os.environ.get("CLOUDINARY_URL", "").strip()
+if CLOUDINARY_URL:
+    import cloudinary
+
+    cloudinary.config(secure=True)
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "portal_dashboard"

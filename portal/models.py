@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from cloudinary.models import CloudinaryField
 
 
 class PatientProfile(models.Model):
@@ -41,7 +42,13 @@ class DoctorProfile(models.Model):
     idiomas = models.CharField(max_length=120, blank=True, help_text="Ej. Español, Inglés")
     costo_consulta = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
 
-    foto = models.ImageField(upload_to="doctores/", blank=True, null=True)
+    foto = CloudinaryField(
+        "foto",
+        resource_type="image",
+        folder="cap_online/doctores",
+        blank=True,
+        null=True,
+    )
     activo = models.BooleanField(default=True)
 
     def __str__(self):
