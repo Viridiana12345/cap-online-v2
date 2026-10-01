@@ -19,7 +19,7 @@ class RolePermissionTests(TestCase):
     def setUpTestData(cls):
         cls.password = "Cactus!River-6942"
         patients = Group.objects.create(name="Pacientes")
-        doctors = Group.objects.create(name="Doctores")
+        doctors, _ = Group.objects.get_or_create(name="Doctores")
         cls.patient = User.objects.create_user("patient", "patient@example.com", cls.password)
         cls.other_patient = User.objects.create_user("other", "other@example.com", cls.password)
         for user in (cls.patient, cls.other_patient):

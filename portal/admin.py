@@ -2,7 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import AdminUserCreationForm, UserChangeForm
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from .forms import validate_unique_email
 from .permissions import is_doctor, care_patient_ids
 from .models import DoctorProfile, PatientProfile, Appointment, ChatMessage, CallRequest, CallSignal
@@ -69,6 +69,12 @@ class DoctorProfileAdmin(admin.ModelAdmin):
         "cedula",
     )
     list_filter = ("activo", "modalidad", "especialidad")
+
+    def save_model(self, request, obj, form, change):
+        """Mantiene sincronizado el perfil profesional con el rol del usuario."""
+        super().save_model(request, obj, form, change)
+        doctor_group, _ = Group.objects.get_or_create(name="Doctores")
+        obj.user.groups.add(doctor_group)
 
 
 @admin.register(ChatMessage)

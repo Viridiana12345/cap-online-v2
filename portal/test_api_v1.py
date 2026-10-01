@@ -13,7 +13,7 @@ class MobileApiTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         pg = Group.objects.create(name="Pacientes")
-        dg = Group.objects.create(name="Doctores")
+        dg, _ = Group.objects.get_or_create(name="Doctores")
         cls.patient = User.objects.create_user("p@example.com", "p@example.com", "StrongPass123!")
         cls.patient.groups.add(pg); PatientProfile.objects.create(user=cls.patient)
         cls.doctor = User.objects.create_user("d@example.com", "d@example.com", "StrongPass123!", first_name="Elena")

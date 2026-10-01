@@ -72,6 +72,7 @@ class DoctorPhotoCloudinaryTests(TestCase):
         })
         self.assertEqual(response.status_code, 302)
         doctor = DoctorProfile.objects.get(user=self.doctor_user)
+        self.assertTrue(self.doctor_user.groups.filter(name="Doctores").exists())
         self.assertEqual(doctor.foto.public_id, "cap_online/doctores/doctora")
         self.assertTrue(doctor.foto.url.startswith("https://res.cloudinary.com/"))
         upload_resource.assert_called_once()
@@ -147,7 +148,8 @@ class BaseStabilityTests(TestCase):
 
     def test_profile_update_preserves_activation_state(self):
         user = User.objects.create_user(username="doctor")
-        user.groups.add(Group.objects.create(name="Doctores"))
+        doctor_group, _ = Group.objects.get_or_create(name="Doctores")
+        user.groups.add(doctor_group)
         doctor = DoctorProfile.objects.create(
             user=user, especialidad="Psicología", cedula="123"
         )
@@ -173,7 +175,7 @@ class BaseStabilityTests(TestCase):
 class VideoCallsTests(TestCase):
     def setUp(self):
         patient_group = Group.objects.create(name="Pacientes")
-        doctor_group = Group.objects.create(name="Doctores")
+        doctor_group, _ = Group.objects.get_or_create(name="Doctores")
         self.patient = User.objects.create_user("patient-calls", email="patient-calls@example.com")
         self.patient.groups.add(patient_group)
         PatientProfile.objects.create(user=self.patient)
