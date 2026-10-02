@@ -37,6 +37,26 @@ class MobileApiTests(TestCase):
         doctors = self.client.get(reverse("api_v1_doctors"), **self.auth(token)).json()["doctors"]
         self.assertEqual(doctors[0]["name"], "Elena")
 
+    def test_login_returns_token_and_serialized_user(self):
+        response = self.client.post(
+            reverse("api_v1_login"),
+            data=json.dumps({"email": "p@example.com", "password": "StrongPass123!"}),
+            content_type="application/json",
+            HTTP_ORIGIN="https://localhost",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["token"])
+        self.assertEqual(response.json()["user"]["email"], "p@example.com")
+        self.assertEqual(response["Access-Control-Allow-Origin"], "https://localhost")
+
+    def test_capacitor_origins_are_allowed(self):
+        for origin in ("https://localhost", "http://localhost", "capacitor://localhost"):
+            with self.subTest(origin=origin):
+                response = self.client.options(reverse("api_v1_login"), HTTP_ORIGIN=origin)
+                self.assertEqual(response.status_code, 204)
+                self.assertEqual(response["Access-Control-Allow-Origin"], origin)
+
     def test_appointments_are_scoped(self):
         token = self.login()
         data = self.client.get(reverse("api_v1_appointments"), **self.auth(token)).json()["appointments"]

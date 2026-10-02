@@ -150,8 +150,7 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 MOBILE_ALLOWED_ORIGINS = _env_list(
     "MOBILE_ALLOWED_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173,capacitor://localhost,http://localhost,https://localhost"
-    if DEBUG else "",
+    "https://localhost,http://localhost,capacitor://localhost,http://localhost:5173,http://127.0.0.1:5173",
 )
 
 # Correo seguro: las credenciales nunca deben guardarse en el repositorio.

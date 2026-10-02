@@ -4,11 +4,19 @@ import { BiometricAuth, AndroidBiometryStrength } from '@aparajita/capacitor-bio
 import './styles.css'
 
 const state={token:null,user:null,api:null,contacts:[]};
-const $=s=>document.querySelector(s);const content=$('#content');
+const $=s=>document.querySelector(s);let content;
+function domReady(){
+  if(document.readyState!=='loading')return Promise.resolve();
+  return new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
+}
+function showLogin(){
+  $('#loginScreen')?.classList.remove('hidden');
+  $('#mainScreen')?.classList.add('hidden');
+}
 function defaultApi(){
   const productionApi=(import.meta.env.VITE_API_URL||'').replace(/\/$/,'');
   if(productionApi)return productionApi;
-  return Capacitor.isNativePlatform()?'http://10.0.2.2:8000/api/v1':'http://127.0.0.1:8000/api/v1';
+  return 'https://cap-online-v2.onrender.com/api/v1';
 }
 async function prefGet(key){return (await Preferences.get({key})).value}
 async function prefSet(key,value){await Preferences.set({key,value})}
@@ -18,11 +26,7 @@ async function api(path,opt={}){opt.headers={...(opt.headers||{}),'Content-Type'
 async function saveSession(token,user){state.token=token;state.user=user;await prefSet('cap_token',token);await prefSet('cap_user',JSON.stringify(user))}
 function showMain(){ $('#loginScreen').classList.add('hidden');$('#mainScreen').classList.remove('hidden');$('#hello').textContent='Hola, '+(state.user.first_name||state.user.full_name||'');go('home') }
 async function login(){try{$('#loginMsg').textContent='';const d=await api('/auth/login/',{method:'POST',body:JSON.stringify({email:$('#email').value,password:$('#password').value})});await saveSession(d.token,d.user);showMain()}catch(e){$('#loginMsg').textContent=e.message}}
-$('#loginBtn').onclick=login;
-$('#forgot').onclick=()=>window.open(state.api.replace('/api/v1','')+'/password-reset/','_blank');
 async function biometric(){try{if(!Capacitor.isNativePlatform())throw new Error('La biometría se prueba al instalar la app en Android/iOS.');const info=await BiometricAuth.checkBiometry();if(!info.isAvailable)throw new Error('No hay biometría disponible o configurada en este dispositivo.');const token=await prefGet('cap_token'), rawUser=await prefGet('cap_user');if(!token||!rawUser)throw new Error('Primero inicia sesión con correo y contraseña una vez.');await BiometricAuth.authenticate({reason:'Ingresar a CAP Online',cancelTitle:'Cancelar',allowDeviceCredential:true,iosFallbackTitle:'Usar código',androidTitle:'CAP Online',androidSubtitle:'Confirma tu identidad',androidConfirmationRequired:false,androidBiometryStrength:AndroidBiometryStrength.weak});state.token=token;state.user=JSON.parse(rawUser);await api('/me/');showMain()}catch(e){$('#loginMsg').textContent=e.message||'No se pudo validar biometría.'}}
-$('#bioBtn').onclick=biometric;
-document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 function doctorCard(d){return `<div class="card doctor"><div class="avatar">${d.foto?`<img src="${d.foto}" style="width:100%;height:100%;object-fit:cover;border-radius:16px">`:'🩺'}</div><div><b>${d.name}</b><div class="muted">${d.especialidad}</div><span class="pill">${d.modalidad}</span> <span class="pill">${d.experiencia_anios} años</span></div></div>`}
 async function go(page){try{if(page==='home'){let a=await api('/appointments/');content.innerHTML=`<div class="card"><b>¿Cómo te sientes hoy?</b><div class="moods"><span>😊</span><span>😌</span><span>😐</span><span>😔</span><span>😣</span></div></div><h3 class="section-title">Próxima cita</h3>${a.appointments.length?apptCard(a.appointments.find(x=>['pending','approved'].includes(x.status))||a.appointments[0]):'<div class="card muted">Aún no tienes citas.</div>'}<h3 class="section-title">Accesos rápidos</h3><div class="quick"><button id="qDoctors"><b>♡</b>Psicólogos</button><button id="qApps"><b>▣</b>Mis citas</button><button id="qChat"><b>◯</b>Chat</button><button id="qProfile"><b>☺</b>Perfil</button></div>`;$('#qDoctors').onclick=()=>go('doctors');$('#qApps').onclick=()=>go('appointments');$('#qChat').onclick=()=>go('chat');$('#qProfile').onclick=()=>go('profile')}
 else if(page==='doctors'){let d=await api('/doctors/');content.innerHTML=`<input class="search" id="docSearch" placeholder="Buscar especialista..."><div id="docList">${d.doctors.map(doctorCard).join('')}</div>`;$('#docSearch').oninput=async e=>{let x=await api('/doctors/?q='+encodeURIComponent(e.target.value));$('#docList').innerHTML=x.doctors.map(doctorCard).join('')}}
@@ -38,4 +42,36 @@ async function openVideo(id){const d=await api('/appointments/'+id+'/video/',{me
 async function saveApi(){state.api=$('#apiBase').value.replace(/\/$/,'');await prefSet('cap_api',state.api);alert('Servidor guardado')}
 async function logoutApp(){try{await api('/auth/logout/',{method:'POST',body:'{}'})}catch(e){}await prefRemove('cap_token');await prefRemove('cap_user');location.reload()}
 
-await initConfig();const t=await prefGet('cap_token'),u=await prefGet('cap_user');if(t&&u){state.token=t;state.user=JSON.parse(u);try{await api('/me/');showMain()}catch(e){}}
+async function bootstrap(){
+  await domReady();
+  content=$('#content');
+  if(!content)throw new Error('No se encontro el elemento raiz #content.');
+
+  $('#loginBtn').onclick=login;
+  $('#forgot').onclick=()=>window.open(state.api.replace('/api/v1','')+'/password-reset/','_blank');
+  $('#bioBtn').onclick=biometric;
+  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+
+  showLogin();
+  await initConfig();
+  const t=await prefGet('cap_token'),u=await prefGet('cap_user');
+  if(!t||!u)return;
+
+  try{
+    state.token=t;
+    state.user=JSON.parse(u);
+    await api('/me/');
+    showMain();
+  }catch(e){
+    state.token=null;
+    state.user=null;
+    showLogin();
+  }
+}
+
+bootstrap().catch(e=>{
+  console.error('No se pudo iniciar CAP Online:',e);
+  showLogin();
+  const message=$('#loginMsg');
+  if(message)message.textContent='No se pudo iniciar la aplicacion. Intenta nuevamente.';
+});
