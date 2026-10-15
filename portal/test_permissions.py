@@ -219,7 +219,7 @@ class RolePermissionTests(TestCase):
     def test_appointment_creation_forces_owner_and_pending_state(self):
         self.login_as(self.patient)
         data = {"doctor": self.doctor.pk, "patient": self.other_patient.pk, "status": "approved",
-                "start_at": "2027-01-01T10:00", "end_at": "2027-01-01T11:00", "notes": "new"}
+                "start_at": "2027-01-01T10:00", "end_at": "2027-01-01T10:30", "notes": "new"}
         self.client.post(reverse("appointment_create"), data)
         appointment = Appointment.objects.get(notes="new")
         self.assertEqual(appointment.patient, self.patient)
@@ -241,12 +241,41 @@ class RolePermissionTests(TestCase):
             self.assertEqual(method(url, {"titulo": "No", "observaciones": "No"}).status_code, 403)
         self.assertEqual(SessionNote.objects.count(), 1)
 
-    def test_pending_appointment_does_not_grant_clinical_access(self):
-        self.appointment.status = "pending"
+    def test_existing_own_notes_remain_accessible_without_active_care(self):
+        self.appointment.status = "cancelled"
         self.appointment.save()
         self.login_as(self.doctor)
-        self.assertEqual(self.client.get(reverse("notas_paciente", args=[self.patient.pk])).status_code, 403)
-        self.assertNotContains(self.client.get(reverse("mis_notas_clinicas")), "clinical-secret")
+        url = reverse("notas_paciente", args=[self.patient.pk])
+        self.assertContains(self.client.get(url), "clinical-secret")
+        self.assertEqual(self.client.post(url, {"titulo": "Nueva", "observaciones": "No"}).status_code, 403)
+
+    def test_note_edit_updates_same_record_and_rejects_foreign_appointment(self):
+        self.login_as(self.doctor)
+        url = reverse("note_edit", args=[self.note.pk])
+        response = self.client.post(url, {"titulo": "Actualizada", "observaciones": "Avances", "appointment": self.other_appointment.pk})
+        self.assertEqual(response.status_code, 200)
+        self.note.refresh_from_db()
+        self.assertEqual(self.note.titulo, "Confidencial")
+        response = self.client.post(url, {"titulo": "Actualizada", "observaciones": "Avances", "appointment": self.appointment.pk, "proxima_sesion": "2026-12-01"})
+        self.assertEqual(response.status_code, 302)
+        self.note.refresh_from_db()
+        self.assertEqual(self.note.titulo, "Actualizada")
+        self.assertEqual(self.note.appointment_id, self.appointment.pk)
+        self.assertEqual(SessionNote.objects.count(), 1)
+
+    def test_note_delete_requires_owner_post_and_confirmation(self):
+        url = reverse("note_delete", args=[self.note.pk])
+        self.login_as(self.other_doctor)
+        self.assertEqual(self.client.post(url, {"confirm": "yes"}).status_code, 404)
+        self.login_as(self.patient)
+        self.assertEqual(self.client.post(url, {"confirm": "yes"}).status_code, 403)
+        self.login_as(self.doctor)
+        self.assertEqual(self.client.get(url).status_code, 200)
+        self.assertTrue(SessionNote.objects.filter(pk=self.note.pk).exists())
+        self.assertEqual(self.client.post(url).status_code, 400)
+        self.assertEqual(self.client.post(url, {"confirm": "yes"}).status_code, 302)
+        self.assertFalse(SessionNote.objects.filter(pk=self.note.pk).exists())
+        self.assertTrue(Appointment.objects.filter(pk=self.appointment.pk).exists())
 
     def test_authorized_doctor_notes_are_scoped_and_creation_ignores_forged_owner(self):
         other_note = SessionNote.objects.create(doctor=self.other_doctor, patient=self.patient,

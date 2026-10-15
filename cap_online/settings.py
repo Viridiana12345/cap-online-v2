@@ -37,10 +37,13 @@ if not SECRET_KEY:
 def _env_list(name, default=""):
     return [x.strip() for x in os.environ.get(name, default).split(",") if x.strip()]
 
-ALLOWED_HOSTS = _env_list(
-    "ALLOWED_HOSTS",
-    "localhost,127.0.0.1,[::1],10.36.189.58"
-)
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "10.36.189.68",
+    "cap-online-v2.onrender.com",
+]
+
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "").strip()
 if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
@@ -177,6 +180,24 @@ DEFAULT_FROM_EMAIL = os.environ.get(
 WEBRTC_TURN_URL = os.environ.get("WEBRTC_TURN_URL", "").strip()
 WEBRTC_TURN_USERNAME = os.environ.get("WEBRTC_TURN_USERNAME", "").strip()
 WEBRTC_TURN_CREDENTIAL = os.environ.get("WEBRTC_TURN_CREDENTIAL", "").strip()
+WEBRTC_TURN_URLS = _env_list("WEBRTC_TURN_URLS")
+WEBRTC_STUN_URLS = _env_list("WEBRTC_STUN_URLS", "stun:stun.l.google.com:19302,stun:stun1.l.google.com:19302")
+WEBRTC_TURN_SHARED_SECRET = os.environ.get("WEBRTC_TURN_SHARED_SECRET", "").strip()
+WEBRTC_TURN_TTL = int(os.environ.get("WEBRTC_TURN_TTL", "86400"))
+WEBRTC_ICE_TRANSPORT_POLICY = os.environ.get("WEBRTC_ICE_TRANSPORT_POLICY", "all").strip()
+
+# ============================================
+# TWILIO / WEBRTC TURN
+# ============================================
+
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+TWILIO_API_KEY = os.getenv("TWILIO_API_KEY", "")
+TWILIO_API_SECRET = os.getenv("TWILIO_API_SECRET", "")
+
+WEBRTC_ICE_TRANSPORT_POLICY = os.getenv(
+    "WEBRTC_ICE_TRANSPORT_POLICY",
+    "all",
+)
 
 LOGGING = {
     "version": 1,

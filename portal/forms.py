@@ -203,6 +203,7 @@ class DoctorAvailabilityForm(forms.ModelForm):
     class Meta:
         model = DoctorAvailability
         fields = ["weekday", "start_time", "end_time", "active"]
+        labels = {"weekday": "Día", "start_time": "Hora de inicio", "end_time": "Hora de fin", "active": "Horario activo"}
         widgets = {
             "start_time": forms.TimeInput(attrs={"type": "time"}),
             "end_time": forms.TimeInput(attrs={"type": "time"}),

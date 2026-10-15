@@ -1,0 +1,3 @@
+{% extends 'portal/base.html' %}{% block page_title %}Editar nota clínica{% endblock %}{% block content %}
+<section class="content-card clinical-notes"><h2>{{ note.patient.get_full_name|default:note.patient.username }}</h2><p>Actualiza esta nota sin crear un segundo registro.</p><form method="post">{% csrf_token %}{% include 'portal/note_form_fields.html' %}<button class="btn btn-primary">Guardar cambios</button> <a class="btn btn-outline" href="{% url 'notas_paciente' note.patient_id %}">Cancelar</a></form></section>
+{% endblock %}

@@ -1288,6 +1288,7 @@
     </style>
 
     {% block extra_styles %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'portal/css/portal-theme.css' %}">
 
 {% include "includes/responsive_styles.html" %}
 </head>
@@ -1600,18 +1601,7 @@
             <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M14 4h4a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-4"/></svg>
             <span>Salir</span>
         </a>
-        {% else %}<a
-            class="profile-link"
-            href="{% url 'portal_settings' %}"
-        >
-
-            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
-
-            <span>
-                Perfil
-            </span>
-
-        </a>{% endif %}
+        {% endif %}
 
 
     </div>
@@ -1680,19 +1670,6 @@
         <!-- ACTIONS -->
 
         <div class="top-actions">
-
-
-            {% if not role_is_admin %}<div class="search-box">
-
-                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-
-                <input
-                    type="search"
-                    placeholder="Buscar..."
-                >
-
-            </div>{% endif %}
-
 
 
             {% if not role_is_admin %}<a

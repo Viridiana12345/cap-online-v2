@@ -1,0 +1,8 @@
+{% extends 'portal/base.html' %}
+{% block page_title %}{% if is_new %}Agregar horario{% else %}Editar horario{% endif %}{% endblock %}
+{% block content %}
+<section class="content-card clinical-notes">
+<p>Los cambios se conservarán al regresar a Mis citas. Desmarca «Horario activo» para deshabilitar este horario sin eliminarlo.</p>
+<form method="post">{% csrf_token %}{% include 'portal/note_form_fields.html' %}<button class="btn btn-primary">Guardar horario</button> <a class="btn btn-outline" href="{% url 'portal_calendar_doctor' %}">Cancelar</a></form>
+</section>
+{% endblock %}

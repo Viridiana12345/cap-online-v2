@@ -41,6 +41,7 @@ class PreparedModelTests(TestCase):
         self.assertIsNone(message.conversation_id)
 
     def test_availability_accepts_multiple_intervals_and_rejects_invalid_ones(self):
+        self.doctor.availability.all().delete()
         for start, end in ((time(9), time(12)), (time(14), time(18))):
             DoctorAvailability.objects.create(
                 doctor=self.doctor, weekday=0, start_time=start, end_time=end,

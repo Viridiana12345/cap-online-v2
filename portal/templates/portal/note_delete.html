@@ -1,0 +1,3 @@
+{% extends 'portal/base.html' %}{% block page_title %}Eliminar nota clínica{% endblock %}{% block content %}
+<section class="content-card clinical-notes"><h2>¿Eliminar esta nota?</h2><p><strong>{{ note.titulo }}</strong> · {{ note.patient.get_full_name|default:note.patient.username }}</p><p>La eliminación es permanente. Las demás notas y citas del paciente se conservarán. Si solo quieres corregir información, puedes editar la nota.</p><form method="post">{% csrf_token %}<input type="hidden" name="confirm" value="yes"><button class="btn btn-danger">Sí, eliminar esta nota</button> <a class="btn btn-outline" href="{% url 'notas_paciente' note.patient_id %}">Cancelar</a></form></section>
+{% endblock %}

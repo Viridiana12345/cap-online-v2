@@ -1,7 +1,9 @@
+from django.views.decorators.cache import never_cache
 import json
 import logging
 from datetime import datetime, timedelta
 
+from cloudinary.exceptions import Error as CloudinaryError
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -10,10 +12,11 @@ from django.contrib.auth.models import Group, User
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.validators import validate_email
 from django.db import IntegrityError, transaction
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
 from .forms import (
@@ -103,12 +106,16 @@ def _fits_availability(doctor, start_at, end_at):
     profile = getattr(doctor, "doctor_profile", None)
     if not profile:
         return False
-    rules = profile.availability.filter(active=True, weekday=start_at.weekday())
-    if not rules.exists():
-        return True
-    local_start = timezone.localtime(start_at).time()
-    local_end = timezone.localtime(end_at).time()
-    return rules.filter(start_time__lte=local_start, end_time__gte=local_end).exists()
+    local_start, local_end = timezone.localtime(start_at), timezone.localtime(end_at)
+    if end_at - start_at != timedelta(minutes=30) or local_start.date() != local_end.date():
+        return False
+    if local_start.hour > 21 or (local_start.hour == 21 and local_start.minute > 0):
+        return False
+    if local_start.minute not in (0, 30) or local_start.second or local_start.microsecond:
+        return False
+    return profile.availability.filter(active=True, weekday=local_start.weekday(),
+        start_time__lte=local_start.time(), end_time__gte=local_end.time()).exists()
+
 
 
 def landing(request):
@@ -206,8 +213,32 @@ def dashboard(request):
     }
     if is_patient(request.user):
         ctx["featured_doctors"] = DoctorProfile.objects.filter(activo=True, user__is_active=True).select_related("user")[:4]
+        ctx["patient_stats"] = qs.aggregate(
+            pending=Count("pk", filter=Q(status="pending")),
+            approved=Count("pk", filter=Q(status="approved", end_at__gt=now)),
+            completed=Count("pk", filter=Q(status="done")),
+        )
+        ctx["next_appointment"] = qs.filter(status__in=("pending", "approved"), end_at__gt=now).order_by("start_at").first()
+        ctx["recent_appointments"] = qs.order_by("-start_at")[:4]
+        ctx["now"] = now
+        return render(request, "portal/dashboard_patient.html", ctx)
     else:
         ctx["patient_count"] = User.objects.filter(pk__in=care_patient_ids(request.user)).distinct().count()
+        today = timezone.localdate(now)
+        day_start = timezone.make_aware(datetime.combine(today, datetime.min.time()))
+        day_end = timezone.make_aware(datetime.combine(today + timedelta(days=1), datetime.min.time()))
+        ctx["doctor_stats"] = qs.aggregate(
+            today=Count("pk", filter=Q(start_at__gte=day_start, start_at__lt=day_end, status="approved")),
+            pending=Count("pk", filter=Q(status="pending")),
+            completed=Count("pk", filter=Q(status="done")),
+        )
+        ctx["today"] = today
+        from .dashboard_metrics import doctor_charts
+        ctx["charts"] = doctor_charts(request.user, today)
+        ctx["now"] = now
+        ctx["upcoming_sessions"] = qs.filter(status="approved", end_at__gt=now).order_by("start_at")[:5]
+        ctx["pending_requests"] = qs.filter(status="pending").order_by("start_at")[:3]
+        return render(request, "portal/dashboard_doctor.html", ctx)
     return render(request, "portal/dashboard.html", ctx)
 
 
@@ -256,13 +287,66 @@ def calendar_view(request):
 
 
 @patient_required
+@never_cache
 def calendar_patient(request):
     form = AppointmentCreateForm()
-    form.fields["doctor"].queryset = User.objects.filter(doctor_profile__activo=True, is_active=True, groups__name="Doctores").distinct()
-    return render(request, "portal/calendar_patient.html", {
+    doctors = User.objects.filter(
+        doctor_profile__activo=True, is_active=True, groups__name="Doctores",
+    ).select_related("doctor_profile").distinct().order_by("first_name", "last_name")
+    form.fields["doctor"].queryset = doctors
+    status_filter = (request.GET.get("status") or "all").strip()
+    appointments = Appointment.objects.filter(patient=request.user).select_related("doctor").order_by("-start_at")
+    valid_statuses = {value for value, _ in Appointment.STATUS}
+    if status_filter in valid_statuses:
+        appointments = appointments.filter(status=status_filter)
+    else:
+        status_filter = "all"
+    return render(request, "portal/calendar_patient_clean.html", {
         "notifications_count": _notifications_count(request.user), "form": form,
-        "appointments": Appointment.objects.filter(patient=request.user).select_related("doctor").order_by("-start_at"),
+        "appointments": appointments, "status_filter": status_filter,
     })
+
+
+@patient_required
+@never_cache
+def appointment_availability_api(request):
+    import calendar
+    try:
+        doctor_id = int(request.GET.get("doctor", ""))
+        monthly = bool(request.GET.get("month"))
+        selected = datetime.strptime(request.GET.get("month") if monthly else request.GET.get("date", ""), "%Y-%m" if monthly else "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "Selecciona un especialista y una fecha v\u00e1lida."}, status=400)
+    doctor = get_object_or_404(User.objects.select_related("doctor_profile"), pk=doctor_id,
+        is_active=True, doctor_profile__activo=True, groups__name="Doctores")
+    days = [selected + timedelta(days=i) for i in range(calendar.monthrange(selected.year, selected.month)[1] if monthly else 1)]
+    ranges = list(DoctorAvailability.objects.filter(doctor=doctor.doctor_profile, active=True).values_list("weekday", "start_time", "end_time"))
+    begin = timezone.make_aware(datetime.combine(days[0], datetime.min.time()))
+    finish = timezone.make_aware(datetime.combine(days[-1] + timedelta(days=1), datetime.min.time()))
+    occupied = Appointment.objects.filter(doctor=doctor, status__in=("pending", "approved"), start_at__lt=finish, end_at__gt=begin)
+    exclude = request.GET.get("exclude")
+    if exclude:
+        own = get_object_or_404(Appointment, pk=exclude, patient=request.user, doctor=doctor)
+        occupied = occupied.exclude(pk=own.pk)
+    occupied = list(occupied.values_list("start_at", "end_at"))
+    now = timezone.now()
+    result = {}
+    for day in days:
+        slots = {}
+        for weekday, start, end in ranges:
+            if weekday != day.weekday():
+                continue
+            minute = ((start.hour * 60 + start.minute + (1 if start.second else 0) + 29) // 30) * 30
+            while minute <= 21 * 60 and minute + 30 <= end.hour * 60 + end.minute:
+                cursor = timezone.make_aware(datetime.combine(day, datetime.min.time())) + timedelta(minutes=minute)
+                stop = cursor + timedelta(minutes=30)
+                if cursor > now and not any(cursor < busy_end and stop > busy_start for busy_start, busy_end in occupied):
+                    slots[cursor.isoformat()] = {"start": cursor.isoformat(), "end": stop.isoformat(), "available": True, "state": "available"}
+                minute += 30
+        result[day.isoformat()] = sorted(slots.values(), key=lambda slot: slot["start"])
+    if monthly:
+        return JsonResponse({"days": result, "duration": 30, "availability_configured": bool(ranges)})
+    return JsonResponse({"date": selected.isoformat(), "duration": 30, "slots": result[selected.isoformat()]})
 
 
 @doctor_required
@@ -272,6 +356,7 @@ def calendar_doctor(request):
         "appointments": Appointment.objects.filter(doctor=request.user).select_related("patient").order_by("-start_at"),
         "availability": request.user.doctor_profile.availability.all(),
         "availability_form": DoctorAvailabilityForm(),
+        "now": timezone.now(),
     })
 
 
@@ -287,14 +372,17 @@ def appointment_create(request):
     appt.patient = request.user
     if appt.start_at <= timezone.now() or appt.end_at <= appt.start_at:
         messages.error(request, "Selecciona una fecha futura y un horario válido.")
-    elif _appointment_conflict(appt.doctor, appt.start_at, appt.end_at):
-        messages.error(request, "Ese horario ya está ocupado.")
     elif not _fits_availability(appt.doctor, appt.start_at, appt.end_at):
         messages.error(request, "El horario está fuera de la disponibilidad del psicólogo.")
     else:
-        appt.save()
-        _notify(appt.doctor, "Nueva cita", f"{_display_name(request.user)} solicitó una cita.")
-        messages.success(request, "Cita solicitada. Queda pendiente de aprobación.")
+        with transaction.atomic():
+            User.objects.select_for_update().get(pk=appt.doctor_id)
+            if _appointment_conflict(appt.doctor, appt.start_at, appt.end_at):
+                messages.error(request, "Este horario ya no está disponible. Selecciona otra fecha u hora.")
+                return redirect("portal_calendar_patient")
+            appt.save()
+            _notify(appt.doctor, "Nueva cita", f"{_display_name(request.user)} solicitó una cita.")
+        messages.success(request, "Cita solicitada correctamente. Queda pendiente de aprobación.")
     return redirect("portal_calendar_patient")
 
 
@@ -307,27 +395,42 @@ def appointment_update_status(request, appt_id, new_status):
     if new_status not in allowed.get(appt.status, set()):
         return HttpResponseBadRequest("Transición no permitida.")
     appt.status = new_status
-    appt.save(update_fields=["status"])
+    update_fields = ["status"]
+    if new_status == "rejected":
+        reason = (request.POST.get("rejection_reason") or "").strip()
+        if not reason:
+            messages.error(request, "Indica el motivo del rechazo.")
+            return redirect("portal_calendar_doctor")
+        appt.cancellation_reason = reason[:1000]
+        update_fields.append("cancellation_reason")
+    appt.save(update_fields=update_fields)
     label = dict(Appointment.STATUS).get(new_status, new_status)
-    _notify(appt.patient, f"Cita {label.lower()}", f"Tu cita del {timezone.localtime(appt.start_at):%d/%m/%Y %H:%M} cambió a {label}.", "appointment_confirmed" if new_status == "approved" else "appointment_changed")
+    detail = f" Motivo: {appt.cancellation_reason}" if new_status == "rejected" else ""
+    _notify(appt.patient, f"Cita {label.lower()}", f"Tu cita del {timezone.localtime(appt.start_at):%d/%m/%Y %H:%M} cambió a {label}.{detail}", "appointment_confirmed" if new_status == "approved" else "appointment_changed")
+    messages.success(request, "Estado de la cita actualizado correctamente.")
     return redirect("portal_calendar_doctor")
 
 
 @portal_required
 @require_POST
+@transaction.atomic
 def appointment_cancel(request, appt_id):
-    appt = get_object_or_404(_appointment_queryset(request.user), pk=appt_id)
+    appt = get_object_or_404(_appointment_queryset(request.user).select_for_update(), pk=appt_id)
     if appt.status in {"done", "cancelled", "rejected"}:
         messages.error(request, "Esta cita ya no puede cancelarse.")
+        return redirect("portal_calendar")
+    reason = (request.POST.get("reason") or "").strip()
+    if not reason or len(reason) > 1000:
+        messages.error(request, "Indica un motivo de cancelaci\u00f3n de hasta 1000 caracteres.")
         return redirect("portal_calendar")
     appt.status = "cancelled"
     appt.cancelled_at = timezone.now()
     appt.cancelled_by = request.user
-    appt.cancellation_reason = (request.POST.get("reason") or "Cancelada por el usuario")[:1000]
+    appt.cancellation_reason = reason
     appt.save(update_fields=["status", "cancelled_at", "cancelled_by", "cancellation_reason"])
     other = appt.doctor if request.user.id == appt.patient_id else appt.patient
     _notify(other, "Cita cancelada", f"La cita del {timezone.localtime(appt.start_at):%d/%m/%Y %H:%M} fue cancelada.", "appointment_cancelled")
-    messages.success(request, "Cita cancelada.")
+    messages.success(request, "Cita cancelada correctamente.")
     return redirect("portal_calendar")
 
 
@@ -339,6 +442,10 @@ def appointment_reschedule(request, appt_id):
     if old.status not in {"pending", "approved"}:
         messages.error(request, "Esta cita no puede reprogramarse.")
         return redirect("portal_calendar_patient")
+    reason = (request.POST.get("reason") or "").strip()
+    if not reason or len(reason) > 1000:
+        messages.error(request, "Indica un motivo de modificaci\u00f3n de hasta 1000 caracteres.")
+        return redirect("portal_calendar_patient")
     try:
         start_at = datetime.fromisoformat(request.POST.get("start_at"))
         end_at = datetime.fromisoformat(request.POST.get("end_at"))
@@ -347,17 +454,21 @@ def appointment_reschedule(request, appt_id):
     except Exception:
         messages.error(request, "Fecha u hora inválida.")
         return redirect("portal_calendar_patient")
-    if start_at <= timezone.now() or end_at <= start_at or _appointment_conflict(old.doctor, start_at, end_at, exclude_id=old.id):
+    if start_at <= timezone.now() or end_at <= start_at or not _fits_availability(old.doctor, start_at, end_at):
         messages.error(request, "El nuevo horario no está disponible.")
         return redirect("portal_calendar_patient")
-    new = Appointment.objects.create(
-        patient=old.patient, doctor=old.doctor, start_at=start_at, end_at=end_at,
-        notes=old.notes, modalidad=old.modalidad, status="pending", rescheduled_from=old,
-    )
-    old.status = "rescheduled"
-    old.save(update_fields=["status"])
-    _notify(old.doctor, "Cita reprogramada", f"{_display_name(request.user)} propuso un nuevo horario.", "appointment_changed")
-    messages.success(request, "Nuevo horario enviado para aprobación.")
+    User.objects.select_for_update().get(pk=old.doctor_id)
+    if _appointment_conflict(old.doctor, start_at, end_at, exclude_id=old.id):
+        messages.error(request, "Este horario ya no está disponible. Selecciona otra fecha u hora.")
+        return redirect("portal_calendar_patient")
+    previous = timezone.localtime(old.start_at).strftime("%d/%m/%Y %H:%M")
+    old.start_at, old.end_at, old.status = start_at, end_at, "pending"
+    old.save(update_fields=["start_at", "end_at", "status"])
+    detail = f"Cita #{old.pk}: {previous} -> {timezone.localtime(start_at):%d/%m/%Y %H:%M}. Motivo: {reason}"
+    _notify(old.doctor, "Cita modificada", detail, "appointment_changed")
+    _notify(old.patient, "Cita modificada", detail, "appointment_changed")
+    registrar_auditoria(request, f"Modific\u00f3 cita #{old.pk}", "Citas")
+    messages.success(request, "Cita modificada correctamente. El nuevo horario queda pendiente de aprobaci\u00f3n.")
     return redirect("portal_calendar_patient")
 
 
@@ -371,8 +482,19 @@ def availability_create(request):
         obj.save()
         messages.success(request, "Disponibilidad agregada.")
     else:
-        messages.error(request, "Revisa el horario de disponibilidad.")
+        return render(request, "portal/availability_edit.html", {"form": form, "is_new": True})
     return redirect("portal_calendar_doctor")
+
+
+@doctor_required
+def availability_edit(request, availability_id):
+    availability = get_object_or_404(DoctorAvailability, pk=availability_id, doctor=request.user.doctor_profile)
+    form = DoctorAvailabilityForm(request.POST if request.method == "POST" else None, instance=availability)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Horario actualizado correctamente.")
+        return redirect("portal_calendar_doctor")
+    return render(request, "portal/availability_edit.html", {"form": form})
 
 
 @doctor_required
@@ -427,7 +549,10 @@ def chat_send_api(request, user_id):
     text = (request.POST.get("text") or "").strip()
     if not text: return HttpResponseBadRequest("missing text")
     msg = _send_chat_message(request.user, other, text)
-    return JsonResponse({"ok": True, "id": msg.id})
+    return JsonResponse({"ok": True, "id": msg.id, "message": {
+        "id": msg.id, "sender_id": msg.sender_id, "text": msg.text,
+        "created_at": msg.created_at.isoformat(),
+    }})
 
 
 @transaction.atomic
@@ -483,51 +608,98 @@ def doctor_create(request):
     form = DoctorCreateForm(request.POST or None, request.FILES or None)
     if request.method == "POST" and form.is_valid():
         d = form.cleaned_data
-        with transaction.atomic():
-            user = User.objects.create_user(username=d["email"], email=d["email"], password=d["password"], first_name=d["first_name"], last_name=d["last_name"])
-            user.groups.add(_ensure_group("Doctores"))
-            DoctorProfile.objects.create(
-                user=user, especialidad=d["especialidad"], cedula=d["cedula"], biografia=d["biografia"],
-                experiencia_anios=d.get("experiencia_anios") or 0, telefono=d.get("telefono") or "",
-                modalidad=d.get("modalidad") or "online", idiomas=d.get("idiomas") or "",
-                costo_consulta=d.get("costo_consulta"), foto=d.get("foto"), activo=bool(d.get("activo")),
+        try:
+            with transaction.atomic():
+                user = User.objects.create_user(username=d["email"], email=d["email"], password=d["password"], first_name=d["first_name"], last_name=d["last_name"])
+                user.groups.add(_ensure_group("Doctores"))
+                DoctorProfile.objects.create(
+                    user=user, especialidad=d["especialidad"], cedula=d["cedula"], biografia=d["biografia"],
+                    experiencia_anios=d.get("experiencia_anios") or 0, telefono=d.get("telefono") or "",
+                    modalidad=d.get("modalidad") or "online", idiomas=d.get("idiomas") or "",
+                    costo_consulta=d.get("costo_consulta"), foto=d.get("foto"), activo=bool(d.get("activo")),
+                )
+        except (CloudinaryError, ValueError):
+            logger.exception("Cloudinary failed while creating a doctor profile")
+            form.add_error(
+                "foto",
+                "No pudimos subir la fotografía. Revisa la configuración de Cloudinary e intenta nuevamente.",
             )
-        messages.success(request, "Psicólogo registrado.")
-        return redirect("doctor_list")
+        else:
+            messages.success(request, "Psicólogo registrado.")
+            return redirect("doctor_list")
     return render(request, "portal/rh/doctor_create.html", {"form": form})
 
 
 @doctor_required
 def mis_notas_clinicas(request):
-    patients = User.objects.filter(pk__in=care_patient_ids(request.user), groups__name="Pacientes").distinct()
-    notes = SessionNote.objects.filter(doctor=request.user, patient__in=patients).select_related("patient").order_by("-created_at")
-    return render(request, "portal/mis_notas_clinicas.html", {"notas": notes, "paciente": None, "patients": patients, "notifications_count": _notifications_count(request.user)})
+    own = SessionNote.objects.filter(doctor=request.user)
+    patients = User.objects.filter(Q(pk__in=care_patient_ids(request.user)) | Q(pk__in=own.values("patient_id"))).distinct().order_by("first_name", "username")
+    notes = own.select_related("patient", "appointment").order_by("-created_at", "-pk")
+    search = request.GET.get("q", "").strip()[:150]
+    if search:
+        notes = notes.filter(Q(titulo__icontains=search) | Q(patient__first_name__icontains=search) | Q(patient__last_name__icontains=search) | Q(patient__username__icontains=search))
+    from django.core.paginator import Paginator
+    return render(request, "portal/mis_notas_clinicas.html", {"notas": Paginator(notes, 12).get_page(request.GET.get("page")), "patients": patients, "search": search, "notifications_count": _notifications_count(request.user)})
 
 
 @doctor_required
 def notas_paciente(request, patient_id):
+    from .note_forms import SessionNoteForm
+    from django.core.paginator import Paginator
     patient = get_object_or_404(User, pk=patient_id)
-    if not has_care_relationship(request.user, patient): raise PermissionDenied
-    notes = SessionNote.objects.filter(doctor=request.user, patient=patient).order_by("-created_at")
-    if request.method == "POST":
-        title = (request.POST.get("titulo") or "").strip()
-        observations = (request.POST.get("observaciones") or "").strip()
-        if not title or not observations: return HttpResponseBadRequest("Título y observaciones son obligatorios.")
-        SessionNote.objects.create(
-            doctor=request.user, patient=patient, titulo=title,
-            estado_emocional=(request.POST.get("estado_emocional") or "")[:120],
-            observaciones=observations, recomendaciones=request.POST.get("recomendaciones", ""),
-        )
-        registrar_auditoria(request, "Creó una nota clínica", "Notas clínicas")
+    notes = SessionNote.objects.filter(doctor=request.user, patient=patient).select_related("appointment").order_by("-created_at", "-pk")
+    can_create = has_care_relationship(request.user, patient)
+    if not can_create and not notes.exists():
+        raise PermissionDenied
+    if request.method == "POST" and not can_create:
+        raise PermissionDenied
+    form = SessionNoteForm(request.POST if request.method == "POST" else None, doctor=request.user, patient=patient)
+    if request.method == "POST" and form.is_valid():
+        with transaction.atomic():
+            note = form.save(commit=False)
+            note.doctor = request.user
+            note.patient = patient
+            note.save()
+            registrar_auditoria(request, f"Creó nota clínica #{note.pk}", "Notas clínicas")
         messages.success(request, "Nota clínica guardada.")
-        return redirect("notas_paciente", patient_id=patient.id)
-    return render(request, "portal/mis_notas_clinicas.html", {"paciente": patient, "notas": notes, "notifications_count": _notifications_count(request.user)})
+        return redirect("notas_paciente", patient_id=patient.pk)
+    return render(request, "portal/mis_notas_clinicas.html", {"paciente": patient, "notas": Paginator(notes, 12).get_page(request.GET.get("page")), "form": form, "can_create": can_create, "notifications_count": _notifications_count(request.user)})
+
+
+@doctor_required
+def note_edit(request, note_id):
+    from .note_forms import SessionNoteForm
+    note = get_object_or_404(SessionNote.objects.select_related("patient"), pk=note_id, doctor=request.user)
+    form = SessionNoteForm(request.POST if request.method == "POST" else None, instance=note, doctor=request.user, patient=note.patient)
+    if request.method == "POST" and form.is_valid():
+        with transaction.atomic():
+            form.save()
+            registrar_auditoria(request, f"Editó nota clínica #{note.pk}", "Notas clínicas")
+        messages.success(request, "Nota clínica actualizada correctamente.")
+        return redirect("notas_paciente", patient_id=note.patient_id)
+    return render(request, "portal/note_edit.html", {"form": form, "note": note})
+
+
+@doctor_required
+def note_delete(request, note_id):
+    note = get_object_or_404(SessionNote.objects.select_related("patient"), pk=note_id, doctor=request.user)
+    if request.method == "POST":
+        if request.POST.get("confirm") != "yes":
+            return HttpResponseBadRequest("Confirma la eliminación de la nota.")
+        with transaction.atomic():
+            registrar_auditoria(request, f"Eliminó nota clínica #{note.pk}", "Notas clínicas")
+            note.delete()
+        messages.success(request, "Nota clínica eliminada correctamente.")
+        return redirect("mis_notas_clinicas")
+    return render(request, "portal/note_delete.html", {"note": note})
 
 
 def _video_appointment(user, appointment_id):
     appt = get_object_or_404(Appointment.objects.select_related("patient", "doctor"), pk=appointment_id)
     if user.id not in {appt.patient_id, appt.doctor_id}: raise PermissionDenied
     if appt.status != "approved" or appt.modalidad != "online": raise PermissionDenied
+    now = timezone.now()
+    if now < appt.start_at or now > appt.end_at: raise PermissionDenied
     return appt
 
 
@@ -548,8 +720,14 @@ def video_calls(request):
 
 
 @portal_required
+@never_cache
 def video_room(request, appointment_id):
     appt = _video_appointment(request.user, appointment_id)
+    from .webrtc import TurnUnavailable, rtc_configuration
+    try:
+        rtc_config = rtc_configuration(request.user.pk)
+    except TurnUnavailable:
+        return render(request, "portal/turn_unavailable.html", {"appointment": appt}, status=503)
     call, _ = VideoCall.objects.get_or_create(appointment=appt)
     room_key = f"cap-appointment-{appt.id}"
     is_initiator = request.user.id == appt.doctor_id
@@ -564,17 +742,9 @@ def video_room(request, appointment_id):
     # ofertas anteriores; el paciente anuncia periódicamente que está listo.
     if is_initiator:
         CallSignal.objects.filter(room_key=room_key).delete()
-    ice_servers = [{"urls": ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"]}]
-    if settings.WEBRTC_TURN_URL:
-        turn = {"urls": settings.WEBRTC_TURN_URL}
-        if settings.WEBRTC_TURN_USERNAME:
-            turn["username"] = settings.WEBRTC_TURN_USERNAME
-        if settings.WEBRTC_TURN_CREDENTIAL:
-            turn["credential"] = settings.WEBRTC_TURN_CREDENTIAL
-        ice_servers.append(turn)
     return render(request, "portal/call_room.html", {
         "appointment": appt, "video_call": call, "room_key": room_key,
-        "ice_servers": ice_servers, "is_initiator": is_initiator,
+        "rtc_config": rtc_config, "is_initiator": is_initiator,
         "notifications_count": _notifications_count(request.user),
     })
 
@@ -598,11 +768,12 @@ def _appointment_from_room(user, room_key):
 
 
 @portal_required
+@never_cache
 def call_signals_pull(request, room_key):
     _appointment_from_room(request.user, room_key)
     try: after = int(request.GET.get("after", "0"))
     except ValueError: after = 0
-    qs = CallSignal.objects.filter(room_key=room_key).exclude(sender=request.user).filter(pk__gt=after)[:100]
+    qs = CallSignal.objects.filter(room_key=room_key).exclude(sender=request.user).filter(pk__gt=after).order_by("pk")[:100]
     return JsonResponse({"signals": [{"id": s.id, "sender_id": s.sender_id, "payload": s.payload} for s in qs]})
 
 

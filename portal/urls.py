@@ -19,10 +19,12 @@ urlpatterns = [
     path("portal/calendario/paciente/", views.calendar_patient, name="portal_calendar_patient"),
     path("portal/calendario/doctor/", views.calendar_doctor, name="portal_calendar_doctor"),
     path("portal/appointment/create/", views.appointment_create, name="appointment_create"),
+    path("portal/api/appointments/availability/", views.appointment_availability_api, name="appointment_availability_api"),
     path("portal/appointment/<int:appt_id>/status/<str:new_status>/", views.appointment_update_status, name="appointment_update_status"),
     path("portal/appointment/<int:appt_id>/cancel/", views.appointment_cancel, name="appointment_cancel"),
     path("portal/appointment/<int:appt_id>/reschedule/", views.appointment_reschedule, name="appointment_reschedule"),
     path("portal/disponibilidad/nueva/", views.availability_create, name="availability_create"),
+    path("portal/disponibilidad/<int:availability_id>/editar/", views.availability_edit, name="availability_edit"),
     path("portal/disponibilidad/<int:availability_id>/eliminar/", views.availability_delete, name="availability_delete"),
 
     path("portal/chat/", views.chat, name="portal_chat"),
@@ -32,6 +34,8 @@ urlpatterns = [
     path("portal/api/chat/send/<int:user_id>/", views.chat_send_api, name="chat_send_api"),
 
     path("portal/notas-clinicas/", views.mis_notas_clinicas, name="mis_notas_clinicas"),
+    path("portal/notas-clinicas/<int:note_id>/editar/", views.note_edit, name="note_edit"),
+    path("portal/notas-clinicas/<int:note_id>/eliminar/", views.note_delete, name="note_delete"),
     path("portal/paciente/<int:patient_id>/notas/", views.notas_paciente, name="notas_paciente"),
 
     path("portal/llamadas/", views.video_calls, name="video_calls"),

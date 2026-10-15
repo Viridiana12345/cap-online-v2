@@ -1,0 +1,40 @@
+{% extends 'portal/base.html' %}
+{% load static %}
+{% block title %}Inicio | CAP Online{% endblock %}
+{% block page_title %}Hola, {{ user.first_name|default:user.username }}{% endblock %}
+{% block extra_styles %}<link rel="stylesheet" href="{% static 'portal/css/dashboard-shared.css' %}">
+<style>
+.patient-support{display:flex;align-items:center;gap:20px;margin-top:20px;padding:24px 28px;border:1px solid #d4e6dc;border-radius:20px;background:#edf6f0}.patient-support-icon{font-size:30px;color:#2f7867}.patient-support-copy{flex:1}.patient-support h2{font-size:12px;letter-spacing:1px;color:#496e60;margin:0 0 9px;text-transform:uppercase}.patient-support blockquote{margin:0;color:#173f37;font-size:clamp(17px,2vw,21px);line-height:1.6;min-height:3.2em}.patient-support button{background:#fff;border:1px solid #bfd9ca;border-radius:12px;padding:11px 15px;color:#2f7867;font:inherit;font-size:12px;font-weight:700;cursor:pointer}.patient-support button:hover{background:#e1eee6}.patient-support button:focus-visible{outline:3px solid #b98432;outline-offset:3px}@media(max-width:650px){.patient-support{padding:20px;flex-wrap:wrap;gap:12px}.patient-support-copy{flex-basis:80%}.patient-support button{margin-left:auto}}
+</style>{% endblock %}
+{% block content %}
+<div class="dd">
+  <section class="dd-hero"><div><span class="dd-eyebrow">Tu espacio de bienestar · {{ now|date:'d M Y' }}</span><p>Consulta tus citas, mantente en contacto con tu especialista y da continuidad a tu atención.</p></div><a class="dd-button" href="{% url 'portal_calendar_patient' %}">Ver mis citas →</a></section>
+  <section class="patient-support" aria-labelledby="patient-support-title" data-day="{{ now|date:'Y-m-d' }}">
+    <span class="patient-support-icon" aria-hidden="true">♡</span>
+    <div class="patient-support-copy"><h2 id="patient-support-title">Un momento para ti</h2><blockquote id="patient-support-phrase" aria-live="polite" aria-atomic="true">No tienes que resolver todo hoy. Puedes ir un paso a la vez.</blockquote></div>
+    <button type="button" id="patient-support-next" hidden>Otra frase ↻</button>
+  </section>
+  <section class="dd-metrics" aria-label="Resumen de mi atención">
+    <a class="dd-metric" href="{% url 'portal_calendar_patient' %}"><div class="dd-metric-top">Citas confirmadas<span class="dd-symbol" aria-hidden="true">◷</span></div><strong>{{ patient_stats.approved }}</strong><small>Próximas o en curso</small></a>
+    <a class="dd-metric pending" href="{% url 'portal_calendar_patient' %}"><div class="dd-metric-top">Por confirmar<span class="dd-symbol" aria-hidden="true">↗</span></div><strong>{{ patient_stats.pending }}</strong><small>Solicitudes pendientes de aprobación</small></a>
+    <div class="dd-metric"><div class="dd-metric-top">Citas completadas<span class="dd-symbol" aria-hidden="true">✓</span></div><strong>{{ patient_stats.completed }}</strong><small>Sesiones registradas como realizadas</small></div>
+    <a class="dd-metric" href="{% url 'portal_chat' %}"><div class="dd-metric-top">Mensajes nuevos<span class="dd-symbol" aria-hidden="true">✉</span></div><strong>{{ unread_messages_count }}</strong><small>Mensajes sin leer</small></a>
+  </section>
+  <div class="dd-columns"><div>
+    <section class="dd-panel"><div class="dd-heading"><div><h3>Tu próxima cita</h3><p>Los detalles de tu siguiente sesión</p></div></div>
+      {% if next_appointment %}{% with a=next_appointment %}<article class="dd-session"><div class="dd-date"><strong>{{ a.start_at|date:'d' }}</strong><span>{{ a.start_at|date:'M' }}</span></div><div class="dd-person"><h4>{{ a.doctor.get_full_name|default:a.doctor.username }}</h4><p>{{ a.start_at|date:'l, d M Y · H:i' }} · {{ a.get_modalidad_display }}</p></div><span class="dd-badge {% if a.status == 'pending' %}amber{% endif %}">{{ a.get_status_display }}</span></article>
+      {% if a.status == 'approved' and a.modalidad == 'online' and a.start_at <= now %}<a class="dd-button" href="{% url 'video_room' a.id %}">Entrar a videollamada</a>{% else %}<a class="dd-button dd-wide" href="{% url 'portal_calendar_patient' %}">Consultar o modificar mi cita</a>{% endif %}{% endwith %}
+      {% else %}<div class="dd-empty"><strong>No tienes citas próximas</strong>Elige un especialista y consulta sus horarios para solicitar tu cita.</div><a class="dd-button dd-wide" href="{% url 'portal_calendar_patient' %}">Solicitar una cita →</a>{% endif %}
+    </section>
+    <section class="dd-panel"><div class="dd-heading"><div><h3>Historial de citas</h3><p>Tus citas más recientes por fecha</p></div><a class="dd-link" href="{% url 'portal_calendar_patient' %}">Ver todas →</a></div>
+      {% for a in recent_appointments %}<article class="dd-session"><div class="dd-person"><h4>{{ a.doctor.get_full_name|default:a.doctor.username }}</h4><p>{{ a.start_at|date:'d M Y · H:i' }} · {{ a.get_modalidad_display }}</p></div><span class="dd-badge {% if a.status != 'done' and a.status != 'approved' %}amber{% endif %}">{{ a.get_status_display }}</span></article>{% empty %}<div class="dd-empty">Aquí aparecerán tus citas cuando registres la primera solicitud.</div>{% endfor %}
+    </section>
+  </div><aside>
+    <section class="dd-panel"><div class="dd-heading"><h3>Accesos rápidos</h3></div><div class="dd-shortcuts"><a class="dd-shortcut" href="{% url 'portal_chat' %}">Mensajes<span>Conversa con tu especialista</span></a><a class="dd-shortcut" href="{% url 'video_calls' %}">Videollamadas<span>Consulta tus sesiones en línea</span></a><a class="dd-shortcut" href="{% url 'portal_specialists' %}">Psicólogos<span>Conoce a los especialistas</span></a><a class="dd-shortcut" href="{% url 'portal_settings' %}">Mi perfil<span>Actualiza tus datos</span></a></div></section>
+    <section class="dd-panel"><div class="dd-heading"><h3>Conoce a nuestros especialistas</h3></div>{% for d in featured_doctors %}<article class="dd-session"><div class="dd-person"><h4>{{ d.user.get_full_name|default:d.user.username }}</h4><p>{{ d.especialidad }}</p></div><a class="dd-link" href="{% url 'portal_profile' d.id %}">Ver perfil →</a></article>{% empty %}<p class="dd-chart-caption">Por ahora no hay especialistas disponibles.</p>{% endfor %}</section>
+  </aside></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'portal/js/patient-support.js' %}" defer></script>
+{% endblock %}

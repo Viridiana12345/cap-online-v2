@@ -1,0 +1,11 @@
+{% extends 'portal/base.html' %}
+{% block title %}Videollamada | CAP Online{% endblock %}
+{% block page_title %}Videollamada{% endblock %}
+{% block content %}
+<section role="alert">
+  <h2>No se pudo preparar la videollamada</h2>
+  <p>El servicio de conexión no está disponible en este momento. Intenta nuevamente en unos instantes. Si continúa, contacta al administrador.</p>
+  <a href="{% url 'video_room' appointment.id %}">Intentar de nuevo</a>
+  <a href="{% url 'video_calls' %}">Volver a videollamadas</a>
+</section>
+{% endblock %}

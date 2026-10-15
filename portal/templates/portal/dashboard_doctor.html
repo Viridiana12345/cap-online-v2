@@ -1,0 +1,59 @@
+{% extends 'portal/base.html' %}
+{% load static %}
+{% block title %}Inicio del doctor | CAP Online{% endblock %}
+{% block page_title %}Hola, Dr(a). {{ user.first_name|default:user.username }}{% endblock %}
+{% block extra_styles %}
+<link rel="stylesheet" href="{% static 'portal/css/dashboard-shared.css' %}">
+<style>
+.dd-analytics-title{margin:30px 0 16px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}.dd-analytics-title h3{margin:0;font-size:21px}.dd-analytics-title p{margin:0;font-size:12px;color:var(--muted)}.dd-charts{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}.dd-chart-number{font-size:32px;font-weight:800;margin:16px 0 4px}.dd-chart-caption{font-size:12px;color:var(--muted);margin:0 0 18px;line-height:1.6}.dd-bars{display:flex;align-items:stretch;gap:12px;height:190px;border-bottom:1px solid #dae6df;padding:0 4px}.dd-bar-column{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px}.dd-bar-space{width:100%;height:140px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;background:repeating-linear-gradient(to top,transparent 0,transparent 34px,#edf2ef 35px)}.dd-bar-fill{width:65%;max-width:48px;background:#4e9c87;border-radius:6px 6px 0 0;min-height:0}.dd-bar-column strong{font-size:12px}.dd-bar-column span{font-size:11px;color:var(--muted);padding:6px 0}.dd-status-row{display:grid;grid-template-columns:100px 1fr 58px;gap:12px;align-items:center;margin:18px 0;font-size:12px}.dd-track{height:9px;background:#eff4f1;border-radius:8px;overflow:hidden}.dd-track i{height:100%;display:block;border-radius:8px}.dd-status-row strong{text-align:right;font-size:11px}.dd-week-panel .dd-bar-fill{background:#7ca699}.dd-chart-note{font-size:11px;color:var(--muted);line-height:1.6;margin-top:16px}.dd-week-panel{margin-bottom:24px}@media(max-width:850px){.dd-charts{grid-template-columns:1fr;gap:0}}@media(max-width:450px){.dd-status-row{grid-template-columns:85px 1fr 55px;gap:8px}.dd-bars{gap:6px}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="dd">
+  <section class="dd-hero">
+    <div><div class="dd-eyebrow">Tu espacio de atención · {{ today|date:'d M Y' }}</div><h2>Tu día, en un vistazo.</h2><p>Bienvenido, Dr(a). {{ user.first_name|default:user.username }}. Revisa tus próximas sesiones y organiza el cuidado de tus pacientes.</p></div>
+    <a class="dd-button" href="{% url 'portal_calendar_doctor' %}">Ver mis citas <span aria-hidden="true">↗</span></a>
+  </section>
+  <section class="dd-metrics" aria-label="Resumen de actividad">
+    <a class="dd-metric" href="{% url 'portal_calendar_doctor' %}"><div class="dd-metric-top">Citas de hoy <span class="dd-symbol" aria-hidden="true">◷</span></div><strong>{{ doctor_stats.today }}</strong><small>Sesiones aprobadas para hoy</small></a>
+    <a class="dd-metric pending" href="{% url 'portal_calendar_doctor' %}"><div class="dd-metric-top">Por confirmar <span class="dd-symbol" aria-hidden="true">↗</span></div><strong>{{ doctor_stats.pending }}</strong><small>Solicitudes pendientes</small></a>
+    <div class="dd-metric"><div class="dd-metric-top">Mis pacientes <span class="dd-symbol" aria-hidden="true">♡</span></div><strong>{{ patient_count }}</strong><small>Pacientes vinculados a tu atención</small></div>
+    <a class="dd-metric" href="{% url 'portal_chat' %}"><div class="dd-metric-top">Mensajes nuevos <span class="dd-symbol" aria-hidden="true">✉</span></div><strong>{{ unread_messages_count }}</strong><small>Mensajes pendientes de lectura</small></a>
+  </section>
+  <div class="dd-analytics-title"><h3>Indicadores de tu consulta</h3><p>Datos de tus citas · Actualizados al abrir Inicio</p></div>
+  <div class="dd-charts">
+    <section class="dd-panel" aria-labelledby="completed-chart-title">
+      <div class="dd-heading"><div><h3 id="completed-chart-title">Sesiones completadas</h3><p>Últimos 6 meses · Mes actual hasta hoy</p></div></div>
+      <div class="dd-chart-number">{{ charts.completed }}</div><p class="dd-chart-caption">Sesiones registradas como realizadas en el periodo</p>
+      <div class="dd-bars" role="list" aria-label="Sesiones completadas por mes">
+        {% for bar in charts.months %}<div class="dd-bar-column" role="listitem" aria-label="{{ bar.date|date:'F Y' }}: {{ bar.count }} sesiones"><strong>{{ bar.count }}</strong><div class="dd-bar-space" aria-hidden="true"><div class="dd-bar-fill" style="height:{{ bar.height }}%"></div></div><span>{{ bar.date|date:'M' }}</span></div>{% endfor %}
+      </div>
+      <p class="dd-chart-note">Agrupadas por fecha de la cita. El mes actual todavía está en curso.{% if not charts.completed %} Aún no hay sesiones completadas en este periodo.{% endif %}</p>
+    </section>
+    <section class="dd-panel" aria-labelledby="status-chart-title"><div class="dd-heading"><div><h3 id="status-chart-title">Estado de las citas</h3><p>{{ charts.since|date:'d M Y' }} – {{ today|date:'d M Y' }}</p></div></div>
+      <div class="dd-chart-number">{{ charts.total }}</div><p class="dd-chart-caption">Citas cuya fecha está dentro del periodo</p>
+      {% for item in charts.statuses %}<div class="dd-status-row"><span>{{ item.label }}</span><div class="dd-track" aria-hidden="true"><i style="width:{{ item.percent }}%;background:{{ item.color }}"></i></div><strong>{{ item.count }} · {{ item.percent }}%</strong></div>{% endfor %}
+      {% if not charts.total %}<p class="dd-chart-note">Sin citas registradas en este periodo.</p>{% endif %}
+    </section>
+  </div>
+  <section class="dd-panel dd-week-panel" aria-labelledby="week-chart-title"><div class="dd-heading"><div><h3 id="week-chart-title">Citas programadas · Próximos 7 días</h3><p>{{ charts.week_total }} citas aprobadas, incluyendo hoy</p></div><a class="dd-link" href="{% url 'portal_calendar_doctor' %}">Gestionar citas →</a></div>
+    <div class="dd-bars" role="list" aria-label="Citas aprobadas por día">{% for bar in charts.week %}<div class="dd-bar-column" role="listitem" aria-label="{{ bar.date|date:'l d F' }}: {{ bar.count }} citas"><strong>{{ bar.count }}</strong><div class="dd-bar-space" aria-hidden="true"><div class="dd-bar-fill" style="height:{{ bar.height }}%"></div></div><span>{{ bar.date|date:'D d' }}</span></div>{% endfor %}</div>
+    <p class="dd-chart-note">Te ayuda a identificar los días con más sesiones. Un día sin citas no implica que tengas disponibilidad configurada.</p>
+  </section>
+  <div class="dd-columns">
+    <section class="dd-panel"><div class="dd-heading"><div><h3>Próximas sesiones</h3><p>Tu agenda de atención confirmada</p></div><a class="dd-link" href="{% url 'portal_calendar_doctor' %}">Ver citas →</a></div>
+      {% for a in upcoming_sessions %}
+      <article class="dd-session"><div class="dd-date"><strong>{{ a.start_at|date:'d' }}</strong><span>{{ a.start_at|date:'M' }}</span></div><div class="dd-person"><h4>{{ a.patient.get_full_name|default:a.patient.username }}</h4><p>{{ a.start_at|date:'H:i' }} – {{ a.end_at|date:'H:i' }} · {{ a.get_modalidad_display }}</p></div><div class="dd-session-action"><span class="dd-badge">{% if a.start_at <= now %}En horario{% else %}Confirmada{% endif %}</span>{% if a.modalidad == 'online' and a.start_at <= now %}<a class="dd-link" href="{% url 'video_room' a.id %}">Entrar a sesión →</a>{% else %}<a class="dd-link" href="{% url 'notas_paciente' a.patient.id %}">Notas clínicas →</a>{% endif %}</div></article>
+      {% empty %}<div class="dd-empty"><strong>Tu agenda está libre por ahora</strong>Las citas aprobadas aparecerán aquí para que prepares tu siguiente sesión.</div>{% endfor %}
+    </section>
+    <aside>
+      <section class="dd-panel"><div class="dd-heading"><div><h3>Solicitudes de citas</h3><p>Revisa las solicitudes de tus pacientes</p></div><span class="dd-badge amber">{{ doctor_stats.pending }} pendientes</span></div>
+        {% for a in pending_requests %}<article class="dd-request"><div class="dd-request-top"><strong>{{ a.patient.get_full_name|default:a.patient.username }}</strong><span class="dd-badge amber">Pendiente</span></div><p>{{ a.start_at|date:'d M · H:i' }} · {{ a.get_modalidad_display }}</p></article>{% empty %}<div class="dd-empty"><strong>Todo al día</strong>No tienes solicitudes pendientes.</div>{% endfor %}
+        <a class="dd-button dd-wide" href="{% url 'portal_calendar_doctor' %}">Gestionar citas →</a>
+      </section>
+      <section class="dd-panel"><div class="dd-heading"><h3>Accesos rápidos</h3></div><div class="dd-shortcuts"><a class="dd-shortcut" href="{% url 'portal_chat' %}">Mensajes<span>Habla con tus pacientes</span></a><a class="dd-shortcut" href="{% url 'video_calls' %}">Videollamadas<span>Consulta tus sesiones en línea</span></a><a class="dd-shortcut" href="{% url 'mis_notas_clinicas' %}">Notas clínicas<span>Da seguimiento a tus sesiones</span></a><a class="dd-shortcut" href="{% url 'portal_calendar_doctor' %}">Disponibilidad<span>Organiza tus horarios</span></a></div></section>
+    </aside>
+  </div>
+  <p class="dd-foot">{{ doctor_stats.completed }} sesiones completadas · Gracias por brindar un espacio de atención y confianza.</p>
+</div>
+{% endblock %}

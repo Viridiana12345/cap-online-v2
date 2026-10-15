@@ -1,4 +1,5 @@
 {% extends "portal/base.html" %}
+{% load static %}
 
 {% block title %}
 Mis citas | CAP Online
@@ -1554,6 +1555,14 @@ Mis citas
     }
 
 
+    .appointment-filters{display:flex;gap:7px;overflow-x:auto;margin-bottom:16px;padding-bottom:4px;scrollbar-width:thin}
+    .appointment-filters a{flex:none;padding:8px 12px;border:1px solid var(--cita-border);border-radius:999px;color:var(--cita-muted);font-size:10px;font-weight:800;text-decoration:none}
+    .appointment-filters a.active{border-color:var(--cita-green-dark);background:var(--cita-green-dark);color:#fff}
+    .rejection-reason{margin-top:11px;padding:10px 12px;border-left:3px solid var(--cita-danger);border-radius:10px;background:var(--cita-danger-soft);color:#8c3030;font-size:11px;line-height:1.5}
+    .slot-btn.busy{border-color:#eabcbc!important;background:#fff0f0!important;color:#9b3030!important;opacity:1!important}
+    .slot-btn.busy::after{content:"Ocupado";display:block;margin-top:3px;color:#b93838;font-size:8px;font-weight:900;text-transform:uppercase}
+    .slot-btn:not(.busy):not(.past) .slot-sub{color:var(--cita-green-dark);font-weight:700}
+
     @media(max-width:390px){
 
         .slots-grid{
@@ -2017,6 +2026,14 @@ Mis citas
             <div class="card-body">
 
 
+                <nav class="appointment-filters" aria-label="Filtrar citas por estado">
+                    <a href="?status=all" class="{% if status_filter == 'all' %}active{% endif %}">Todas</a>
+                    <a href="?status=pending" class="{% if status_filter == 'pending' %}active{% endif %}">Pendientes</a>
+                    <a href="?status=approved" class="{% if status_filter == 'approved' %}active{% endif %}">Aprobadas</a>
+                    <a href="?status=rejected" class="{% if status_filter == 'rejected' %}active{% endif %}">Rechazadas</a>
+                    <a href="?status=cancelled" class="{% if status_filter == 'cancelled' %}active{% endif %}">Canceladas</a>
+                    <a href="?status=done" class="{% if status_filter == 'done' %}active{% endif %}">Completadas</a>
+                </nav>
                 <div class="history-list">
 
 
@@ -2111,6 +2128,10 @@ Mis citas
 
                             {% endif %}
 
+                            {% if a.status == 'rejected' and a.cancellation_reason %}
+                                <div class="rejection-reason"><strong>Motivo del rechazo:</strong> {{ a.cancellation_reason }}</div>
+                            {% endif %}
+
 
 
                             <!-- =============================
@@ -2145,6 +2166,7 @@ Mis citas
                                     <form
                                         method="post"
                                         action="{% url 'appointment_cancel' a.id %}"
+                                        onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta cita?');"
                                     >
 
                                         {% csrf_token %}
@@ -2189,6 +2211,7 @@ Mis citas
                                             class="reschedule-form"
                                             method="post"
                                             action="{% url 'appointment_reschedule' a.id %}"
+                                            onsubmit="return confirm('¿Deseas enviar esta nueva fecha y hora para reprogramar la cita?');"
                                         >
 
                                             {% csrf_token %}
@@ -2282,7 +2305,8 @@ Mis citas
      HORARIOS OCUPADOS DESDE DJANGO
 ===================================================== -->
 
-{{ occupied_slots_json|json_script:"occupied-slots-data" }}
+{{ schedule_data|json_script:"schedule-data" }}
+{{ empty_occupied_slots|json_script:"occupied-slots-data" }}
 
 
 
@@ -3457,6 +3481,5 @@ Mis citas
 
 
 </script>
-
-
+<script src="{% static 'portal/js/official-appointment-availability.js' %}"></script>
 {% endblock %}

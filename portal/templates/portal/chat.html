@@ -1156,6 +1156,26 @@ Chat
 
 {% block content %}
 
+<style>
+    .chat-page{max-width:1500px!important}.chat-layout{min-height:clamp(560px,calc(100dvh - 150px),900px)!important}
+    .chat-search{padding:12px 14px;border-bottom:1px solid #ddebe6}.chat-search label{position:relative;display:block}
+    .chat-search svg{position:absolute;left:12px;top:50%;width:17px;transform:translateY(-50%);fill:none;stroke:#2f6f62;stroke-width:2}
+    .chat-search input{width:100%;min-height:42px;padding:0 12px 0 39px;border:1px solid #ddebe6;border-radius:13px;background:#f4f8f6;color:#173d36;font:inherit;outline:0}
+    .chat-search input:focus{border-color:#4a9a87;box-shadow:0 0 0 3px rgba(74,154,135,.12)}
+    @media(max-width:760px){.chat-layout{min-height:calc(100dvh - 118px)!important}.chat-page{width:100%}}
+
+.chat-page .chat-hero{display:none}
+.chat-page .chat-layout{height:calc(100dvh - 180px);min-height:300px!important;max-height:850px;grid-template-rows:minmax(0,1fr)}
+.chat-page .chat-window{min-height:0;overflow:hidden}
+.chat-page .messages{flex:1;min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain;scroll-behavior:auto;overflow-anchor:none}
+.chat-page .chat-head,.chat-page .chat-compose{flex-shrink:0}
+.chat-page .chat-contacts{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.chat-page .chat-compose{position:relative;flex-wrap:wrap;background:#fff}
+.chat-send-feedback{width:100%;font-size:12px;color:#9a4944}
+.chat-send-feedback:empty{display:none}
+@media(max-width:700px){.chat-page .chat-layout{height:calc(100dvh - 160px);grid-template-rows:auto minmax(0,1fr)}.chat-page .chat-contacts{max-height:135px}}
+</style>
+
 <div class="chat-page">
 
 
@@ -1230,6 +1250,8 @@ Chat
 
             </div>
 
+            <div class="chat-search"><label><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="chatSearch" type="search" placeholder="Buscar chats" aria-label="Buscar chats"></label></div>
+
 
 
             <div class="contacts-list">
@@ -1246,6 +1268,7 @@ Chat
                         {% endif %}
                     "
                     href="{% url 'portal_chat_with' u.id %}"
+                    data-chat-contact="{{ u.get_full_name|default:u.username|lower }} {{ u.email|lower }}"
                 >
 
 
@@ -1564,193 +1587,89 @@ Chat
 
 <script>
 
-    const messageBox =
-        document.getElementById(
-            "messages"
-        );
-
-
-    /* IR AL ÚLTIMO MENSAJE */
-
-    if(messageBox){
-
-        messageBox.scrollTop =
-            messageBox.scrollHeight;
-
+(() => {
+    const box = document.getElementById('messages');
+    const form = document.querySelector('.chat-compose');
+    const input = form.querySelector('[name="text"]');
+    const button = form.querySelector('[type="submit"]');
+    const feedback = document.createElement('span');
+    feedback.setAttribute('role', 'status');
+    feedback.className = 'chat-send-feedback';
+    form.appendChild(feedback);
+    const seen = new Set([...box.querySelectorAll('[data-id]')].map(el => Number(el.dataset.id)));
+    let cursor = Math.max(0, ...seen), sending = false, polling = false;
+    box.scrollTop = box.scrollHeight;
+    function append(message, own = false) {
+        if (seen.has(message.id)) return;
+        const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+        box.querySelector('.chat-empty-thread')?.remove();
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble' + (message.sender_id === {{ user.id }} ? ' me' : '');
+        bubble.dataset.id = message.id;
+        const text = document.createElement('div');
+        text.textContent = message.text;
+        const time = document.createElement('div');
+        time.className = 'message-time';
+        time.textContent = new Date(message.created_at).toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+        bubble.append(text, time);
+        // A send can finish before a pending poll: keep server ID order.
+        const next = [...box.querySelectorAll('[data-id]')].find(el => Number(el.dataset.id) > message.id);
+        box.insertBefore(bubble, next || null);
+        seen.add(message.id);
+        if (own || nearBottom) box.scrollTop = box.scrollHeight;
     }
-
-
-
-    /* ÚLTIMO ID */
-
-    let lastMessageId = 0;
-
-
-    document
-    .querySelectorAll(
-        "[data-id]"
-    )
-    .forEach(
-        function(element){
-
-            lastMessageId =
-                Math.max(
-                    lastMessageId,
-                    Number(
-                        element.dataset.id
-                    )
-                );
-
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (sending || !input.value.trim()) return;
+        const draft = input.value;
+        sending = true;
+        button.disabled = true;
+        feedback.textContent = '';
+        try {
+            const response = await fetch('{% url "chat_send_api" receiver.id %}', {
+                method:'POST', credentials:'same-origin', body:new FormData(form),
+                headers:{'X-CSRFToken':form.querySelector('[name="csrfmiddlewaretoken"]').value}
+            });
+            if (!response.ok) throw new Error('send');
+            const data = await response.json();
+            append(data.message, true);
+            if (input.value === draft) input.value = '';
+            input.focus({preventScroll:true});
+        } catch (_) {
+            feedback.textContent = 'No se pudo confirmar el env\u00edo. Tu texto se conserva; revisa la conversaci\u00f3n antes de reintentar.';
+        } finally {
+            sending = false;
+            button.disabled = false;
         }
-    );
-
-
-
-    /* =====================================================
-       CREAR MENSAJE NUEVO
-    ====================================================== */
-
-    function appendMessage(message){
-
-        const element =
-            document.createElement(
-                "div"
-            );
-
-
-        element.className =
-            "bubble "
-            +
-            (
-                message.sender_id === {{ user.id }}
-                ?
-                "me"
-                :
-                ""
-            );
-
-
-        element.dataset.id =
-            message.id;
-
-
-
-        const text =
-            document.createElement(
-                "div"
-            );
-
-
-        text.textContent =
-            message.text;
-
-
-
-        const time =
-            document.createElement(
-                "div"
-            );
-
-
-        time.className =
-            "message-time";
-
-
-        time.textContent =
-            message.created_at
-            ?
-            message.created_at
-            :
-            "";
-
-
-
-        element.appendChild(
-            text
-        );
-
-
-        element.appendChild(
-            time
-        );
-
-
-        messageBox.appendChild(
-            element
-        );
-
-
-        lastMessageId =
-            Math.max(
-                lastMessageId,
-                message.id
-            );
-
-
-        messageBox.scrollTop =
-            messageBox.scrollHeight;
-
+    });
+    async function poll() {
+        if (polling) return;
+        polling = true;
+        try {
+            const response = await fetch('{% url "chat_thread_api" receiver.id %}?after=' + cursor, {credentials:'same-origin', cache:'no-store'});
+            if (!response.ok) return;
+            const data = await response.json();
+            for (const message of data.messages || []) {
+                append(message);
+                cursor = Math.max(cursor, message.id);
+            }
+        } catch (_) { /* Retry on the next poll without moving the page. */ }
+        finally { polling = false; }
     }
-
-
-
-    /* =====================================================
-       ACTUALIZACIÓN AUTOMÁTICA
-    ====================================================== */
-
-    setInterval(
-
-        async function(){
-
-            try{
-
-                const response =
-                    await fetch(
-                        '{% url "chat_thread_api" receiver.id %}?after='
-                        +
-                        lastMessageId
-                    );
-
-
-                if(!response.ok){
-
-                    return;
-
-                }
-
-
-                const data =
-                    await response.json();
-
-
-                for(
-                    const message
-                    of
-                    data.messages || []
-                ){
-
-                    appendMessage(
-                        message
-                    );
-
-                }
-
-            }
-
-            catch(error){
-
-                /* evitamos romper el chat */
-
-            }
-
-        },
-
-        2500
-
-    );
+    const timer = setInterval(poll, 2500);
+    window.addEventListener('pagehide', () => clearInterval(timer), {once:true});
+})();
 
 </script>
 
 {% endif %}
+
+<script>
+(() => {
+    const search=document.getElementById('chatSearch');
+    if(!search)return;
+    search.addEventListener('input',()=>{const value=search.value.trim().toLocaleLowerCase('es');document.querySelectorAll('[data-chat-contact]').forEach(contact=>{contact.hidden=value&&!contact.dataset.chatContact.includes(value)})});
+})();
+</script>
 
 {% endblock %}

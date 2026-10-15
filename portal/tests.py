@@ -1,9 +1,11 @@
 from urllib.parse import urlsplit
 from datetime import timedelta
+from io import BytesIO
 from unittest.mock import patch
 
 import cloudinary
 from cloudinary import CloudinaryResource
+from PIL import Image
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core import mail
@@ -19,14 +21,6 @@ from .forms import SecureSetPasswordForm
 User = get_user_model()
 
 
-ONE_PIXEL_PNG = (
-    b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01"
-    b"\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89"
-    b"\x00\x00\x00\rIDAT\x08\xd7c\xf8\xcf\xc0\xf0\x1f\x00\x05"
-    b"\x00\x01\xff\x89\x99=\x1d\x00\x00\x00\x00IEND\xaeB`\x82"
-)
-
-
 class DoctorPhotoCloudinaryTests(TestCase):
     def setUp(self):
         cloudinary.config(cloud_name="cap-online-tests", secure=True)
@@ -40,7 +34,9 @@ class DoctorPhotoCloudinaryTests(TestCase):
 
     @staticmethod
     def uploaded_photo():
-        return SimpleUploadedFile("doctora.png", ONE_PIXEL_PNG, content_type="image/png")
+        image_bytes = BytesIO()
+        Image.new("RGB", (2, 2), color="#2e9b8e").save(image_bytes, format="PNG")
+        return SimpleUploadedFile("doctora.png", image_bytes.getvalue(), content_type="image/png")
 
     @staticmethod
     def cloudinary_result():
@@ -119,6 +115,24 @@ class DoctorPhotoCloudinaryTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "https://res.cloudinary.com/")
 
+    @patch("cloudinary.models.uploader.upload_resource")
+    def test_custom_doctor_form_handles_cloudinary_failure_without_partial_user(self, upload_resource):
+        upload_resource.side_effect = ValueError("Must supply api_secret")
+        response = self.client.post(reverse("doctor_create"), {
+            "first_name": "Doctora",
+            "last_name": "Temporal",
+            "email": "cloud-error@example.com",
+            "password": "CloudTest123!",
+            "password2": "CloudTest123!",
+            "especialidad": "Psicología clínica",
+            "cedula": "CLOUD-ERROR",
+            "foto": self.uploaded_photo(),
+            "activo": "on",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No pudimos subir la fotografía")
+        self.assertFalse(User.objects.filter(email="cloud-error@example.com").exists())
+
 
 class BaseStabilityTests(TestCase):
     def test_removed_admin_route_cannot_create_users(self):
@@ -172,7 +186,29 @@ class BaseStabilityTests(TestCase):
                 self.assertEqual(doctor.biografia, "Perfil actualizado")
 
 
+@override_settings(TWILIO_ACCOUNT_SID="", TWILIO_API_KEY="", TWILIO_API_SECRET="")
 class VideoCallsTests(TestCase):
+    @patch("portal.webrtc.get_twilio_ice_servers")
+    @override_settings(TWILIO_ACCOUNT_SID="account-test", TWILIO_API_KEY="key-test", TWILIO_API_SECRET="secret-test")
+    def test_twilio_servers_reach_authorized_room(self, get_servers):
+        get_servers.return_value = [{"urls": "turn:example.org", "username": "temp", "credential": "temp-pass"}]
+        self.client.force_login(self.patient)
+        response = self.client.get(reverse("video_room", args=[self.appointment.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["rtc_config"]["iceServers"], get_servers.return_value)
+        self.assertNotContains(response, "secret-test")
+        self.assertIn("no-store", response.headers["Cache-Control"])
+
+    @patch("portal.webrtc.rtc_configuration")
+    def test_turn_failure_does_not_start_call(self, config):
+        from .webrtc import TurnUnavailable
+        config.side_effect = TurnUnavailable("private provider detail")
+        self.client.force_login(self.patient)
+        response = self.client.get(reverse("video_room", args=[self.appointment.id]))
+        self.assertEqual(response.status_code, 503)
+        self.assertNotContains(response, "private provider detail", status_code=503)
+        self.assertFalse(VideoCall.objects.filter(appointment=self.appointment).exists())
+
     def setUp(self):
         patient_group = Group.objects.create(name="Pacientes")
         doctor_group, _ = Group.objects.get_or_create(name="Doctores")
@@ -182,7 +218,7 @@ class VideoCallsTests(TestCase):
         self.doctor = User.objects.create_user("doctor-calls", email="doctor-calls@example.com")
         self.doctor.groups.add(doctor_group)
         DoctorProfile.objects.create(user=self.doctor, especialidad="Psicología", cedula="CALL-1")
-        start = timezone.now() + timedelta(days=1)
+        start = timezone.now() - timedelta(minutes=15)
         self.appointment = Appointment.objects.create(
             patient=self.patient, doctor=self.doctor, start_at=start,
             end_at=start + timedelta(hours=1), modalidad="online", status="approved",
@@ -193,6 +229,18 @@ class VideoCallsTests(TestCase):
         response = self.client.get(reverse("video_calls"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, reverse("video_room", args=[self.appointment.id]))
+
+    def test_future_video_call_cannot_be_opened_early(self):
+        future_start = timezone.now() + timedelta(days=1)
+        future = Appointment.objects.create(
+            patient=self.patient, doctor=self.doctor, start_at=future_start,
+            end_at=future_start + timedelta(hours=1), modalidad="online", status="approved",
+        )
+        self.client.force_login(self.patient)
+        listing = self.client.get(reverse("video_calls"))
+        self.assertContains(listing, "No disponible")
+        self.assertContains(listing, "Disponible el")
+        self.assertEqual(self.client.get(reverse("video_room", args=[future.id])).status_code, 403)
 
     def test_unrelated_patient_cannot_enter_video_call(self):
         other = User.objects.create_user("other-patient")
