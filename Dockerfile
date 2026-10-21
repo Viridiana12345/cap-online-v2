@@ -11,4 +11,4 @@ COPY . .
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-CMD sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn cap_online.wsgi:application --bind 0.0.0.0:${PORT:-8000}"
+CMD sh -c "python manage.py migrate && python manage.py bootstrap_admin && python manage.py collectstatic --noinput && exec gunicorn cap_online.wsgi:application --bind 0.0.0.0:${PORT:-8000}"
